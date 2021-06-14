@@ -1,0 +1,32 @@
+{
+    "nameFlagDescription": "name to print",
+    "errorNoOrgResults": "No results found for the org '%s'.",
+    "setup": {
+        "cmdDescription": "Setup a devhub and scratch org from start to finish with one command",
+        "resetAllDescription": "Reset org clearing all devhub and scratch orgs and sdb",
+        "logScratchOrgNumber": "Scratch Org Number flag set to: %s - this means all scratch orgs in %s will be created",
+        "logStoreNumber": "Store Number flag set to: %s - this means all stores in %s will be created",
+        "promptResultN": "n",
+        "errorScratchOrgCreate": "Scratch Org with Admin username %s failed for ScratchOrgCreate",
+        "errorStoreCreate": "Store %s with Scratch Org Admin %s failed for StoreCreate",
+        "errorPaymentsQuickstartSetup": "Store %s with Scratch Org Admin %s failed for PaymentsQuickstartSetup"
+    },
+    "downloads": {
+        "hookRunning": "example init hook running before %s"
+    },
+    "shell": {
+        "errorCheck": "TypeError: Converting circular structure to JSON",
+        "noResultsForCommand": "No results for command: \n"
+    },
+    "jsonUtils": {
+        "parseConfigExample": "Configuration file not specified, defaulting to %s\nExample usage if you want an alternative configuration: -c dev-hub-configuration.steam.json\n",
+        "errorScratchOrgNumber": "scratch-org-number=%s, but config file only has %s scratch org(s).  Indexes are 0 based",
+        "errorStoreNumber": "store-number=%s, but config file only has %s stores.  Indexes are 0 based"
+    },
+    "requires": {
+        "errorNotEnoughDiskSpace": "'Not enough disk space required: %s GB got: %s",
+        "errorSfmConnectionError": "CONNECTION_ERROR: Can't connect to git soma - are you tmp auth'd?",
+        "errorServerConnectionError": "CONNECTION_ERROR: Can't connect to server at %s - make sure core is running\n%s",
+        "errorStep": "STEP_ERROR: Status file indicates required step: ${step} not completed yet"
+    }
+}

@@ -1,0 +1,24 @@
+{
+    "orgName": "My Test B2B Company",
+    "edition": "Developer",
+    "features": ["Communities", "B2BCommerce", "OrderManagement", "EnableSetPasswordInApi"],
+    "settings": {
+        "lightningExperienceSettings": {
+            "enableS1DesktopEnabled": true
+        },
+        "experienceBundleSettings": {
+            "enableExperienceBundleMetadata": true
+        },
+        "communitiesSettings": {
+            "enableNetworksEnabled": true
+        },
+        "orderManagementSettings": {
+            "enableOrderManagement": true
+        },
+        "orderSettings": {
+            "enableOrders": true,
+            "enableEnhancedCommerceOrders": true,
+            "enableOptionalPricebook": true
+        }
+    }
+}

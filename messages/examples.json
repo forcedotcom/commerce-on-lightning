@@ -1,0 +1,10 @@
+{
+  "convertFlags": {
+    "configFileDescription": "config file",
+    "outputDirDescription": "Directory to output the conversion",
+    "convertDescription": "Files to convert"
+  },
+  "convert": {
+    "cmdDescription": "Convert Examples to SFDX"
+  }
+}

@@ -1,0 +1,28 @@
+{
+    "storeName": "Test B2C Company",
+    "edition": "B2C",
+    "template": "b2c-lite-storefront",
+    "features": [
+        "GuestUser"
+    ],
+    "settings": {
+        "checkout": {
+            "paymentGatewayIntegration": "Salesforce",
+            "integrations": true,
+            "orderConfirmationEmailFlow": true
+        },
+        "users": {
+            "buyerUserProfileSetup": true,
+            "sharingSettingsSetup": true
+        },
+        "diagnostic": {
+            "commerceDiagnosticEventSetup": true
+        },
+        "cspTrustedSites": {
+            "amazonaws": true
+        },
+        "productImport": [
+            "Alpine-small.csv"
+        ]
+    }
+}

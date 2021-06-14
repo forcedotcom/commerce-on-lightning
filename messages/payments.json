@@ -1,0 +1,18 @@
+{
+  "paymentsFlags": {
+    "paymentAdapterDescription": "Payment Adapter"
+  },
+  "quickstart": {
+    "setup": {
+      "cmdDescription": "This script will set up all the required parts for using a new Payment Gateway",
+      "settingUpGatewayConvertingNamedCredentialsGatewayAdapterApex": "Setting up %s Gateway\n\"Converting Named Credentials and Gateway Adapter Apex for SFDX use...\"",
+      "pushingNamedCredentialsAndGatewayAdapterApexToOrg": "Pushing Named Credentials and Gateway Adapter Apex to org...",
+      "errorNoResultsForQuery": "No results found for query: ",
+      "creatingPaymentGatewayProviderRecordUsing": "Creating PaymentGatewayProvider record using ",
+      "CreatingPaymentGatewayRecordUsingMerchantCredentialIdPaymentGatewayProviderId": "Creating PaymentGateway record using MerchantCredentialId=%s, PaymentGatewayProviderId=%s.",
+      "theStoreMappingAlreadyExistsDeletingOldMpping": "StoreMapping already exists.  Deleting old mapping.",
+      "creatingStoreIntegratedServiceUsingStoreIntegration": "Creating StoreIntegratedService using the %s store and Integration=%s (%s)",
+      "namedCredentialWasCreatedUpdateItWithValidUsernamePassword": "A Named Credential has been set up for you.  Please update it to use a valid username and password."
+    }
+  }
+}

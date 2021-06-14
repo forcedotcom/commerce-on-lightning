@@ -1,0 +1,119 @@
+[
+    {
+        "command": "commerce:examples:convert",
+        "plugin": "commerce",
+        "flags": [
+            "convert",
+            "definitionfile",
+            "json",
+            "loglevel",
+            "outputdir",
+            "store-name",
+            "type"
+        ]
+    },
+    {
+        "command": "commerce:payments:quickstart:setup",
+        "plugin": "commerce",
+        "flags": [
+            "apiversion",
+            "json",
+            "loglevel",
+            "payment-adapter",
+            "store-name",
+            "targetusername"
+        ]
+    },
+    {
+        "command": "commerce:products:import",
+        "plugin": "commerce",
+        "flags": [
+            "apiversion",
+            "definitionfile",
+            "json",
+            "loglevel",
+            "products-file-csv",
+            "store-name",
+            "targetdevhubusername",
+            "targetusername",
+            "type"
+        ]
+    },
+    {
+        "command": "commerce:store:create",
+        "plugin": "commerce",
+        "flags": [
+            "apiversion",
+            "buyer-username",
+            "definitionfile",
+            "json",
+            "loglevel",
+            "store-name",
+            "targetdevhubusername",
+            "targetusername",
+            "templatename",
+            "type"
+        ]
+    },
+    {
+        "command": "commerce:store:quickstart:create",
+        "plugin": "commerce",
+        "flags": [
+            "apiversion",
+            "json",
+            "loglevel",
+            "store-name",
+            "targetusername",
+            "templatename"
+        ]
+    },
+    {
+        "command": "commerce:store:quickstart:setup",
+        "plugin": "commerce",
+        "flags": [
+            "apiversion",
+            "definitionfile",
+            "json",
+            "loglevel",
+            "store-name",
+            "targetdevhubusername",
+            "targetusername"
+        ]
+    },
+    {
+        "command": "commerce:store:view",
+        "plugin": "commerce",
+        "flags": [
+            "apiversion",
+            "json",
+            "loglevel",
+            "store-name",
+            "targetdevhubusername",
+            "targetusername"
+        ]
+    },
+    {
+        "command": "commerce:store:view:all",
+        "plugin": "commerce",
+        "flags": [
+            "apiversion",
+            "json",
+            "loglevel",
+            "targetusername"
+        ]
+    },
+    {
+        "command": "commerce:store:view:info",
+        "plugin": "commerce",
+        "flags": [
+            "apiversion",
+            "buyer-username",
+            "json",
+            "loglevel",
+            "store-name",
+            "targetdevhubusername",
+            "targetusername",
+            "urlpathprefix"
+        ]
+    }
+]

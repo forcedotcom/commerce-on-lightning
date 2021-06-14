@@ -1,0 +1,21 @@
+{
+    "productsFlags": {
+        "productsFileCsvDescription": "The csv file containing products to import.  Pass in empty value to do product-less import"
+    },
+    "import": {
+        "cmdDescription": "Amend files needed to fill out Product data and import Products and related data to make store functional",
+        "importingProducts": "Importing products.",
+        "uploading": "Uploading...",
+        "uploadedStringWithResult": "Uploaded %s with result: ",
+        "somethingWentWrongNoImportFileId'": "Something went wrong - no import file id",
+        "importingProductsImportFileIdAndStoreId": "Importing products ImportFileId: %s and storeId: %s",
+        "doneImportingProductsRes": "Done importing products, got results: \n",
+        "failedToImportProductsStringDoingProductlessImport": "Failed to import Products...\n$s\n\nDoing product-less import",
+        "failedNoBuyerGroupName": "Failed No BuyerGroupName",
+        "somethingWentWrongNoBuyerGroupName": "Something went wrong, no buyerGroupName",
+        "doingProductlessImport": "Doing Product-less import",
+        "getStandardPricebooksForStoreReplaceJsonFiles": "Get Standard Pricebooks for Store and replace in json files",
+        "alreadyExists": "already exists",
+        "productWithSKUAlreadyExists.": "A Product with this SKU already exists."
+    }
+}
