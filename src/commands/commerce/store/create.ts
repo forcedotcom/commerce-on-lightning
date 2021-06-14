@@ -48,7 +48,7 @@ export class StoreCreate extends SfdxCommand {
         StoreQuickstartSetup.vargsAllowList
     );
     public static description = msgs.getMessage('create.cmdDescription');
-    public static examples = [`sfdx ${CMD} --configuration devhub-configuration.json`];
+    public static examples = [`sfdx ${CMD}`];
     protected static flagsConfig = filterFlags(
         ['store-name', 'scratch-org-buyer-username', 'templatename', 'definitionfile', 'type', 'buyer-username'],
         allFlags

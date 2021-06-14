@@ -24,7 +24,7 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static description = msgs.getMessage('quickstart.setup.cmdDescription');
 
-    public static examples = [`sfdx ${CMD} --configuration devhub-configuration.json`]; // TODO documentation including examples and descriptions
+    public static examples = [`sfdx ${CMD}`]; // TODO documentation including examples and descriptions
     protected static flagsConfig = {
         ...paymentsFlags,
         ...filterFlags(['store-name'], storeFlags),

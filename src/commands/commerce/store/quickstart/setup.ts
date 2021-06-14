@@ -60,7 +60,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         'communityExperienceBundleName',
     ];
 
-    public static examples = [`sfdx ${CMD} --configuration devhub-configuration.json`];
+    public static examples = [`sfdx ${CMD}`];
 
     protected static flagsConfig = {
         ...filterFlags(['store-name', 'definitionfile'], allFlags),

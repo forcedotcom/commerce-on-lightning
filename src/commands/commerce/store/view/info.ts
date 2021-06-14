@@ -26,7 +26,7 @@ export class StoreViewInfo extends SfdxCommand {
     public static readonly requiresDevhubUsername = true;
     public static description = messages.getMessage('view.info.cmdDescription');
 
-    public static examples = [`sfdx ${CMD} --configuration devhub-configuration.json`]; // TODO documentation including examples and descriptions
+    public static examples = [`sfdx ${CMD}`]; // TODO documentation including examples and descriptions
     protected static flagsConfig = filterFlags(['store-name', 'buyer-username', 'urlpathprefix'], allFlags);
     public org: Org;
     private statusFileManager: StatusFileManager;

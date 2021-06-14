@@ -113,11 +113,11 @@ OPTIONS
   -e, --convert=convert                                                             Files to convert
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    /Users/jarndt/.commerce/config/store
+                                                                                    ~/.commerce/config/store
                                                                                     -scratch-def.json] config file
 
   -o, --outputdir=outputdir                                                         [default:
-                                                                                    /Users/jarndt/.commerce/force-app]
+                                                                                    ~/.commerce/force-app]
                                                                                     Directory to output the conversion
 
   -s, --store-name=store-name                                                       [default: 1commerce] name of the
@@ -159,7 +159,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:payments:quickstart:setup --configuration devhub-configuration.json
+  sfdx commerce:payments:quickstart:setup
 ```
 
 ## `sfdx commerce:products:import [-c <string>] [-f <filepath>] [-d <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
@@ -173,14 +173,14 @@ USAGE
 
 OPTIONS
   -c, --products-file-csv=products-file-csv
-      [default: /Users/jarndt/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass 
+      [default: ~/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass 
       in empty value to do product-less import
 
   -d, --type=b2c|b2b
       [default: b2c] The type of store you want to create
 
   -f, --definitionfile=definitionfile
-      [default: /Users/jarndt/.commerce/config/store-scratch-def.json] config file
+      [default: ~/.commerce/config/store-scratch-def.json] config file
 
   -s, --store-name=store-name
       [default: 1commerce] name of the site to create
@@ -222,7 +222,7 @@ OPTIONS
                                                                                     want to create
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    /Users/jarndt/.commerce/config/store
+                                                                                    ~/.commerce/config/store
                                                                                     -scratch-def.json] config file
 
   -s, --store-name=store-name                                                       [default: 1commerce] name of the
@@ -246,7 +246,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:create --configuration devhub-configuration.json
+  sfdx commerce:store:create
 ```
 
 ## `sfdx commerce:store:quickstart:create [-t <string>] [-s <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
@@ -291,7 +291,7 @@ USAGE
 
 OPTIONS
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    /Users/jarndt/.commerce/config/store
+                                                                                    ~/.commerce/config/store
                                                                                     -scratch-def.json] config file
 
   -s, --store-name=store-name                                                       [default: 1commerce] name of the
@@ -312,7 +312,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:quickstart:setup --configuration devhub-configuration.json
+  sfdx commerce:store:quickstart:setup
 ```
 
 ## `sfdx commerce:store:view [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
@@ -407,7 +407,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:view:info --configuration devhub-configuration.json
+  sfdx commerce:store:view:info
 ```
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->

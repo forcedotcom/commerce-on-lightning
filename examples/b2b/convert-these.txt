@@ -1,6 +1,5 @@
 # Comment out the modules that you don't want to setup in your org
 # This is the list of converted modules for all orgs
-# for org specific modules add to devhub-configuration.json file
 # $EXAMPLE_DIR will get replaced with examples directory
 
 $EXAMPLE_DIR/checkout/payment-gateway-integration/Salesforce/
