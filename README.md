@@ -87,23 +87,22 @@ sfdx plugins
 ## Commands
 
 <!-- commands -->
-* [`sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-e <string>] [-o <string>] [-s <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceexamplesconvert--f-filepath--d-string--e-string--o-string--s-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:payments:quickstart:setup [-p <string>] [-s <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercepaymentsquickstartsetup--p-string--s-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceproductsimport--c-string--f-filepath--o-string--s-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorecreate-namevalue--f-filepath--o-string--t-string--b-string--s-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:quickstart:create [-t <string>] [-s <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorequickstartcreate--t-string--s-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorequickstartsetup-namevalue--f-filepath--s-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:view [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoreview--s-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:view:all [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoreviewall--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:view:info [-b <string>] [-s <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoreviewinfo--b-string--s-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-p <string>] [-o <string>] [-n <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceexamplesconvert--f-filepath--d-string--p-string--o-string--n-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:payments:quickstart:setup [-p <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercepaymentsquickstartsetup--p-string--n-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceproductsimport--c-string--f-filepath--o-string--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorecreate-namevalue--f-filepath--o-string--t-string--b-string--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:store:display [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoredisplay--b-string--n-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:store:open [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoreopen--b-string--n-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:store:quickstart:create [-t <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorequickstartcreate--t-string--n-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorequickstartsetup-namevalue--f-filepath--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-e <string>] [-o <string>] [-s <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-p <string>] [-o <string>] [-n <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Convert Examples to SFDX
 
 ```
 USAGE
-  $ sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-e <string>] [-o <string>] [-s <string>] [--json] 
+  $ sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-p <string>] [-o <string>] [-n <string>] [--json] 
   [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -111,17 +110,17 @@ OPTIONS
                                                                                     ~/.commerce/force-app]
                                                                                     Directory to output the conversion
 
-  -e, --convert=convert                                                             Files to convert
-
   -f, --definitionfile=definitionfile                                               [default:
                                                                                     ~/.commerce/config/store
                                                                                     -scratch-def.json] config file
 
+  -n, --store-name=store-name                                                       [default: 1commerce] name of the
+                                                                                    site to create
+
   -o, --type=b2c|b2b                                                                [default: b2c] The type of store you
                                                                                     want to create
 
-  -s, --store-name=store-name                                                       [default: 1commerce] name of the
-                                                                                    site to create
+  -p, --sourcepath=sourcepath                                                       Files to convert
 
   --json                                                                            format output as json
 
@@ -132,20 +131,20 @@ EXAMPLE
   sfdx commerce:examples:convert -f store-scratch-def.json
 ```
 
-## `sfdx commerce:payments:quickstart:setup [-p <string>] [-s <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx commerce:payments:quickstart:setup [-p <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 This script will set up all the required parts for using a new Payment Gateway
 
 ```
 USAGE
-  $ sfdx commerce:payments:quickstart:setup [-p <string>] [-s <string>] [-u <string>] [--apiversion <string>] [--json] 
+  $ sfdx commerce:payments:quickstart:setup [-p <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] 
   [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
-  -p, --payment-adapter=payment-adapter                                             [default: Stripe] Payment Adapter
-
-  -s, --store-name=store-name                                                       [default: 1commerce] name of the
+  -n, --store-name=store-name                                                       [default: 1commerce] name of the
                                                                                     site to create
+
+  -p, --payment-adapter=payment-adapter                                             [default: Stripe] Payment Adapter
 
   -u, --targetusername=targetusername                                               username or alias for the target
                                                                                     org; overrides default target org
@@ -162,13 +161,13 @@ EXAMPLE
   sfdx commerce:payments:quickstart:setup -p Stripe
 ```
 
-## `sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Amend files needed to fill out Product data and import Products and related data to make store functional
 
 ```
 USAGE
-  $ sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-s <string>] [-v <string>] [-u <string>] 
+  $ sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-n <string>] [-v <string>] [-u <string>] 
   [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -179,11 +178,11 @@ OPTIONS
   -f, --definitionfile=definitionfile
       [default: ~/.commerce/config/store-scratch-def.json] config file
 
+  -n, --store-name=store-name
+      [default: 1commerce] name of the site to create
+
   -o, --type=b2c|b2b
       [default: b2c] The type of store you want to create
-
-  -s, --store-name=store-name
-      [default: 1commerce] name of the site to create
 
   -u, --targetusername=targetusername
       username or alias for the target org; overrides default target org
@@ -204,13 +203,13 @@ EXAMPLE
   sfdx commerce:products:import --store-name test-store
 ```
 
-## `sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Create a store
 
 ```
 USAGE
-  $ sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-s <string>] 
+  $ sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-n <string>] 
   [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
@@ -222,11 +221,11 @@ OPTIONS
                                                                                     ~/.commerce/config/store
                                                                                     -scratch-def.json] config file
 
+  -n, --store-name=store-name                                                       [default: 1commerce] name of the
+                                                                                    site to create
+
   -o, --type=b2c|b2b                                                                [default: b2c] The type of store you
                                                                                     want to create
-
-  -s, --store-name=store-name                                                       [default: 1commerce] name of the
-                                                                                    site to create
 
   -t, --templatename=templatename                                                   [default: b2c-lite-storefront]
                                                                                     template to use to create a site
@@ -249,17 +248,96 @@ EXAMPLE
   sfdx commerce:store:create --store-name test-store
 ```
 
-## `sfdx commerce:store:quickstart:create [-t <string>] [-s <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx commerce:store:display [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+
+View Store
+
+```
+USAGE
+  $ sfdx commerce:store:display [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion 
+  <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
+
+OPTIONS
+  -b, --buyer-username=buyer-username                                               [default: buyer@1commerce.com]
+                                                                                    buyer's username
+
+  -n, --store-name=store-name                                                       [default: 1commerce] name of the
+                                                                                    site to create
+
+  -p, --urlpathprefix=urlpathprefix                                                 required if different from
+                                                                                    store-name URL to append to the
+                                                                                    domain created when Experiences was
+                                                                                    enabled for this org
+
+  -u, --targetusername=targetusername                                               username or alias for the target
+                                                                                    org; overrides default target org
+
+  -v, --targetdevhubusername=targetdevhubusername                                   username or alias for the dev hub
+                                                                                    org; overrides default dev hub org
+
+  --apiversion=apiversion                                                           override the api version used for
+                                                                                    api requests made by this command
+
+  --json                                                                            format output as json
+
+  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)  [default: warn] logging level for
+                                                                                    this command invocation
+
+EXAMPLE
+  sfdx commerce:store:display --store-name test-store
+```
+
+## `sfdx commerce:store:open [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+
+View Store
+
+```
+USAGE
+  $ sfdx commerce:store:open [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion 
+  <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
+
+OPTIONS
+  -b, --buyer-username=buyer-username                                               [default: buyer@1commerce.com]
+                                                                                    buyer's username
+
+  -n, --store-name=store-name                                                       [default: 1commerce] name of the
+                                                                                    site to create
+
+  -p, --urlpathprefix=urlpathprefix                                                 required if different from
+                                                                                    store-name URL to append to the
+                                                                                    domain created when Experiences was
+                                                                                    enabled for this org
+
+  -u, --targetusername=targetusername                                               username or alias for the target
+                                                                                    org; overrides default target org
+
+  -v, --targetdevhubusername=targetdevhubusername                                   username or alias for the dev hub
+                                                                                    org; overrides default dev hub org
+
+  --apiversion=apiversion                                                           override the api version used for
+                                                                                    api requests made by this command
+
+  --json                                                                            format output as json
+
+  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)  [default: warn] logging level for
+                                                                                    this command invocation
+
+EXAMPLES
+  sfdx commerce:store:open --store-name test-store
+  sfdx commerce:store:open --all
+```
+
+## `sfdx commerce:store:quickstart:create [-t <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Quickstart various create store
 
 ```
 USAGE
-  $ sfdx commerce:store:quickstart:create [-t <string>] [-s <string>] [-u <string>] [--apiversion <string>] [--json] 
+  $ sfdx commerce:store:quickstart:create [-t <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] 
   [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
-  -s, --store-name=store-name                                                       [default: 1commerce] name of the
+  -n, --store-name=store-name                                                       [default: 1commerce] name of the
                                                                                     site to create
 
   -t, --templatename=templatename                                                   [default: b2c-lite-storefront]
@@ -280,13 +358,13 @@ EXAMPLE
   sfdx commerce:store:quickstart:create --templatename 'b2c-lite-storefront'
 ```
 
-## `sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Quickstart various store setup
 
 ```
 USAGE
-  $ sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-s <string>] [-v <string>] [-u <string>] 
+  $ sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-n <string>] [-v <string>] [-u <string>] 
   [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -294,7 +372,7 @@ OPTIONS
                                                                                     ~/.commerce/config/store
                                                                                     -scratch-def.json] config file
 
-  -s, --store-name=store-name                                                       [default: 1commerce] name of the
+  -n, --store-name=store-name                                                       [default: 1commerce] name of the
                                                                                     site to create
 
   -u, --targetusername=targetusername                                               username or alias for the target
@@ -313,101 +391,6 @@ OPTIONS
 
 EXAMPLE
   sfdx commerce:store:quickstart:setup --definitionfile store-scratch-def.json
-```
-
-## `sfdx commerce:store:view [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
-
-View Store
-
-```
-USAGE
-  $ sfdx commerce:store:view [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
-  trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
-
-OPTIONS
-  -s, --store-name=store-name                                                       [default: 1commerce] name of the
-                                                                                    site to create
-
-  -u, --targetusername=targetusername                                               username or alias for the target
-                                                                                    org; overrides default target org
-
-  -v, --targetdevhubusername=targetdevhubusername                                   username or alias for the dev hub
-                                                                                    org; overrides default dev hub org
-
-  --apiversion=apiversion                                                           override the api version used for
-                                                                                    api requests made by this command
-
-  --json                                                                            format output as json
-
-  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)  [default: warn] logging level for
-                                                                                    this command invocation
-
-EXAMPLE
-  sfdx commerce:store:view --store-name test-store
-```
-
-## `sfdx commerce:store:view:all [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
-
-View all stores
-
-```
-USAGE
-  $ sfdx commerce:store:view:all [-u <string>] [--apiversion <string>] [--json] [--loglevel 
-  trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
-
-OPTIONS
-  -u, --targetusername=targetusername                                               username or alias for the target
-                                                                                    org; overrides default target org
-
-  --apiversion=apiversion                                                           override the api version used for
-                                                                                    api requests made by this command
-
-  --json                                                                            format output as json
-
-  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)  [default: warn] logging level for
-                                                                                    this command invocation
-
-EXAMPLE
-  sfdx commerce:store:view:all -u demo@1commerce.com
-```
-
-## `sfdx commerce:store:view:info [-b <string>] [-s <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
-
-Get store view info
-
-```
-USAGE
-  $ sfdx commerce:store:view:info [-b <string>] [-s <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion 
-  <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
-
-OPTIONS
-  -b, --buyer-username=buyer-username                                               [default: buyer@1commerce.com]
-                                                                                    buyer's username
-
-  -p, --urlpathprefix=urlpathprefix                                                 required if different from
-                                                                                    store-name URL to append to the
-                                                                                    domain created when Experiences was
-                                                                                    enabled for this org
-
-  -s, --store-name=store-name                                                       [default: 1commerce] name of the
-                                                                                    site to create
-
-  -u, --targetusername=targetusername                                               username or alias for the target
-                                                                                    org; overrides default target org
-
-  -v, --targetdevhubusername=targetdevhubusername                                   username or alias for the dev hub
-                                                                                    org; overrides default dev hub org
-
-  --apiversion=apiversion                                                           override the api version used for
-                                                                                    api requests made by this command
-
-  --json                                                                            format output as json
-
-  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)  [default: warn] logging level for
-                                                                                    this command invocation
-
-EXAMPLE
-  sfdx commerce:store:view:info --buyer-username testbuyer@1commere.com
 ```
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
