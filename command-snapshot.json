@@ -73,6 +73,7 @@
         "command": "commerce:store:open",
         "plugin": "commerce",
         "flags": [
+            "all",
             "apiversion",
             "buyer-username",
             "json",
