@@ -3,11 +3,11 @@
         "command": "commerce:examples:convert",
         "plugin": "commerce",
         "flags": [
-            "convert",
             "definitionfile",
             "json",
             "loglevel",
             "outputdir",
+            "sourcepath",
             "store-name",
             "type"
         ]
@@ -56,6 +56,34 @@
         ]
     },
     {
+        "command": "commerce:store:display",
+        "plugin": "commerce",
+        "flags": [
+            "apiversion",
+            "buyer-username",
+            "json",
+            "loglevel",
+            "store-name",
+            "targetdevhubusername",
+            "targetusername",
+            "urlpathprefix"
+        ]
+    },
+    {
+        "command": "commerce:store:open",
+        "plugin": "commerce",
+        "flags": [
+            "apiversion",
+            "buyer-username",
+            "json",
+            "loglevel",
+            "store-name",
+            "targetdevhubusername",
+            "targetusername",
+            "urlpathprefix"
+        ]
+    },
+    {
         "command": "commerce:store:quickstart:create",
         "plugin": "commerce",
         "flags": [
@@ -78,42 +106,6 @@
             "store-name",
             "targetdevhubusername",
             "targetusername"
-        ]
-    },
-    {
-        "command": "commerce:store:view",
-        "plugin": "commerce",
-        "flags": [
-            "apiversion",
-            "json",
-            "loglevel",
-            "store-name",
-            "targetdevhubusername",
-            "targetusername"
-        ]
-    },
-    {
-        "command": "commerce:store:view:all",
-        "plugin": "commerce",
-        "flags": [
-            "apiversion",
-            "json",
-            "loglevel",
-            "targetusername"
-        ]
-    },
-    {
-        "command": "commerce:store:view:info",
-        "plugin": "commerce",
-        "flags": [
-            "apiversion",
-            "buyer-username",
-            "json",
-            "loglevel",
-            "store-name",
-            "targetdevhubusername",
-            "targetusername",
-            "urlpathprefix"
         ]
     }
 ]

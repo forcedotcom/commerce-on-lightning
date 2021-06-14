@@ -34,7 +34,7 @@ export const storeFlags = {
         description: messages.getMessage('setup.buyerEmailDescription'),
     }),
     'store-name': flags.string({
-        char: 's',
+        char: 'n',
         default: '1commerce',
         description: messages.getMessage('setup.storeNameDescription'),
     }),
@@ -42,5 +42,9 @@ export const storeFlags = {
         char: 'p',
         description:
             'required if different from store-name URL to append to the domain created when Experiences was enabled for this org',
+    }),
+    all: flags.boolean({
+        default: false,
+        description: 'View All stores using sfdx force:org:open _ui/networks/setup/SetupNetworksPage page',
     }),
 };

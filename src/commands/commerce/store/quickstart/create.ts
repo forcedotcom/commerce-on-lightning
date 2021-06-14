@@ -22,7 +22,7 @@ export class StoreQuickstartCreate extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static description = msgs.getMessage('quickstart.create.cmdDescription');
 
-    public static examples = [`sfdx ${CMD}`];
+    public static examples = [`sfdx ${CMD} --templatename 'b2c-lite-storefront'`];
     protected static flagsConfig = {
         ...filterFlags(['templatename', 'store-name'], storeFlags),
     };

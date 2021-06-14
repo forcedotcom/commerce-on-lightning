@@ -21,7 +21,8 @@ import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { mkdirSync } from '../../../lib/utils/fsUtils';
 import { StoreQuickstartCreate } from './quickstart/create';
 import { StoreQuickstartSetup } from './quickstart/setup';
-import { StoreView } from './view';
+import { StoreOpen } from './open';
+import { StoreDisplay } from './display';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -48,9 +49,9 @@ export class StoreCreate extends SfdxCommand {
         StoreQuickstartSetup.vargsAllowList
     );
     public static description = msgs.getMessage('create.cmdDescription');
-    public static examples = [`sfdx ${CMD}`];
+    public static examples = [`sfdx ${CMD} --store-name test-store`];
     protected static flagsConfig = filterFlags(
-        ['store-name', 'scratch-org-buyer-username', 'templatename', 'definitionfile', 'type', 'buyer-username'],
+        ['store-name', 'templatename', 'definitionfile', 'type', 'buyer-username'],
         allFlags
     );
     public org: Org;
@@ -220,9 +221,10 @@ export class StoreCreate extends SfdxCommand {
         await this.createSearchIndex();
         this.ux.log(msgs.getMessage('create.openingBrowserTheStoreAdminPage'));
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const res = await StoreView.run(addAllowedArgs(this.argv, StoreView), this.config);
+        const res = await StoreOpen.run(addAllowedArgs(this.argv, StoreOpen), this.config);
         if (!res) return;
         this.ux.log(chalk.green.bold(msgs.getMessage('create.allDone'))); // don't delete the status file here. Status file deleted with reset.
+        await StoreDisplay.run(addAllowedArgs(this.argv, StoreDisplay), this.config);
         await this.statusFileManager.setValue('done', true);
         return { createdStore: true };
     }

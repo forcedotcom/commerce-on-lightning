@@ -14,7 +14,7 @@ const messages = Messages.loadMessages('commerce', TOPIC);
 export const paymentsFlags = {
     'payment-adapter': flags.string({
         char: 'p',
-        default: 'Stripe',
+        default: 'Stripe', // TODO add list of allowed adapters here
         description: messages.getMessage('paymentsFlags.paymentAdapterDescription'),
     }),
 };

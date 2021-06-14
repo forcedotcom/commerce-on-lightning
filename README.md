@@ -87,28 +87,29 @@ sfdx plugins
 ## Commands
 
 <!-- commands -->
-* [`sfdx commerce:examples:convert [-f <filepath>] [-o <string>] [-e <string>] [-d <string>] [-s <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceexamplesconvert--f-filepath--o-string--e-string--d-string--s-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-e <string>] [-o <string>] [-s <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceexamplesconvert--f-filepath--d-string--e-string--o-string--s-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 * [`sfdx commerce:payments:quickstart:setup [-p <string>] [-s <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercepaymentsquickstartsetup--p-string--s-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:products:import [-c <string>] [-f <filepath>] [-d <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceproductsimport--c-string--f-filepath--d-string--s-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:create [name=value...] [-f <filepath>] [-d <string>] [-t <string>] [-b <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorecreate-namevalue--f-filepath--d-string--t-string--b-string--s-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceproductsimport--c-string--f-filepath--o-string--s-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+* [`sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorecreate-namevalue--f-filepath--o-string--t-string--b-string--s-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 * [`sfdx commerce:store:quickstart:create [-t <string>] [-s <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorequickstartcreate--t-string--s-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 * [`sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorequickstartsetup-namevalue--f-filepath--s-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 * [`sfdx commerce:store:view [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoreview--s-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 * [`sfdx commerce:store:view:all [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoreviewall--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 * [`sfdx commerce:store:view:info [-b <string>] [-s <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoreviewinfo--b-string--s-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
-## `sfdx commerce:examples:convert [-f <filepath>] [-o <string>] [-e <string>] [-d <string>] [-s <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-e <string>] [-o <string>] [-s <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Convert Examples to SFDX
 
 ```
 USAGE
-  $ sfdx commerce:examples:convert [-f <filepath>] [-o <string>] [-e <string>] [-d <string>] [-s <string>] [--json] 
+  $ sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-e <string>] [-o <string>] [-s <string>] [--json] 
   [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
-  -d, --type=b2c|b2b                                                                [default: b2c] The type of store you
-                                                                                    want to create
+  -d, --outputdir=outputdir                                                         [default:
+                                                                                    ~/.commerce/force-app]
+                                                                                    Directory to output the conversion
 
   -e, --convert=convert                                                             Files to convert
 
@@ -116,9 +117,8 @@ OPTIONS
                                                                                     ~/.commerce/config/store
                                                                                     -scratch-def.json] config file
 
-  -o, --outputdir=outputdir                                                         [default:
-                                                                                    ~/.commerce/force-app]
-                                                                                    Directory to output the conversion
+  -o, --type=b2c|b2b                                                                [default: b2c] The type of store you
+                                                                                    want to create
 
   -s, --store-name=store-name                                                       [default: 1commerce] name of the
                                                                                     site to create
@@ -159,16 +159,16 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:payments:quickstart:setup
+  sfdx commerce:payments:quickstart:setup -p Stripe
 ```
 
-## `sfdx commerce:products:import [-c <string>] [-f <filepath>] [-d <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Amend files needed to fill out Product data and import Products and related data to make store functional
 
 ```
 USAGE
-  $ sfdx commerce:products:import [-c <string>] [-f <filepath>] [-d <string>] [-s <string>] [-v <string>] [-u <string>] 
+  $ sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-s <string>] [-v <string>] [-u <string>] 
   [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -176,11 +176,11 @@ OPTIONS
       [default: ~/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass 
       in empty value to do product-less import
 
-  -d, --type=b2c|b2b
-      [default: b2c] The type of store you want to create
-
   -f, --definitionfile=definitionfile
       [default: ~/.commerce/config/store-scratch-def.json] config file
+
+  -o, --type=b2c|b2b
+      [default: b2c] The type of store you want to create
 
   -s, --store-name=store-name
       [default: 1commerce] name of the site to create
@@ -204,13 +204,13 @@ EXAMPLE
   sfdx commerce:products:import --store-name test-store
 ```
 
-## `sfdx commerce:store:create [name=value...] [-f <filepath>] [-d <string>] [-t <string>] [-b <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
+## `sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Create a store
 
 ```
 USAGE
-  $ sfdx commerce:store:create [name=value...] [-f <filepath>] [-d <string>] [-t <string>] [-b <string>] [-s <string>] 
+  $ sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-s <string>] 
   [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
@@ -218,12 +218,12 @@ OPTIONS
   -b, --buyer-username=buyer-username                                               [default: buyer@1commerce.com]
                                                                                     buyer's username
 
-  -d, --type=b2c|b2b                                                                [default: b2c] The type of store you
-                                                                                    want to create
-
   -f, --definitionfile=definitionfile                                               [default:
                                                                                     ~/.commerce/config/store
                                                                                     -scratch-def.json] config file
+
+  -o, --type=b2c|b2b                                                                [default: b2c] The type of store you
+                                                                                    want to create
 
   -s, --store-name=store-name                                                       [default: 1commerce] name of the
                                                                                     site to create
@@ -246,7 +246,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:create
+  sfdx commerce:store:create --store-name test-store
 ```
 
 ## `sfdx commerce:store:quickstart:create [-t <string>] [-s <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
@@ -277,7 +277,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:quickstart:create
+  sfdx commerce:store:quickstart:create --templatename 'b2c-lite-storefront'
 ```
 
 ## `sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
@@ -312,7 +312,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:quickstart:setup
+  sfdx commerce:store:quickstart:setup --definitionfile store-scratch-def.json
 ```
 
 ## `sfdx commerce:store:view [-s <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
@@ -343,7 +343,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:view
+  sfdx commerce:store:view --store-name test-store
 ```
 
 ## `sfdx commerce:store:view:all [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
@@ -368,7 +368,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:view:all
+  sfdx commerce:store:view:all -u demo@1commerce.com
 ```
 
 ## `sfdx commerce:store:view:info [-b <string>] [-s <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
@@ -407,7 +407,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:view:info
+  sfdx commerce:store:view:info --buyer-username testbuyer@1commere.com
 ```
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->

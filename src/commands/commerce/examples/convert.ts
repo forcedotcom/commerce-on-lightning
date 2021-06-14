@@ -43,13 +43,13 @@ export class ExamplesConvert extends SfdxCommand {
         const scratchDef = parseStoreScratchDef(this.flags.definitionfile);
         const paths = convertStoreScratchDefToExamples(scratchDef);
         copyFileSync(BASE_DIR + '/sfdx-project.json', mkdirSync(this.flags.outputdir));
-        if ((this.flags.convert as string).indexOf('-v') >= 0)
-            this.flags.convert = removeFlagBeforeAll('-v', this.flags.convert);
-        if (!this.flags.convert && this.flags['examples-convert'])
-            this.flags.convert = this.flags['examples-convert'] as string;
-        if (this.flags.convert)
+        if ((this.flags.sourcepath as string).indexOf('-v') >= 0)
+            this.flags.sourcepath = removeFlagBeforeAll('-v', this.flags.sourcepath);
+        if (!this.flags.sourcepath && this.flags['examples-convert'])
+            this.flags.sourcepath = this.flags['examples-convert'] as string;
+        if (this.flags.sourcepath)
             // if you pass -v meta path to convert then don't read in the config file, basically override config file
-            this.convert(this.flags.convert);
+            this.convert(this.flags.sourcepath);
         else if (paths) this.convert(paths);
         else
             this.convert(

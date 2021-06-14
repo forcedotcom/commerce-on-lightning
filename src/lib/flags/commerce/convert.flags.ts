@@ -20,18 +20,18 @@ export const exampleFlags = {
         description: messages.getMessage('convertFlags.configFileDescription'),
     }),
     outputdir: flags.string({
-        char: 'o',
+        char: 'd',
         default: BASE_DIR + '/force-app',
         description: messages.getMessage('convertFlags.outputDirDescription'),
     }),
-    convert: flags.string({
-        char: 'e',
+    sourcepath: flags.string({
+        char: 'p',
         multiple: true,
         default: '',
         description: messages.getMessage('convertFlags.convertDescription'),
     }),
     type: flags.string({
-        char: 'd',
+        char: 'o',
         options: ['b2c', 'b2b'],
         parse: (input) => input.toLowerCase(),
         default: 'b2c',

@@ -6,37 +6,42 @@
  */
 import { URL } from 'url';
 import { SfdxCommand } from '@salesforce/command';
-import { fs, Messages, Org, SfdxError } from '@salesforce/core';
+import { Messages, Org, SfdxError } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { B2C_CONFIG_OVERRIDE } from '../../../../lib/utils/constants/properties';
-import { forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
-import { StoreCreate } from '../create';
-import { StatusFileManager } from '../../../../lib/utils/statusFileManager';
-import { filterFlags } from '../../../../lib/utils/args/flagsUtils';
-import { allFlags } from '../../../../lib/flags/commerce/all.flags';
+import { allFlags } from '../../../lib/flags/commerce/all.flags';
+import { filterFlags } from '../../../lib/utils/args/flagsUtils';
+import { StatusFileManager } from '../../../lib/utils/statusFileManager';
+import { forceDataSoql } from '../../../lib/utils/sfdx/forceDataSoql';
+import { StoreCreate } from './create';
 
 Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'store';
-const CMD = `commerce:${TOPIC}:view:info`;
+const CMD = `commerce:${TOPIC}:display`;
 const messages = Messages.loadMessages('commerce', TOPIC);
 
-export class StoreViewInfo extends SfdxCommand {
+export class StoreDisplay extends SfdxCommand {
     public static readonly requiresUsername = true;
-    public static readonly requiresDevhubUsername = true;
-    public static description = messages.getMessage('view.info.cmdDescription');
-
-    public static examples = [`sfdx ${CMD}`]; // TODO documentation including examples and descriptions
+    public static readonly supportsDevhubUsername = true;
+    public static description = messages.getMessage('view.cmdDescription');
+    public static examples = [`sfdx ${CMD} --store-name test-store`];
     protected static flagsConfig = filterFlags(['store-name', 'buyer-username', 'urlpathprefix'], allFlags);
+
     public org: Org;
     private statusFileManager: StatusFileManager;
 
     public async run(): Promise<AnyJson> {
+        let devhub = (await this.org.getDevHubOrg()).getUsername();
+        if (!devhub) devhub = 'Not Supplied';
         this.statusFileManager = new StatusFileManager(
-            (await this.org.getDevHubOrg()).getUsername(),
+            devhub,
             this.org.getUsername(),
             this.flags['store-name'] as string
         );
+        return { res: await this.viewBuyerInfo() };
+    }
+
+    public async viewBuyerInfo(): Promise<boolean> {
         if (
             this.flags.urlpathprefix &&
             (this.flags.urlpathprefix as string).replace(/[\\W_]+/g, '') !== (this.flags.urlpathprefix as string)
@@ -62,8 +67,9 @@ export class StoreViewInfo extends SfdxCommand {
         this.ux.log(
             messages.getMessage('view.info.savingConfigIntoConfig', ['commerce.config-override.js', configFile])
         );
-        fs.writeFileSync(B2C_CONFIG_OVERRIDE(), configFile); // Shall we resolve this query - 'should this write it to the scratch org directory?'
-        return { viewedInfo: true };
+        this.ux.log(configFile);
+        // fs.writeFileSync(B2C_CONFIG_OVERRIDE(), configFile); // Shall we resolve this query - 'should this write it to the scratch org directory?'
+        return true;
     }
 
     private async getFullStoreURL(): Promise<string> {
