@@ -62,6 +62,7 @@ export function getPassedArgs(argv: string[], flags: {}, flagConfig: FlagsConfig
  */
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export function addAllowedArgs(argv: string[], sfdxCommand): string[] {
+    // TODO update this to include vargs if sfdxCommand['vargsAllowList']
     const args = [];
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment
     const flags = sfdxCommand.flags;
@@ -95,6 +96,7 @@ export function addAllowedArgs(argv: string[], sfdxCommand): string[] {
  * @param argv
  */
 export function modifyArgFlag(flag: string[], value: string, argv: string[]): void {
+    // TODO update this to include vargs if sfdxCommand['vargsAllowList']
     let isModified = false;
     for (let i = 0; i < argv.length; i++) {
         if (!argv[i].startsWith('-')) continue;
@@ -118,6 +120,7 @@ export function modifyArgFlag(flag: string[], value: string, argv: string[]): vo
  */
 // eslint-disable-next-line @typescript-eslint/ban-types,no-shadow
 export function filterFlags(desiredFlags: string[], allFlags: {}, isInclude = true): {} {
+    // TODO update this to include vargs if sfdxCommand['vargsAllowList']
     return Object.keys(allFlags)
         .filter((key) => (isInclude ? desiredFlags.includes(key) : !desiredFlags.includes(key)))
         .reduce((obj, key) => {

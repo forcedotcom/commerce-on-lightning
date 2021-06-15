@@ -39,6 +39,7 @@ const CMD = `commerce:${TOPIC}:quickstart:setup`;
 const msgs = Messages.loadMessages('commerce', TOPIC);
 
 export class StoreQuickstartSetup extends SfdxCommand {
+    // TODO add apiversion to all shell'd commands
     public static readonly requiresUsername = true;
     public static readonly requiresDevhubUsername = true;
     public static description = msgs.getMessage('quickstart.setup.cmdDescription');
