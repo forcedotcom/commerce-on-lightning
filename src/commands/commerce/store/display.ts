@@ -23,7 +23,7 @@ const messages = Messages.loadMessages('commerce', TOPIC);
 export class StoreDisplay extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static readonly supportsDevhubUsername = true;
-    public static description = messages.getMessage('view.cmdDescription');
+    public static description = messages.getMessage('view.info.cmdDescription');
     public static examples = [`sfdx ${CMD} --store-name test-store`];
     protected static flagsConfig = filterFlags(['store-name', 'buyer-username', 'urlpathprefix'], allFlags);
 

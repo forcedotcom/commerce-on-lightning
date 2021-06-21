@@ -250,7 +250,7 @@ EXAMPLE
 
 ## `sfdx commerce:store:display [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
-Open store(s)
+Display buyer info
 
 ```
 USAGE
