@@ -5,6 +5,6 @@
     "convertDescription": "Files to convert"
   },
   "convert": {
-    "cmdDescription": "Convert repo examples to SFDX scratchorg"
+    "cmdDescription": "Convert repo examples to SFDX scratch org"
   }
 }

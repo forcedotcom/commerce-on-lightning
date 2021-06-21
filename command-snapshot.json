@@ -75,13 +75,11 @@
         "flags": [
             "all",
             "apiversion",
-            "buyer-username",
             "json",
             "loglevel",
             "store-name",
             "targetdevhubusername",
-            "targetusername",
-            "urlpathprefix"
+            "targetusername"
         ]
     },
     {

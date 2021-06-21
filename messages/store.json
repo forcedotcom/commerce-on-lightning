@@ -49,7 +49,7 @@
     },
     "quickstart": {
         "setup": {
-            "cmdDescription": "Quickstart various store setup",
+            "cmdDescription": "Set up a store",
             "orgCreationNotCompletedSuccesfully": "The status file indicates that org creation was not completed succesfully. Please complete org creation before attempting to set up a store.",
             "completedQuickstartStep1": "Completed Quickstart Step 1",
             "completedQuickstartStep2": "Completed Quickstart Step 2",
@@ -100,7 +100,7 @@
             "publishingCommunityStep7": "7. Publishing the community."
         },
         "create": {
-            "cmdDescription": "Quickstart various create store",
+            "cmdDescription": "Create a store",
             "creatingNewStoreInQueUpTo10Minutes": "Creating a new store, this may take up to 10 minutes until it's available.\n",
             "storeName": "Store name: %s\n",
             "communityTemplate": "Community Template: %s\n",
