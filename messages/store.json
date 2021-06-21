@@ -12,7 +12,7 @@
         "storeNameDescription": "name of the site to create"
     },
     "create": {
-        "cmdDescription": "Create a store",
+        "cmdDescription": "Create and set up a store",
         "webStoreNotSupported": "'WebStore' is not supported",
         "automaticallySettingPermFailedPleaseDoItManually": "Automatically setting perm failed, please do it manually. \nIn the opened page, search for B2CLiteAccess and CommerceEnabled, and make sure they are checked. If not, check them and click Save\nIf the page asks for a username/password, the org is still being created. If so, wait five minutes then re-run the command below until sfdx logs you in automatically.",
         "pressEnterWhenPermIsSet": "Press [ENTER] when you've set the perm",
@@ -117,13 +117,13 @@
         }
     },
     "view": {
-        "cmdDescription": "View Store",
+        "cmdDescription": "Open store(s)",
         "errorStoreId": "Could not resolve store to a store id.",
         "all": {
             "cmdDescription": "View all stores"
         },
         "info": {
-            "cmdDescription": "Get store view info",
+            "cmdDescription": "Display buyer info",
             "errorNoUserInfo": "No user info, something went wrong",
             "storeUrlBuyerInfo": "Store url: %s\nBuyer username: %s\nBuyer password: %s",
             "savingConfigIntoConfig": "Saving the following config into %s\n%s",

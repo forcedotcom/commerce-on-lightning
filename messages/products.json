@@ -3,7 +3,7 @@
         "productsFileCsvDescription": "The csv file containing products to import.  Pass in empty value to do product-less import"
     },
     "import": {
-        "cmdDescription": "Amend files needed to fill out Product data and import Products and related data to make store functional",
+        "cmdDescription": "Prepare product data files for import",
         "importingProducts": "Importing products.",
         "uploading": "Uploading...",
         "uploadedStringWithResult": "Uploaded %s with result: ",

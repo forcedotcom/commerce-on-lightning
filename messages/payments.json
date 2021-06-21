@@ -4,7 +4,7 @@
   },
   "quickstart": {
     "setup": {
-      "cmdDescription": "This script will set up all the required parts for using a new Payment Gateway",
+      "cmdDescription": "Set up a new Payment Gateway",
       "settingUpGatewayConvertingNamedCredentialsGatewayAdapterApex": "Setting up %s Gateway\n\"Converting Named Credentials and Gateway Adapter Apex for SFDX use...\"",
       "pushingNamedCredentialsAndGatewayAdapterApexToOrg": "Pushing Named Credentials and Gateway Adapter Apex to org...",
       "errorNoResultsForQuery": "No results found for query: ",
