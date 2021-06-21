@@ -1,0 +1,19 @@
+# Comment out the modules that you don't want to setup in your org
+# This is the list of converted modules for all orgs
+# $EXAMPLE_DIR will get replaced with examples directory
+
+$EXAMPLE_DIR/checkout/payment-gateway-integration/Salesforce/
+$EXAMPLE_DIR/checkout/notifications/
+$EXAMPLE_DIR/checkout/integrations/
+$EXAMPLE_DIR/tests/integrations/
+
+
+$EXAMPLE_DIR/users/buyer-user-profile-setup/
+$EXAMPLE_DIR/users/sharing-settings-setup/
+
+$EXAMPLE_DIR/diagnostic/commerce-diagnostic-event-setup/
+
+# default flow to async?
+$EXAMPLE_DIR/checkout-async/
+
+

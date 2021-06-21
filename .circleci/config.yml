@@ -1,0 +1,47 @@
+version: 2.1
+
+orbs:
+    release-management: salesforce/npm-release-management@4
+
+workflows:
+    version: 2
+    test-and-release:
+        jobs:
+            - release-management/validate-pr:
+                  filters:
+                      branches:
+                          ignore: main
+            - release-management/test-package:
+                  name: node-latest
+                  node_version: latest
+            - release-management/test-package:
+                  name: node-12
+            - release-management/test-nut:
+                  name: nuts-on-linux
+                  sfdx_version: latest
+                  requires:
+                      - node-latest
+            - release-management/test-nut:
+                  name: nuts-on-windows
+                  sfdx_version: latest
+                  os: windows
+                  requires:
+                      - node-latest
+            - release-management/release-package:
+                  sign: true
+                  github-release: true
+                  requires:
+                      - node-latest
+                  filters:
+                      branches:
+                          only: main
+    test-ts-update:
+        triggers:
+            - schedule:
+                  cron: 0 0 * * *
+                  filters:
+                      branches:
+                          only:
+                              - main
+        jobs:
+            - release-management/test-ts-update

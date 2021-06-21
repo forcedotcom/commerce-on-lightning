@@ -1,0 +1,11 @@
+{
+  "packageDirectories": [
+    {
+      "path": "force-app",
+      "default": true
+    }
+  ],
+  "namespace": "",
+  "sfdcLoginUrl": "http://localhost.internal.salesforce.com:6109",
+  "sourceApiVersion": "52.0"
+}

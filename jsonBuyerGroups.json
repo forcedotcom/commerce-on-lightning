@@ -1,0 +1,12 @@
+{
+    "records": [
+        {
+            "attributes": {
+                "type": "BuyerGroup",
+                "referenceId": "BuyerGroupRef1"
+            },
+            "Name": "BUYERGROUP_FROM_QUICKSTART_5",
+            "Description": "1commerce"
+        }
+    ]
+}

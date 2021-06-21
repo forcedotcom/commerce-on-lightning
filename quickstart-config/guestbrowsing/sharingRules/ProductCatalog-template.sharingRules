@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingGuestRules>
+        <fullName>CC_Product_Guest_Access_YourStoreName</fullName>
+        <accessLevel>Read</accessLevel>
+        <label>CC Product Guest Access YourStoreName</label>
+        <sharedTo>
+            <guestUser>YourStoreName</guestUser>
+        </sharedTo>
+        <criteriaItems>
+            <field>CreatedById</field>
+            <operation>notEqual</operation>
+            <value>test</value>
+        </criteriaItems>
+    </sharingGuestRules>
+</SharingRules>

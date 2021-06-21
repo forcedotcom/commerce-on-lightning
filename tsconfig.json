@@ -1,0 +1,15 @@
+{
+    "extends": "@salesforce/dev-config/tsconfig",
+    "compilerOptions": {
+        "allowJs": false,
+        "declaration": true,
+        "outDir": "./lib",
+        "importHelpers": true,
+        "rootDir": "./src",
+        "skipLibCheck": true,
+        "esModuleInterop": true,
+        "lib": ["es2018", "dom", "esnext"]
+    },
+    "include": ["./src/**/*.ts"],
+    "exclude": ["./node_modules"]
+}
