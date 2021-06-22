@@ -11,7 +11,7 @@ import { StoreCreate } from '../../../../src/commands/commerce/store/create';
 describe('flagsUtils add allowed args', () => {
     it('should add only args that the sfdxcommand Auth allows', async () => {
         const res = addAllowedArgs(['-c', 'hi', '-b', 'bye'], StoreCreate);
-        // -c is allowed but -b isn't so i don't expect -b to exist in assert
-        assert.deepEqual(res, ['-c', 'hi']);
+        // -c is not allowed but -b is so i don't expect -c or it's value to exist in assert
+        assert.deepEqual(res, ['-b', 'bye']);
     });
 });

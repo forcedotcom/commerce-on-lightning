@@ -28,7 +28,7 @@ export class StoreDisplay extends SfdxCommand {
     protected static flagsConfig = filterFlags(['store-name', 'buyer-username', 'urlpathprefix'], allFlags);
 
     public org: Org;
-    private statusFileManager: StatusFileManager;
+    public statusFileManager: StatusFileManager;
 
     public async run(): Promise<AnyJson> {
         let devhub = (await this.org.getDevHubOrg()).getUsername();

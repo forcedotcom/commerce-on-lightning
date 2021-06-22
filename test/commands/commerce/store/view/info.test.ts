@@ -11,22 +11,24 @@ import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
 import { IConfig } from '@oclif/config';
 import { $$ } from '@salesforce/command/lib/test';
 import { UX } from '@salesforce/command';
+import { Org } from '@salesforce/core';
 import * as forceOrgSoqlExports from '../../../../../src/lib/utils/sfdx/forceDataSoql';
-import { DevHubConfig, Result } from '../../../../../src/lib/utils/jsonUtils';
+import { Result } from '../../../../../src/lib/utils/jsonUtils';
 import { StatusFileManager } from '../../../../../src/lib/utils/statusFileManager';
 import { StoreCreate } from '../../../../../src/commands/commerce/store/create';
 import { UserInfo } from '../../../../../src/lib/utils/jsonUtils';
 import { StoreDisplay } from '../../../../../src/commands/commerce/store/display';
 
-describe('commerce:store:view:info', () => {
+describe('commerce:store:display', () => {
     const config = stubInterface<IConfig>($$.SANDBOX, {});
     afterEach(() => {
         sinon.restore();
     });
     it('should get full store url using getFullStoreURL', async () => {
-        const d = stub(StatusFileManager.prototype, 'setValue').resolves();
+        const sfm = new StatusFileManager('a', 'b', 'c');
+        const d = stub(sfm, 'setValue').resolves();
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        const c = stub(StatusFileManager.prototype, 'getValue').resolves();
+        const c = stub(sfm, 'getValue').resolves();
         const c1 = stub(StoreCreate, 'getUserInfo').resolves(
             new UserInfo('https://dayna-lwc-2815-dev-ed.my.localhost.sfdcdev.salesforce.com:6101')
         );
@@ -41,12 +43,11 @@ describe('commerce:store:view:info', () => {
             public totalSize: number;
         })();
         const c2 = stub(forceOrgSoqlExports, 'forceDataSoql').returns(qr);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
-        const dhc = new DevHubConfig();
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        dhc.storeName = 'test';
+        // const org = stub(Org.prototype, 'getUsername').returns('test');
+        const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
         const storeViewInfo = new StoreDisplay([], config);
+        storeViewInfo.org = org;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore because protected member
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
@@ -54,11 +55,11 @@ describe('commerce:store:view:info', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        storeViewInfo.devHubConfig = dhc;
+        storeViewInfo.statusFileManager = sfm;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore because protected member
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        storeViewInfo.flags = Object.assign({}, { configuration: 'devhub-configuration.json' });
+        storeViewInfo.flags = Object.assign({}, { 'store-name': 'test' });
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access

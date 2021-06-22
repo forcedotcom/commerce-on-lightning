@@ -68,9 +68,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
     };
 
     public org: SfdxOrg;
+    public statusFileManager: StatusFileManager;
     private devHubUsername: string;
     private storeDir: string;
-    private statusFileManager: StatusFileManager;
     private storeType: string;
 
     public async run(): Promise<AnyJson> {
