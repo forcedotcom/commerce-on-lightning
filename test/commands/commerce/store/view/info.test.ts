@@ -16,7 +16,7 @@ import { DevHubConfig, Result } from '../../../../../src/lib/utils/jsonUtils';
 import { StatusFileManager } from '../../../../../src/lib/utils/statusFileManager';
 import { StoreCreate } from '../../../../../src/commands/commerce/store/create';
 import { UserInfo } from '../../../../../src/lib/utils/jsonUtils';
-import { StoreViewInfo } from '../../../../../src/commands/commerce/store/view/info';
+import { StoreDisplay } from '../../../../../src/commands/commerce/store/display';
 
 describe('commerce:store:view:info', () => {
     const config = stubInterface<IConfig>($$.SANDBOX, {});
@@ -45,19 +45,23 @@ describe('commerce:store:view:info', () => {
         const dhc = new DevHubConfig();
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         dhc.storeName = 'test';
-        const storeViewInfo = new StoreViewInfo([], config);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
+        const storeViewInfo = new StoreDisplay([], config);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore because protected member
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
         storeViewInfo.ux = stubInterface<UX>($$.SANDBOX);
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         storeViewInfo.devHubConfig = dhc;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore because protected member
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         storeViewInfo.flags = Object.assign({}, { configuration: 'devhub-configuration.json' });
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         assert.equal(await storeViewInfo.getFullStoreURL(), 'https://hello:6101/test/s');
         [c, c1, c2, d].forEach((k) => k.restore());
     });

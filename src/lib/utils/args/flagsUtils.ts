@@ -22,7 +22,11 @@ function contains(v: string, a): boolean {
  * @param flags
  * @param argv
  */
-export function getPassedArgs(argv: string[], flags: {}, flagConfig: FlagsConfig = allFlags): Record<string, never> {
+export function getPassedArgs(
+    argv: string[],
+    flags: Record<string, unknown>,
+    flagConfig: FlagsConfig = allFlags
+): Record<string, never> {
     // if no argv then return empty object
     if (!(argv && argv.length > 0)) return {};
     const m = {};

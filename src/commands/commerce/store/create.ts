@@ -60,9 +60,9 @@ export class StoreCreate extends SfdxCommand {
     private storeDir;
     private statusFileManager: StatusFileManager;
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     public static async getStoreId(
         statusFileManager: StatusFileManager,
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         ux,
         cnt = 0,
         setPerms = true
