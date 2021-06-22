@@ -111,8 +111,8 @@ OPTIONS
                                                                                     Directory to output the conversion
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store
-                                                                                    -scratch-def.json] config file
+                                                                                    ~/.commerce/config/stor
+                                                                                    e-scratch-def.json] config file
 
   -n, --store-name=store-name                                                       [default: 1commerce] name of the
                                                                                     site to create
@@ -218,8 +218,8 @@ OPTIONS
                                                                                     buyer's username
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store
-                                                                                    -scratch-def.json] config file
+                                                                                    ~/.commerce/config/stor
+                                                                                    e-scratch-def.json] config file
 
   -n, --store-name=store-name                                                       [default: 1commerce] name of the
                                                                                     site to create
@@ -366,8 +366,8 @@ USAGE
 
 OPTIONS
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store
-                                                                                    -scratch-def.json] config file
+                                                                                    ~/.commerce/config/stor
+                                                                                    e-scratch-def.json] config file
 
   -n, --store-name=store-name                                                       [default: 1commerce] name of the
                                                                                     site to create
