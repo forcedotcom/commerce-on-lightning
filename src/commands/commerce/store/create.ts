@@ -28,7 +28,7 @@ Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:create`;
-const msgs = Messages.loadMessages('commerce', TOPIC);
+const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class StoreCreate extends SfdxCommand {
     public static readonly requiresUsername = true;

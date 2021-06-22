@@ -12,7 +12,7 @@ import { Result } from './jsonUtils';
 import { sleep } from './sleep';
 
 Messages.importMessagesDirectory(__dirname);
-const msgs = Messages.loadMessages('commerce', 'commerce');
+const msgs = Messages.loadMessages('@salesforce/commerce', 'commerce');
 /* eslint-disable */
 if (!Object.entries)
     Object.entries = (obj) => {

@@ -10,7 +10,7 @@ import { Messages } from '@salesforce/core';
 
 Messages.importMessagesDirectory(__dirname);
 const TOPIC = 'store';
-const messages = Messages.loadMessages('commerce', TOPIC);
+const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export const storeFlags = {
     templatename: flags.string({

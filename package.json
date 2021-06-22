@@ -1,8 +1,8 @@
 {
-  "name": "commerce",
+  "name": "@salesforce/commerce",
   "version": "0.1.0",
   "author": "Jonathan Arndt",
-  "bugs": "https://git.soma.salesforce.com/communities/1commerce/issues",
+  "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
   "dependencies": {
     "@mshanemc/plugin-helpers": "^2.1.0",
     "@oclif/command": "^1",

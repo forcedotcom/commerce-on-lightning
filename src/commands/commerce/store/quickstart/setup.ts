@@ -36,7 +36,7 @@ Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:quickstart:setup`;
-const msgs = Messages.loadMessages('commerce', TOPIC);
+const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class StoreQuickstartSetup extends SfdxCommand {
     // TODO add apiversion to all shell'd commands

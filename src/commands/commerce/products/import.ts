@@ -23,7 +23,7 @@ Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'products';
 const CMD = `commerce:${TOPIC}:import`;
-const msgs = Messages.loadMessages('commerce', TOPIC);
+const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class ProductsImport extends SfdxCommand {
     public static readonly requiresUsername = true;

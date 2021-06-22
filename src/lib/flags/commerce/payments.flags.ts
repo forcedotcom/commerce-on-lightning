@@ -9,7 +9,7 @@ import { Messages } from '@salesforce/core';
 
 Messages.importMessagesDirectory(__dirname);
 const TOPIC = 'payments';
-const messages = Messages.loadMessages('commerce', TOPIC);
+const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export const paymentsFlags = {
     'payment-adapter': flags.string({

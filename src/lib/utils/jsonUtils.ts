@@ -13,7 +13,7 @@ import { CONFIG_DIR, EXAMPLE_DIR } from './constants/properties';
 import { getPassedArgs } from './args/flagsUtils';
 
 Messages.importMessagesDirectory(__dirname);
-const msgs = Messages.loadMessages('commerce', 'commerce');
+const msgs = Messages.loadMessages('@salesforce/commerce', 'commerce');
 // TODO dont' disable this linting
 /* eslint-disable */
 /**

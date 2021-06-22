@@ -18,7 +18,7 @@ Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'payments';
 const CMD = `commerce:${TOPIC}:quickstart:setup`;
-const msgs = Messages.loadMessages('commerce', TOPIC);
+const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class PaymentsQuickstartSetup extends SfdxCommand {
     public static readonly requiresUsername = true;

@@ -19,7 +19,7 @@ import { convertStoreScratchDefToExamples, parseStoreScratchDef } from '../../..
 const TOPIC = 'examples';
 const CMD = `commerce:${TOPIC}:convert`;
 Messages.importMessagesDirectory(__dirname);
-const messages = Messages.loadMessages('commerce', TOPIC);
+const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class ExamplesConvert extends SfdxCommand {
     // TODO fix this to use store-def.json file

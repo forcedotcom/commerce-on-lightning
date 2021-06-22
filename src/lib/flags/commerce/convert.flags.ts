@@ -11,7 +11,7 @@ import { BASE_DIR, CONFIG_DIR } from '../../utils/constants/properties';
 Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'examples';
-const messages = Messages.loadMessages('commerce', TOPIC);
+const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export const exampleFlags = {
     definitionfile: flags.filepath({
