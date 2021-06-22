@@ -137,7 +137,7 @@
     "test:command-reference": "./bin/run commandreference:generate --erroronwarnings",
     "test:deprecation-policy": "./bin/run snapshot:compare",
     "test:nuts": "nyc mocha \"**/*.nut.ts\" --slow 4500 --timeout 600000 --parallel",
-    "version": "oclif-dev readme && sed -i '' -e \"s|$(realpath ~)|~|g\" README.md && git add README.md"
+    "version": "(oclif-dev readme && sed -i '' -e \"s|$(realpath ~)|~|g\" README.md && git add README.md) || exit 0"
   },
   "husky": {
     "hooks": {
