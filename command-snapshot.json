@@ -1,7 +1,7 @@
 [
     {
         "command": "commerce:examples:convert",
-        "plugin": "commerce",
+        "plugin": "@salesforce/commerce",
         "flags": [
             "definitionfile",
             "json",
@@ -14,7 +14,7 @@
     },
     {
         "command": "commerce:payments:quickstart:setup",
-        "plugin": "commerce",
+        "plugin": "@salesforce/commerce",
         "flags": [
             "apiversion",
             "json",
@@ -26,7 +26,7 @@
     },
     {
         "command": "commerce:products:import",
-        "plugin": "commerce",
+        "plugin": "@salesforce/commerce",
         "flags": [
             "apiversion",
             "definitionfile",
@@ -41,7 +41,7 @@
     },
     {
         "command": "commerce:store:create",
-        "plugin": "commerce",
+        "plugin": "@salesforce/commerce",
         "flags": [
             "apiversion",
             "buyer-username",
@@ -57,7 +57,7 @@
     },
     {
         "command": "commerce:store:display",
-        "plugin": "commerce",
+        "plugin": "@salesforce/commerce",
         "flags": [
             "apiversion",
             "buyer-username",
@@ -71,7 +71,7 @@
     },
     {
         "command": "commerce:store:open",
-        "plugin": "commerce",
+        "plugin": "@salesforce/commerce",
         "flags": [
             "all",
             "apiversion",
@@ -84,7 +84,7 @@
     },
     {
         "command": "commerce:store:quickstart:create",
-        "plugin": "commerce",
+        "plugin": "@salesforce/commerce",
         "flags": [
             "apiversion",
             "json",
@@ -96,7 +96,7 @@
     },
     {
         "command": "commerce:store:quickstart:setup",
-        "plugin": "commerce",
+        "plugin": "@salesforce/commerce",
         "flags": [
             "apiversion",
             "definitionfile",
