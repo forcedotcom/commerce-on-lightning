@@ -9,25 +9,82 @@
 [![Downloads/week](https://img.shields.io/npm/dw/1commerce.svg)](https://npmjs.org/package/1commerce)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-brightgreen.svg)](https://raw.githubusercontent.com/salesforcecli/plugin-auth/main/LICENSE.txt)
 
-Commerce commands for Salesforce CLI
+Commerce commands for Salesforce CLI.
+
+If you want a store, for test or any other purposes, then use this plugin to automate all steps required.
+It has built in automation to help if any steps fail. This plugin is designed to be as hands off as possible.
+
+This plugin is used to create and setup either a B2B or a B2C store with data with as little effort as possible.
 
 This plugin requires the [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli). For more information on the CLI, read the [getting started guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm).
 
 We always recommend using the latest version of these commands, however, you can install a specific version or tag if needed.
 
-
-
+-   [Usage](#usage)
 -   [Install](#install)
 -   [Post Install](#now-that-you-have-the-commerce-plugin-installed-please-see)
 -   [Commands](#commands)
 -   [Debugging your plugin](#debugging-your-plugin)
+<!-- usage -->
+
+## Usage
+
+First [create](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_scratch_orgs.htm)
+and [authorize](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_auth.htm)
+a scratch org.
+
+### Commands
+
+Create your store using this command. By default it will use the default values
+placed in `~/.commerce` directory, however you can pass your own configuration via a
+switch.
+
+```bash
+sfdx commerce:store:create
+```
+
+This will
+
+-   Create a community using `sfdx commerce:store:quickstart:create` which uses `sfdx force:community:create`
+-   Push Store Sources first using `sfdx commerce:examples:convert` then `sfdx commerce:store:quickstart:setup`
+-   Then quickstart setup does examples convert if not already done then retrieves and modfies some packages
+    `sfdx force:mdapi:retrieve` sets up integrations, member lists, credit card and payments, imports products using
+    `sfdx commerce:products:import` adds contact point and publishes community `sfdx force:community:publish`.
+-   Then it assigns shopper profile to buyer user, creates search index and opens your newly created and setup store.
+
+This plugin uses a store definition file. The default file is located at `~/.commerce/config/b2c-store-scratch-def.json` (or b2b).
+
+This file defines the store name and whether features are enabled (everything is included by default unless turned off).  
+Things like guest user your product import file and your payment integration.
+
+The `sfdx commerce:examples:convert` uses this file as well to convert the requested examples, but not push them to your store just put
+the converted examples in your force-app folder.
+
+The `sfdx commerce:products:import` imports a csv file with data into your store. With examples
+in `~/.commerce/examples/csv` folder using the `Alpine-small.csv` by default (This one picked since it's smaller it's quicker to import) (this can be defined in your store def and setup will do this for you as well).
+
+The `sfdx commerce:payments:quickstart:setup` allows you to install a different payment adapter other than salesforce (this can be defined in your store def and setup will do this for you as well)
+
+The `sfdx commerce:store:display` command shows your buyer user credentials and url for your store
+
+The `sfdx commerce:store:open` command opens your store or with the `--all` flag opens the page that shows all your stores
+
+### Scratch Def
+
+We put the default project scratch def for your scratch org in `~/.commerce/config/*-project-scratch-def.json`
+
+### Examples
+
+We put all examples and import product csv files you can use in your own project in `~/.commerce/examples`
+
+<!-- usagestop -->
+
 <!-- install -->
 
 ## Install
 
-
 ```bash
-sfdx plugins:install commerce@x.y.z
+sfdx plugins:install @salesforce/commerce
 ```
 
 <!-- installstop -->
@@ -87,14 +144,15 @@ sfdx plugins
 ## Commands
 
 <!-- commands -->
-* [`sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-p <string>] [-o <string>] [-n <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceexamplesconvert--f-filepath--d-string--p-string--o-string--n-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:payments:quickstart:setup [-p <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercepaymentsquickstartsetup--p-string--n-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceproductsimport--c-string--f-filepath--o-string--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorecreate-namevalue--f-filepath--o-string--t-string--b-string--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:display [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoredisplay--b-string--n-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:open [-n <string>] [--all] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoreopen--n-string---all--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:quickstart:create [name=value...] [-t <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorequickstartcreate-namevalue--t-string--n-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
-* [`sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorequickstartsetup-namevalue--f-filepath--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+
+-   [`sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-p <string>] [-o <string>] [-n <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceexamplesconvert--f-filepath--d-string--p-string--o-string--n-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+-   [`sfdx commerce:payments:quickstart:setup [-p <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercepaymentsquickstartsetup--p-string--n-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+-   [`sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commerceproductsimport--c-string--f-filepath--o-string--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+-   [`sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorecreate-namevalue--f-filepath--o-string--t-string--b-string--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+-   [`sfdx commerce:store:display [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoredisplay--b-string--n-string--p-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+-   [`sfdx commerce:store:open [-n <string>] [--all] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestoreopen--n-string---all--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+-   [`sfdx commerce:store:quickstart:create [name=value...] [-t <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorequickstartcreate-namevalue--t-string--n-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
+-   [`sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-n <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`](#sfdx-commercestorequickstartsetup-namevalue--f-filepath--n-string--v-string--u-string---apiversion-string---json---loglevel-tracedebuginfowarnerrorfataltracedebuginfowarnerrorfatal)
 
 ## `sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-p <string>] [-o <string>] [-n <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -102,7 +160,7 @@ Convert repo examples to SFDX scratch org
 
 ```
 USAGE
-  $ sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-p <string>] [-o <string>] [-n <string>] [--json] 
+  $ sfdx commerce:examples:convert [-f <filepath>] [-d <string>] [-p <string>] [-o <string>] [-n <string>] [--json]
   [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -137,7 +195,7 @@ Set up a new Payment Gateway
 
 ```
 USAGE
-  $ sfdx commerce:payments:quickstart:setup [-p <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json] 
+  $ sfdx commerce:payments:quickstart:setup [-p <string>] [-n <string>] [-u <string>] [--apiversion <string>] [--json]
   [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -167,12 +225,12 @@ Prepare product data files for import
 
 ```
 USAGE
-  $ sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-n <string>] [-v <string>] [-u <string>] 
+  $ sfdx commerce:products:import [-c <string>] [-f <filepath>] [-o <string>] [-n <string>] [-v <string>] [-u <string>]
   [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
   -c, --products-file-csv=products-file-csv
-      [default: ~/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass 
+      [default: ~/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass
       in empty value to do product-less import
 
   -f, --definitionfile=definitionfile
@@ -209,8 +267,8 @@ Create and set up a store
 
 ```
 USAGE
-  $ sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-n <string>] 
-  [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel 
+  $ sfdx commerce:store:create [name=value...] [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-n <string>]
+  [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -254,7 +312,7 @@ Display buyer info
 
 ```
 USAGE
-  $ sfdx commerce:store:display [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion 
+  $ sfdx commerce:store:display [-b <string>] [-n <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion
   <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -293,7 +351,7 @@ Open store(s)
 
 ```
 USAGE
-  $ sfdx commerce:store:open [-n <string>] [--all] [-v <string>] [-u <string>] [--apiversion <string>] [--json] 
+  $ sfdx commerce:store:open [-n <string>] [--all] [-v <string>] [-u <string>] [--apiversion <string>] [--json]
   [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -330,7 +388,7 @@ Create a store
 
 ```
 USAGE
-  $ sfdx commerce:store:quickstart:create [name=value...] [-t <string>] [-n <string>] [-u <string>] [--apiversion 
+  $ sfdx commerce:store:quickstart:create [name=value...] [-t <string>] [-n <string>] [-u <string>] [--apiversion
   <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -361,7 +419,7 @@ Set up a store
 
 ```
 USAGE
-  $ sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-n <string>] [-v <string>] [-u <string>] 
+  $ sfdx commerce:store:quickstart:setup [name=value...] [-f <filepath>] [-n <string>] [-v <string>] [-u <string>]
   [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
@@ -389,6 +447,7 @@ OPTIONS
 EXAMPLE
   sfdx commerce:store:quickstart:setup --definitionfile store-scratch-def.json
 ```
+
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
 
@@ -396,20 +455,20 @@ EXAMPLE
 
 We recommend using the Visual Studio Code (VS Code) IDE for your plugin development. Included in the `.vscode` directory of this plugin is a `launch.json` config file, which allows you to attach a debugger to the node process when running your commands.
 
-To debug the `hello:org` command:
+To debug the `commerce:store:create` command:
 
 1. Start the inspector
 
 If you linked your plugin to the sfdx cli, call your command with the `dev-suspend` switch:
 
 ```sh-session
-$ sfdx hello:org -u myOrg@example.com --dev-suspend
+$ sfdx commerce:store:create -u myOrg@example.com --dev-suspend
 ```
 
 Alternatively, to call your command using the `bin/run` script, set the `NODE_OPTIONS` environment variable to `--inspect-brk` when starting the debugger:
 
 ```sh-session
-$ NODE_OPTIONS=--inspect-brk bin/run hello:org -u myOrg@example.com
+$ NODE_OPTIONS=--inspect-brk bin/run commerce:store:create -u myOrg@example.com
 ```
 
 2. Set some breakpoints in your command code
