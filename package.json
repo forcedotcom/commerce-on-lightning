@@ -71,7 +71,7 @@
         "/oclif.manifest.json",
         "/sfdx-project.json"
     ],
-    "homepage": "https://git.soma.salesforce.com/communities/1commerce",
+    "homepage": "https://github.com/forcedotcom/commerce-on-lightning",
     "keywords": [
         "force",
         "salesforce",
@@ -111,7 +111,7 @@
             "init": "./lib/hooks/init/download"
         }
     },
-    "repository": "https://git.soma.salesforce.com/communities/1commerce",
+    "repository": "https://github.com/forcedotcom/commerce-on-lightning",
     "scripts": {
         "build": "sf-build",
         "clean": "sf-clean",
