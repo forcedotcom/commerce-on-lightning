@@ -100,12 +100,15 @@ export const replaceErrors = (key, value) => {
     return value;
 };
 
-export const parseStoreScratchDef = (defFile: string, argv?: string[], flags?: {}, flagConfig: FlagsConfig = allFlags): StoreScratchDef => {
-    if(!defFile || !fs.existsSync(defFile))
-        if(flags && flags['type'])
-            fs.copyFileSync(`${CONFIG_DIR()}/${flags['type']}-store-scratch-def.json`, defFile);
-        else
-            fs.copyFileSync(CONFIG_DIR()+'/b2c-store-scratch-def.json', defFile);
+export const parseStoreScratchDef = (
+    defFile: string,
+    argv?: string[],
+    flags?: {},
+    flagConfig: FlagsConfig = allFlags
+): StoreScratchDef => {
+    if (!defFile || !fs.existsSync(defFile))
+        if (flags && flags['type']) fs.copyFileSync(`${CONFIG_DIR()}/${flags['type']}-store-scratch-def.json`, defFile);
+        else fs.copyFileSync(CONFIG_DIR() + '/b2c-store-scratch-def.json', defFile);
     const sctDef = Object.assign(
         new StoreScratchDef(),
         JSON.parse(
@@ -116,37 +119,42 @@ export const parseStoreScratchDef = (defFile: string, argv?: string[], flags?: {
                 .replace('$(hostname)', os.hostname())
         )
     );
-    const parsedArgs = getPassedArgs(argv,flags,flagConfig);
+    const parsedArgs = getPassedArgs(argv, flags, flagConfig);
     // add more potentially from settings to be passed in cli
-    if(parsedArgs['store-name'])
-        sctDef.storeName = parsedArgs['store-name']
-    if(parsedArgs['type'])
-        sctDef.edition = parsedArgs['type']
-    if(parsedArgs['templatename'])
-        sctDef.template = parsedArgs['templatename']
-    sctDef.storeName = sctDef.storeName.replaceAll(' ','_');
+    if (parsedArgs['store-name']) sctDef.storeName = parsedArgs['store-name'];
+    if (parsedArgs['type']) sctDef.edition = parsedArgs['type'];
+    if (parsedArgs['templatename']) sctDef.template = parsedArgs['templatename'];
+    sctDef.storeName = sctDef.storeName.replace(/ /g, '_');
     return sctDef;
-}
+};
 
 export const convertStoreScratchDefToExamples = (def: StoreScratchDef): string[] => {
     let path = EXAMPLE_DIR() + '/' + def.edition.toLowerCase() + '/';
     const paths = [];
     Object.keys(def.settings)
-        .filter(key => !Array.isArray(def.settings[key]) && key !== 'lwc')
-        .forEach(key =>{
-            if(typeof def.settings[key] !== 'object')
+        .filter((key) => !Array.isArray(def.settings[key]) && key !== 'lwc')
+        .forEach((key) => {
+            if (typeof def.settings[key] !== 'object')
                 paths.push(path + convertToCamelKabob(key) + '/' + convertToCamelKabob(def.settings[key]));
             else
-                Object.keys(def.settings[key]).forEach(key1 => {
-                   // TODO theoretically make this recursive
-                   if(typeof def.settings[key][key1] !== 'string')
-                       paths.push(path + convertToCamelKabob(key) + '/' + convertToCamelKabob(key1) + '/');
-                   else
-                       paths.push(path + convertToCamelKabob(key) + '/' + convertToCamelKabob(key1) + '/' + def.settings[key][key1] + '/');
+                Object.keys(def.settings[key]).forEach((key1) => {
+                    // TODO theoretically make this recursive
+                    if (typeof def.settings[key][key1] !== 'string')
+                        paths.push(path + convertToCamelKabob(key) + '/' + convertToCamelKabob(key1) + '/');
+                    else
+                        paths.push(
+                            path +
+                                convertToCamelKabob(key) +
+                                '/' +
+                                convertToCamelKabob(key1) +
+                                '/' +
+                                def.settings[key][key1] +
+                                '/'
+                        );
                 });
-    })
+        });
     return paths;
-}
+};
 
 export class StoreScratchDef {
     public storeName: string;

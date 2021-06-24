@@ -123,7 +123,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         if (await this.statusFileManager.getValue('retrievedPackages')) return;
         // Replace the names of the components that will be retrieved. // this should stay as a template so users can modify it to their liking
         const packageRetrieve = fs
-            .readFileSync(PACKAGE_RETRIEVE_TEMPLATE(this.getStoreType()))
+            .readFileSync(PACKAGE_RETRIEVE_TEMPLATE(this.getStoreType().toLowerCase()))
             .toString()
             .replace('YourCommunitySiteNameHere', this.varargs['communitySiteName'] as string)
             .replace('YourCommunityExperienceBundleNameHere', this.varargs['communityExperienceBundleName'] as string)
@@ -367,6 +367,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const data = fs
             .readFileSync(networkMetaFile)
             .toString()
+            .replace(/<selfRegProfile>.*<\/selfRegProfile>/g, '')
             .replace(
                 '</Network>',
                 `    <selfRegProfile>Buyer_User_Profile_From_QuickStart${
@@ -698,7 +699,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 'Something went wrong no experience bundle ' + `${this.storeDir}/experience-bundle-package/unpackaged/`
             );
         fs.copyFileSync(
-            `${QUICKSTART_CONFIG()}/${this.getStoreType()}-package-deploy-template.xml`,
+            `${QUICKSTART_CONFIG()}/${this.getStoreType().toLowerCase()}-package-deploy-template.xml`,
             `${this.storeDir}/experience-bundle-package/unpackaged/package.xml`
         );
         shell(

@@ -157,7 +157,7 @@ export class StoreCreate extends SfdxCommand {
         this.scrDef = parseStoreScratchDef(this.flags.definitionfile, this.argv, this.flags);
         // parseStoreScratchDef overrides scrDef with arg flag values, below is needed when none are supplied so we use the values in store def file
         const modifyArgs = [
-            { args: ['-s', '--store-name'], value: this.scrDef.storeName as string },
+            { args: ['-n', '--store-name'], value: this.scrDef.storeName as string },
             { args: ['-t', '--templatename'], value: this.scrDef.template as string },
         ];
         modifyArgs.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));

@@ -24,7 +24,7 @@ export class Requires {
         if (force === 'true' || !fs.existsSync(dir + '/force-app') || !fs.lstatSync(dir + '/force-app').isDirectory()) {
             if (fs.existsSync(dir + '/force-app') && !fs.lstatSync(dir + '/force-app').isDirectory())
                 fs.unlinkSync(dir + '/force-app'); // this shouldn't happen, but if it does...
-            await ExamplesConvert.run(['-o', dir, '-s', storeName, '-f', configFile]);
+            await ExamplesConvert.run(['-d', dir, '-n', storeName, '-f', configFile]);
         }
     }
 

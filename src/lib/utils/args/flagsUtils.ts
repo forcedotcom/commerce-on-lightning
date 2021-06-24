@@ -35,9 +35,9 @@ export function getPassedArgs(
         m['-' + (flagConfig[k]['char'] as string)] = k;
     });
     const n = {};
+    let last;
     // eslint-disable-next-line no-console,@typescript-eslint/no-empty-function
     argv.forEach((arg) => {
-        let last;
         if (arg.startsWith('-')) {
             if (arg in m) {
                 // for case -v something or --hello something
