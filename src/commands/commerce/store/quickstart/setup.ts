@@ -635,7 +635,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         return storeType;
     }
 
-    private async addContactPointAndDeploy(): Promise<void> {
+    private async addContactPointAndDeploy(cnt = 0): Promise<void> {
         let accountId = (await this.statusFileManager.getValue('accountId')) as string;
         if (!accountId) await this.createBuyerUserWithContactAndAccount();
         accountId = (await this.statusFileManager.getValue('accountId')) as string;
@@ -679,9 +679,10 @@ export class StoreQuickstartSetup extends SfdxCommand {
             );
             const processMetaFile =
                 this.storeDir + '/experience-bundle-package/unpackaged/flows/Process_CommerceDiagnosticEvents.flow';
-            if (!fs.fileExistsSync(processMetaFile)) {
+            if (!fs.fileExistsSync(processMetaFile) && cnt === 0) {
                 await this.statusFileManager.setValue('retrievedPackages', false);
                 await this.retrievePackages();
+                return await this.addContactPointAndDeploy(++cnt);
             }
             fs.writeFileSync(
                 processMetaFile,
@@ -730,6 +731,10 @@ export class StoreQuickstartSetup extends SfdxCommand {
                         this.varargs['communityExperienceBundleName'] as string
                     }ToDeploy.zip" --wait -1 --verbose --singlepackage`
                 );
+            } else if (JSON.stringify(e.message).indexOf('Error parsing file') >= 0 && cnt === 0) {
+                await this.statusFileManager.setValue('retrievedPackages', false);
+                await this.retrievePackages();
+                return await this.addContactPointAndDeploy(++cnt);
             } else throw e;
         }
         // Need to add here because: Error happens if done above, "Error: You can only select profiles that are associated with the experience."
