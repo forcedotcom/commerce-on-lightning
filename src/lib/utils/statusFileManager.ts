@@ -27,7 +27,7 @@ import { sleep } from './sleep';
  *                  created: done
  *                  ....
  */
-/* eslint-disable jsdoc/check-indentation */
+/* eslint-disable jsdoc/check-indentation,@typescript-eslint/no-unsafe-call */
 export class StatusFileManager {
     public readonly devhubAdminUsername: string;
     public readonly scratchOrgAdminUsername: string;
@@ -49,6 +49,7 @@ export class StatusFileManager {
         this.filePath = filePath;
         this.lockFile = filePath + '.lock';
         try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             fs.unlinkSync(this.lockFile);
         } catch (e) {
             /* DO NOTHING DON'T CARE IF IT DOESN'T EXIST*/

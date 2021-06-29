@@ -58,6 +58,7 @@ export class StoreCreate extends SfdxCommand {
     public org: Org;
     private scrDef;
     private storeDir;
+    private devhubUsername;
     private statusFileManager: StatusFileManager;
 
     public static async getStoreId(
@@ -151,6 +152,7 @@ export class StoreCreate extends SfdxCommand {
         }
     }
     public async run(): Promise<AnyJson> {
+        this.devhubUsername = (await this.org.getDevHubOrg()).getUsername();
         const passedArgs = getPassedArgs(this.argv, this.flags);
         if (!Object.keys(passedArgs).includes('definitionfile') && Object.keys(passedArgs).includes('type'))
             this.flags.definitionfile = (this.flags.type as string) + '-store-scratch-def.json';
@@ -162,16 +164,11 @@ export class StoreCreate extends SfdxCommand {
         ];
         modifyArgs.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         this.statusFileManager = new StatusFileManager(
-            (await this.org.getDevHubOrg()).getUsername(),
+            this.devhubUsername,
             this.org.getUsername(),
             this.scrDef.storeName
         );
-        this.storeDir = STORE_DIR(
-            BASE_DIR,
-            (await this.org.getDevHubOrg()).getUsername(),
-            this.org.getUsername(),
-            this.scrDef.storeName
-        ); // TODO keep steps with status file and config but decouple them from this plugin add it to orchestration plugin
+        this.storeDir = STORE_DIR(BASE_DIR, this.devhubUsername, this.org.getUsername(), this.scrDef.storeName); // TODO keep steps with status file and config but decouple them from this plugin add it to orchestration plugin
         if (await this.statusFileManager.getValue('done')) {
             this.ux.log(msgs.getMessage('create.statusIndicatesCompletedSkipping'));
             return { createdStore: true };
@@ -256,9 +253,7 @@ export class StoreCreate extends SfdxCommand {
 
     private async pushStoreSources(): Promise<void> {
         if ((await this.statusFileManager.getValue('pushedSources')) === 'true') return;
-        const scratchOrgDir = mkdirSync(
-            SCRATCH_ORG_DIR(BASE_DIR, (await this.org.getDevHubOrg()).getUsername(), this.org.getUsername())
-        );
+        const scratchOrgDir = mkdirSync(SCRATCH_ORG_DIR(BASE_DIR, this.devhubUsername, this.org.getUsername()));
         try {
             fs.removeSync(scratchOrgDir + '/force-app');
         } catch (e) {
@@ -315,7 +310,8 @@ export class StoreCreate extends SfdxCommand {
             shellJsonSfdx(
                 `sfdx force:user:password:generate -u "${this.org.getUsername()}" -o "${
                     this.flags['buyer-username'] as string
-                }" -v "${(await this.org.getDevHubOrg()).getUsername()}"`
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                }" -v "${this.devhubUsername}"`
             );
         } catch (e) {
             if (e.message.indexOf('INSUFFICIENT_ACCESS') < 0) {
