@@ -34,6 +34,7 @@ describe('Status File Manager', () => {
     });
     afterEach(() => {
         try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
             fs.unlinkSync(statusFilePath);
         } catch (e) {
             /**/

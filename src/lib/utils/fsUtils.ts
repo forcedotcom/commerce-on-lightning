@@ -11,6 +11,7 @@ import { fs } from '@salesforce/core';
 import { BASE_DIR } from './constants/properties';
 import { shell } from './shell';
 
+/* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment */
 export function remove(filePath: string): void {
     try {
         if (fs.lstatSync(filePath).isDirectory()) fs.removeSync(filePath);
@@ -82,9 +83,11 @@ export async function getFiles(dir) {
             return (await stat(res)).isDirectory() ? getFiles(res) : res;
         })
     );
+    // @ts-ignore
     return files.reduce((a, f) => a.concat(f), []);
 }
 export async function renameRecursive(renameList, target) {
+    // @ts-ignore
     (await getFiles(target)).forEach((file) => {
         for (const renameValue of renameList)
             if (file.indexOf(renameValue.name) >= 0)

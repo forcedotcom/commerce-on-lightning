@@ -67,7 +67,6 @@ export class StoreDisplay extends SfdxCommand {
         this.ux.log(
             messages.getMessage('view.info.savingConfigIntoConfig', ['commerce.config-override.js', configFile])
         );
-        this.ux.log(configFile);
         // fs.writeFileSync(B2C_CONFIG_OVERRIDE(), configFile); // Shall we resolve this query - 'should this write it to the scratch org directory?'
         return true;
     }

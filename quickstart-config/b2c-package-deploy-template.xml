@@ -17,6 +17,10 @@
         <name>SharingRules</name>
     </types>
     <types>
+        <members>Product2</members>
+        <name>SharingRules</name>
+    </types>
+    <types>
         <members>*</members>
         <name>NavigationMenu</name>
     </types>

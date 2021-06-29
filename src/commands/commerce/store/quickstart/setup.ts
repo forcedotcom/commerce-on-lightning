@@ -122,12 +122,14 @@ export class StoreQuickstartSetup extends SfdxCommand {
         // TODO possible turn this into a requires
         if (await this.statusFileManager.getValue('retrievedPackages')) return;
         // Replace the names of the components that will be retrieved. // this should stay as a template so users can modify it to their liking
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         const packageRetrieve = fs
             .readFileSync(PACKAGE_RETRIEVE_TEMPLATE(this.getStoreType().toLowerCase()))
             .toString()
             .replace('YourCommunitySiteNameHere', this.varargs['communitySiteName'] as string)
             .replace('YourCommunityExperienceBundleNameHere', this.varargs['communityExperienceBundleName'] as string)
             .replace('YourCommunityNetworkNameHere', this.varargs['communityNetworkName'] as string);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         fs.writeFileSync(PACKAGE_RETRIEVE(this.storeDir), packageRetrieve);
         this.ux.log(msgs.getMessage('quickstart.setup.usingToRetrieveStoreInfo', [packageRetrieve]));
         this.ux.log(msgs.getMessage('quickstart.setup.getStoreMetadatFromZip'));
@@ -364,16 +366,26 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const networkMetaFile = `${this.storeDir}/experience-bundle-package/unpackaged/networks/${
             this.varargs['communityNetworkName'] as string
         }.network`;
-        const data = fs
+        let data = fs
             .readFileSync(networkMetaFile)
             .toString()
-            .replace(/<selfRegProfile>.*<\/selfRegProfile>/g, '')
             .replace(
                 '</Network>',
                 `    <selfRegProfile>Buyer_User_Profile_From_QuickStart${
                     this.getStoreType().toLowerCase() === 'b2b' ? '_B2B' : ''
                 }</selfRegProfile>\n</Network>`
             );
+        const r = {
+            disableReputationRecordConversations: false,
+            enableDirectMessages: false,
+            enableGuestChatter: true,
+            enableTalkingAboutStats: false,
+            selfRegistration: true,
+        };
+        Object.keys(r).forEach(
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            (v) => (data = data.replace(new RegExp(`<${v}>.*</${v}>`, 'g'), `<${v}>${r[v]}</${v}>`))
+        );
         fs.writeFileSync(networkMetaFile, data);
         shell(
             `cd "${this.storeDir}/experience-bundle-package/unpackaged" && zip -r -X "../${
@@ -526,16 +538,16 @@ export class StoreQuickstartSetup extends SfdxCommand {
 
         // Sharing Rules
         const sharingRulesDirOrg = QUICKSTART_CONFIG() + '/guestbrowsing/sharingRules';
-        const productCatalogShareTemplate = `${sharingRulesDirOrg}/ProductCatalog-template.sharingRules`;
         const sharingRulesDir = this.storeDir + '/experience-bundle-package/unpackaged/sharingRules';
         mkdirSync(sharingRulesDir);
-        const actualProductCatalogShare = sharingRulesDir + '/ProductCatalog.sharingRules';
-        fs.writeFileSync(
-            actualProductCatalogShare,
-            fs
-                .readFileSync(productCatalogShareTemplate)
-                .toString()
-                .replace(/YourStoreName/g, this.varargs['communitySiteName'] as string)
+        ['ProductCatalog-template.sharingRules', 'Product2-template.sharingRules'].forEach((r) =>
+            fs.writeFileSync(
+                sharingRulesDir + '/' + r.replace('-template', ''),
+                fs
+                    .readFileSync(sharingRulesDirOrg + '/' + r)
+                    .toString()
+                    .replace(/YourStoreName/g, this.varargs['communitySiteName'] as string)
+            )
         );
         if (!fs.existsSync(`${this.storeDir}/experience-bundle-package/unpackaged/experiences`)) {
             await this.statusFileManager.setValue('retrievedPackages', false);

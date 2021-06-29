@@ -21,8 +21,11 @@ export class Requires {
         configFile = '',
         force = 'false'
     ): Promise<void> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         if (force === 'true' || !fs.existsSync(dir + '/force-app') || !fs.lstatSync(dir + '/force-app').isDirectory()) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
             if (fs.existsSync(dir + '/force-app') && !fs.lstatSync(dir + '/force-app').isDirectory())
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
                 fs.unlinkSync(dir + '/force-app'); // this shouldn't happen, but if it does...
             await ExamplesConvert.run(['-d', dir, '-n', storeName, '-f', configFile]);
         }
