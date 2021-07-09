@@ -107,8 +107,8 @@ export const parseStoreScratchDef = (
     flagConfig: FlagsConfig = allFlags
 ): StoreScratchDef => {
     if (!defFile || !fs.existsSync(defFile))
-        if (flags && flags['type']) fs.copyFileSync(`${CONFIG_DIR()}/${flags['type']}-store-scratch-def.json`, defFile);
-        else fs.copyFileSync(CONFIG_DIR() + '/b2c-store-scratch-def.json', defFile);
+        if (flags && flags['type']) fs.copyFileSync(`${CONFIG_DIR}/${flags['type']}-store-scratch-def.json`, defFile);
+        else fs.copyFileSync(CONFIG_DIR + '/b2c-store-scratch-def.json', defFile);
     const sctDef = Object.assign(
         new StoreScratchDef(),
         JSON.parse(
@@ -129,7 +129,7 @@ export const parseStoreScratchDef = (
 };
 
 export const convertStoreScratchDefToExamples = (def: StoreScratchDef): string[] => {
-    let path = EXAMPLE_DIR() + '/' + def.edition.toLowerCase() + '/';
+    let path = EXAMPLE_DIR + '/' + def.edition.toLowerCase() + '/';
     const paths = [];
     Object.keys(def.settings)
         .filter((key) => !Array.isArray(def.settings[key]) && key !== 'lwc')

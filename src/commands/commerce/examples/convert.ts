@@ -35,11 +35,11 @@ export class ExamplesConvert extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         if (!this.flags.definitionfile || !fs.existsSync(this.flags.definitionfile)) {
-            this.flags.definitionfile = CONFIG_DIR() + '/store-scratch-def.json';
+            this.flags.definitionfile = CONFIG_DIR + '/store-scratch-def.json';
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
             fs.copyFileSync(
-                CONFIG_DIR() + `/${(this.flags.type as string).toLowerCase()}-store-scratch-def.json`,
-                CONFIG_DIR() + '/store-scratch-def.json'
+                CONFIG_DIR + `/${(this.flags.type as string).toLowerCase()}-store-scratch-def.json`,
+                CONFIG_DIR + '/store-scratch-def.json'
             );
         }
         const scratchDef = parseStoreScratchDef(this.flags.definitionfile);
@@ -67,7 +67,7 @@ export class ExamplesConvert extends SfdxCommand {
             `${this.flags.outputdir}/force-app`
         );
         if (scratchDef.settings.lwc) {
-            const pathFrom = EXAMPLE_DIR() + '/' + scratchDef.edition.toLowerCase() + '/lwc/force-app/main/default';
+            const pathFrom = EXAMPLE_DIR + '/' + scratchDef.edition.toLowerCase() + '/lwc/force-app/main/default';
             const pathTo = (this.flags.outputdir as string) + '/force-app/main/default';
             if (scratchDef.settings.lwc.classes)
                 scratchDef.settings.lwc.classes.forEach((clz) =>
@@ -82,7 +82,7 @@ export class ExamplesConvert extends SfdxCommand {
     }
 
     private convert(r: string[]): void {
-        r.map((l) => l.replace('$EXAMPLE_DIR', EXAMPLE_DIR()).replace('~', os.homedir())).forEach((dir) =>
+        r.map((l) => l.replace('$EXAMPLE_DIR', EXAMPLE_DIR).replace('~', os.homedir())).forEach((dir) =>
             shell(
                 `cd ${this.flags.outputdir as string} && sfdx force:mdapi:convert -r ${dir} -d ${
                     this.flags.outputdir as string
