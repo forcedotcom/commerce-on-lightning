@@ -58,18 +58,17 @@
     "engines": {
         "node": ">=12.0.0"
     },
+    "engineStrict": true,
     "files": [
-        "/.oclif.manifest.json",
         "/lib",
         "/messages",
         "/examples",
-        "/patches",
         "/json",
         "/quickstart-config",
         "/config",
         "/npm-shrinkwrap.json",
         "/oclif.manifest.json",
-        "/sfdx-project.json"
+        "/.oclif.manifest.json"
     ],
     "homepage": "https://github.com/forcedotcom/commerce-on-lightning",
     "keywords": [
