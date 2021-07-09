@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [232.0.1](https://github.com/forcedotcom/commerce-on-lightning/compare/v0.1.5...v232.0.1) (2021-07-09)
+
+
+### Bug Fixes
+
+* fixing properties_1.CONFIG_DIR not a fucntion ([4f0e567](https://github.com/forcedotcom/commerce-on-lightning/commit/4f0e567a92e0717288dca1b3f187388764aa52fe))
+* fixing properties_1.CONFIG_DIR not a fucntion ([d5822fd](https://github.com/forcedotcom/commerce-on-lightning/commit/d5822fd0bf860686290f55d1d3be43c29fb88a0c))
+* fixing properties_1.CONFIG_DIR not a fucntion ([6a2e761](https://github.com/forcedotcom/commerce-on-lightning/commit/6a2e761fb515e4773f25be175dec3f1a6f07145e))
+* fixing self reg and perm issue ([2926cad](https://github.com/forcedotcom/commerce-on-lightning/commit/2926cad022d2010b8cc3c054e43b15b5c4f03a63))
+
 ### [0.1.5](https://github.com/forcedotcom/commerce-on-lightning/compare/v0.1.4...v0.1.5) (2021-07-09)
 
 ### Bug Fixes
