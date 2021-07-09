@@ -39,7 +39,7 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         const paymentGatewayAdapterName = `${selection}Adapter`;
         const paymentGatewayProviderName = `${selection}PGP`;
         const paymentGatewayName = `${selection}PG`;
-        const examplesDir = `${EXAMPLE_DIR()}/${StoreQuickstartSetup.getStoreType(
+        const examplesDir = `${EXAMPLE_DIR}/${StoreQuickstartSetup.getStoreType(
             this.org.getUsername(),
             this.flags['store-name'],
             this.ux

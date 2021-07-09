@@ -22,26 +22,29 @@ export const STORE_ID = 'storeId';
 // File Paths
 const homedir = os.homedir();
 export const B_DIR = `${__dirname}/../../../..`;
-export const BASE_DIR = homedir + '/.commerce'; // ; `${__dirname}/../../../..` // use commented if you just want to do local
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/explicit-function-return-type */
-export const DEVHUB_DIR = (dir = BASE_DIR, hubOrgAdminUsername?) =>
+export const BASE_DIR = homedir + '/.commerce';
+export const DEVHUB_DIR = (dir = BASE_DIR, hubOrgAdminUsername?: string): string =>
     `${mkdirSync(dir)}/devhubs${hubOrgAdminUsername ? '/' + cleanName(hubOrgAdminUsername) : ''}`;
-export const SCRATCH_ORG_DIR = (dir = BASE_DIR, hubOrgAdminUsername, scratchOrgAdminUsername) =>
+export const SCRATCH_ORG_DIR = (dir = BASE_DIR, hubOrgAdminUsername: string, scratchOrgAdminUsername: string): string =>
     `${DEVHUB_DIR(dir, hubOrgAdminUsername)}${scratchOrgAdminUsername ? '/' + cleanName(scratchOrgAdminUsername) : ''}`;
-export const STORE_DIR = (dir = BASE_DIR, hubOrgAdminUsername, scratchOrgAdminUsername, storeName) =>
+export const STORE_DIR = (
+    dir = BASE_DIR,
+    hubOrgAdminUsername: string,
+    scratchOrgAdminUsername: string,
+    storeName: string
+): string =>
     `${SCRATCH_ORG_DIR(dir, hubOrgAdminUsername, scratchOrgAdminUsername)}${
         storeName ? '/' + cleanName(storeName) : ''
     }`;
-export const STATUS_FILE = (dir = BASE_DIR) => `${mkdirSync(dir)}/status`;
-export const B2C_CONFIG_OVERRIDE = (dir = BASE_DIR) => `${mkdirSync(dir)}/b2c.config-override.js`;
-export const EXAMPLE_DIR = (dir = BASE_DIR) => `${mkdirSync(dir)}/examples`;
-export const PATCH_DIR = (dir = BASE_DIR) => `${mkdirSync(dir)}/patches`;
-export const JSON_DIR = (dir = BASE_DIR) => mkdirSync(`${dir}/json`);
-export const CONFIG_DIR = (dir = BASE_DIR) => `${mkdirSync(dir)}/config`;
-export const BUYER_USER_DEF = (dir = BASE_DIR) => `${mkdirSync(dir + '/config')}/buyer-user-def.json`;
-export const QUICKSTART_CONFIG = (dir = BASE_DIR) => `${mkdirSync(dir)}/quickstart-config`;
-export const PACKAGE_RETRIEVE_TEMPLATE = (type?: string, dir = BASE_DIR) =>
+export const STATUS_FILE = (dir = BASE_DIR): string => `${mkdirSync(dir)}/status`;
+export const B2C_CONFIG_OVERRIDE = (dir = BASE_DIR): string => `${mkdirSync(dir)}/b2c.config-override.js`;
+export const EXAMPLE_DIR = `${mkdirSync(BASE_DIR)}/examples`;
+export const PATCH_DIR = (dir = BASE_DIR): string => `${mkdirSync(dir)}/patches`;
+export const JSON_DIR = (dir = BASE_DIR): string => mkdirSync(`${dir}/json`);
+export const CONFIG_DIR = `${mkdirSync(BASE_DIR)}/config`;
+export const BUYER_USER_DEF = (dir = BASE_DIR): string => `${mkdirSync(dir + '/config')}/buyer-user-def.json`;
+export const QUICKSTART_CONFIG = (dir = BASE_DIR): string => `${mkdirSync(dir)}/quickstart-config`;
+export const PACKAGE_RETRIEVE_TEMPLATE = (type?: string, dir = BASE_DIR): string =>
     `${mkdirSync(QUICKSTART_CONFIG(dir))}/${type ? type.toLowerCase() + '-' : ''}package-retrieve-template.xml`;
-export const PACKAGE_RETRIEVE = (dir = BASE_DIR) => `${mkdirSync(QUICKSTART_CONFIG(dir))}/package-retrieve.xml`;
-export const SFDX_DIR = (dir = homedir) => `${mkdirSync(dir + '/.sfdx')}`;
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/explicit-function-return-type */
+export const PACKAGE_RETRIEVE = (dir = BASE_DIR): string => `${mkdirSync(QUICKSTART_CONFIG(dir))}/package-retrieve.xml`;
+export const SFDX_DIR = (dir = homedir): string => `${mkdirSync(dir + '/.sfdx')}`;

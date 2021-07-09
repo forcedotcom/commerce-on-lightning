@@ -16,7 +16,7 @@ const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 export const exampleFlags = {
     definitionfile: flags.filepath({
         char: 'f',
-        default: CONFIG_DIR() + '/store-scratch-def.json',
+        default: CONFIG_DIR + '/store-scratch-def.json',
         description: messages.getMessage('convertFlags.configFileDescription'),
     }),
     outputdir: flags.string({
