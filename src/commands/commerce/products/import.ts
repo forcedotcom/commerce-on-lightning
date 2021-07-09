@@ -56,7 +56,7 @@ export class ProductsImport extends SfdxCommand {
         if (this.flags.definitionfile) {
             if (!fs.existsSync(this.flags.definitionfile) && this.flags.type)
                 fs.copyFileSync(
-                    CONFIG_DIR() + `/${this.flags.type as string}-store-scratch-def.json`,
+                    CONFIG_DIR + `/${this.flags.type as string}-store-scratch-def.json`,
                     this.flags.definitionfile
                 );
             const def = parseStoreScratchDef(this.flags.definitionfile);

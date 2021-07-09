@@ -15,7 +15,7 @@ const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 export const productsFlags = {
     'products-file-csv': flags.string({
         char: 'c',
-        default: `${EXAMPLE_DIR()}/csv/Alpine-small.csv`,
+        default: `${EXAMPLE_DIR}/csv/Alpine-small.csv`,
         description: messages.getMessage('productsFlags.productsFileCsvDescription'),
     }),
 };
