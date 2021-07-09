@@ -28,7 +28,8 @@ describe('test updating self reg', () => {
                 '    <selfRegProfile>Buyer_User_Profile_From_QuickStart</selfRegProfile>\n</Network>'
             );
         assert.ok(
-            (res.match(/<selfRegProfile>Buyer_User_Profile_From_QuickStart<\/selfRegProfile>/g) || []).length === 1
+            (res.match(/<selfRegProfile>[Bb]uyer_[Uu]ser_[Pp]rofile_[Ff]rom_[Qq]uickStart<\/selfRegProfile>/g) || [])
+                .length === 1
         );
     });
 });
@@ -76,6 +77,7 @@ const testFile = `<?xml version="1.0" encoding="UTF-8"?>
     <picassoSite>X200commerce1</picassoSite>
     <selfRegistration>false</selfRegistration>
     <sendWelcomeEmail>true</sendWelcomeEmail>
+    <selfRegProfile>buyer_user_profile_from_quickStart</selfRegProfile>
     <site>X200commerce</site>
     <status>Live</status>
     <tabs>
