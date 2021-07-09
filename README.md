@@ -31,7 +31,7 @@ $ npm install -g @salesforce/commerce
 $ sfdx COMMAND
 running command...
 $ sfdx (-v|--version|version)
-@salesforce/commerce/0.1.4 linux-x64 node-v12.22.1
+@salesforce/commerce/0.1.4 linux-x64 node-v12.22.3
 $ sfdx --help [COMMAND]
 USAGE
   $ sfdx COMMAND

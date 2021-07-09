@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.1.5](https://github.com/forcedotcom/commerce-on-lightning/compare/v0.1.4...v0.1.5) (2021-07-09)
+
+
+### Bug Fixes
+
+* fixing self reg and perm issue ([98f995d](https://github.com/forcedotcom/commerce-on-lightning/commit/98f995d59e7ce638656da2ea4770e9900556ef50))
+
 ### [0.1.4](https://github.com/forcedotcom/commerce-on-lightning/compare/v0.1.3...v0.1.4) (2021-06-29)
 
 
