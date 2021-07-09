@@ -22,7 +22,11 @@ function contains(v: string, a): boolean {
  * @param flags
  * @param argv
  */
-export function getPassedArgs(argv: string[], flags: {}, flagConfig: FlagsConfig = allFlags): Record<string, never> {
+export function getPassedArgs(
+    argv: string[],
+    flags: Record<string, unknown>,
+    flagConfig: FlagsConfig = allFlags
+): Record<string, never> {
     // if no argv then return empty object
     if (!(argv && argv.length > 0)) return {};
     const m = {};
@@ -31,9 +35,9 @@ export function getPassedArgs(argv: string[], flags: {}, flagConfig: FlagsConfig
         m['-' + (flagConfig[k]['char'] as string)] = k;
     });
     const n = {};
+    let last;
     // eslint-disable-next-line no-console,@typescript-eslint/no-empty-function
     argv.forEach((arg) => {
-        let last;
         if (arg.startsWith('-')) {
             if (arg in m) {
                 // for case -v something or --hello something

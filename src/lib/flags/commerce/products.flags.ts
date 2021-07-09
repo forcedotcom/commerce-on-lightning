@@ -10,7 +10,7 @@ import { EXAMPLE_DIR } from '../../utils/constants/properties';
 
 Messages.importMessagesDirectory(__dirname);
 const TOPIC = 'products';
-const messages = Messages.loadMessages('commerce', TOPIC);
+const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export const productsFlags = {
     'products-file-csv': flags.string({

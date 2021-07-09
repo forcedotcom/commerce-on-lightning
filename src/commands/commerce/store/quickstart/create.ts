@@ -16,7 +16,7 @@ Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:quickstart:create`;
-const msgs = Messages.loadMessages('commerce', TOPIC);
+const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class StoreQuickstartCreate extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -82,8 +82,13 @@ export class StoreQuickstartCreate extends SfdxCommand {
             if (e.message.indexOf('Please enter a unique one') >= 0)
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return this.createCommunity((Math.random() * 1e5).toString().substr(0, 5));
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            this.ux.log(chalk.red(JSON.stringify(e.message, null, 4)));
+            try {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                this.ux.log(chalk.red(JSON.stringify(JSON.parse(e.message)['message'], null, 4)));
+            } catch (ee) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                this.ux.log(chalk.red(JSON.stringify(e.message, null, 4)));
+            }
             const filteredMessages = [
                 msgs.getMessage('quickstart.create.enterDifferentNameExists'),
                 msgs.getMessage('quickstart.create.creatingYourCommunity'),
@@ -96,6 +101,7 @@ export class StoreQuickstartCreate extends SfdxCommand {
                 );
         }
         this.ux.stopSpinner(msgs.getMessage('quickstart.create.done'));
+        if (!output) output = {};
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         output['urlpathprefix'] = urlPathPrefix;
         if (output) this.ux.log(JSON.stringify(output, null, 4));

@@ -28,7 +28,7 @@ Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:create`;
-const msgs = Messages.loadMessages('commerce', TOPIC);
+const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class StoreCreate extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -58,11 +58,12 @@ export class StoreCreate extends SfdxCommand {
     public org: Org;
     private scrDef;
     private storeDir;
+    private devhubUsername;
     private statusFileManager: StatusFileManager;
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     public static async getStoreId(
         statusFileManager: StatusFileManager,
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         ux,
         cnt = 0,
         setPerms = true
@@ -151,27 +152,23 @@ export class StoreCreate extends SfdxCommand {
         }
     }
     public async run(): Promise<AnyJson> {
+        this.devhubUsername = (await this.org.getDevHubOrg()).getUsername();
         const passedArgs = getPassedArgs(this.argv, this.flags);
         if (!Object.keys(passedArgs).includes('definitionfile') && Object.keys(passedArgs).includes('type'))
             this.flags.definitionfile = (this.flags.type as string) + '-store-scratch-def.json';
         this.scrDef = parseStoreScratchDef(this.flags.definitionfile, this.argv, this.flags);
         // parseStoreScratchDef overrides scrDef with arg flag values, below is needed when none are supplied so we use the values in store def file
         const modifyArgs = [
-            { args: ['-s', '--store-name'], value: this.scrDef.storeName as string },
+            { args: ['-n', '--store-name'], value: this.scrDef.storeName as string },
             { args: ['-t', '--templatename'], value: this.scrDef.template as string },
         ];
         modifyArgs.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         this.statusFileManager = new StatusFileManager(
-            (await this.org.getDevHubOrg()).getUsername(),
+            this.devhubUsername,
             this.org.getUsername(),
             this.scrDef.storeName
         );
-        this.storeDir = STORE_DIR(
-            BASE_DIR,
-            (await this.org.getDevHubOrg()).getUsername(),
-            this.org.getUsername(),
-            this.scrDef.storeName
-        ); // TODO keep steps with status file and config but decouple them from this plugin add it to orchestration plugin
+        this.storeDir = STORE_DIR(BASE_DIR, this.devhubUsername, this.org.getUsername(), this.scrDef.storeName); // TODO keep steps with status file and config but decouple them from this plugin add it to orchestration plugin
         if (await this.statusFileManager.getValue('done')) {
             this.ux.log(msgs.getMessage('create.statusIndicatesCompletedSkipping'));
             return { createdStore: true };
@@ -256,9 +253,7 @@ export class StoreCreate extends SfdxCommand {
 
     private async pushStoreSources(): Promise<void> {
         if ((await this.statusFileManager.getValue('pushedSources')) === 'true') return;
-        const scratchOrgDir = mkdirSync(
-            SCRATCH_ORG_DIR(BASE_DIR, (await this.org.getDevHubOrg()).getUsername(), this.org.getUsername())
-        );
+        const scratchOrgDir = mkdirSync(SCRATCH_ORG_DIR(BASE_DIR, this.devhubUsername, this.org.getUsername()));
         try {
             fs.removeSync(scratchOrgDir + '/force-app');
         } catch (e) {
@@ -315,7 +310,8 @@ export class StoreCreate extends SfdxCommand {
             shellJsonSfdx(
                 `sfdx force:user:password:generate -u "${this.org.getUsername()}" -o "${
                     this.flags['buyer-username'] as string
-                }" -v "${(await this.org.getDevHubOrg()).getUsername()}"`
+                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                }" -v "${this.devhubUsername}"`
             );
         } catch (e) {
             if (e.message.indexOf('INSUFFICIENT_ACCESS') < 0) {

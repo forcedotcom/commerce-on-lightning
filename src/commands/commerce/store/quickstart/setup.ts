@@ -36,7 +36,7 @@ Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:quickstart:setup`;
-const msgs = Messages.loadMessages('commerce', TOPIC);
+const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class StoreQuickstartSetup extends SfdxCommand {
     // TODO add apiversion to all shell'd commands
@@ -67,11 +67,32 @@ export class StoreQuickstartSetup extends SfdxCommand {
         ...filterFlags(['store-name', 'definitionfile'], allFlags),
     };
 
+    private static storeType: string;
     public org: SfdxOrg;
+    public statusFileManager: StatusFileManager;
     private devHubUsername: string;
     private storeDir: string;
-    private statusFileManager: StatusFileManager;
-    private storeType: string;
+
+    public static getStoreType(username: string, storeName: string, ux): string {
+        if (!ux) ux = console;
+        if (this.storeType) return this.storeType;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+        ux.log(msgs.getMessage('quickstart.setup.checkingB2BorB2C'));
+        const storeTypeRes = forceDataSoql(`SELECT Type FROM WebStore WHERE Name = '${storeName}'`, username);
+        if (
+            !storeTypeRes.result ||
+            !storeTypeRes.result.records ||
+            storeTypeRes.result.records.length === 0 ||
+            !storeTypeRes.result.records[0]['Type']
+        )
+            throw new SfdxError(msgs.getMessage('quickstart.setup.storeTypeDoesNotExist'));
+        const storeType = storeTypeRes.result.records[0]['Type'] as string;
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+        ux.log('Store Type = ' + JSON.stringify(storeType));
+        // Update Guest Profile with required CRUD and FLS
+        this.storeType = storeType;
+        return storeType;
+    }
 
     public async run(): Promise<AnyJson> {
         this.devHubUsername = (await this.org.getDevHubOrg()).getUsername();
@@ -102,7 +123,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         this.ux.log(chalk.green.bold(msgs.getMessage('quickstart.setup.completedQuickstartStep1')));
         await this.setupIntegrations();
         this.ux.log(chalk.green.bold(msgs.getMessage('quickstart.setup.completedQuickstartStep2')));
-        if (this.getStoreType() === 'B2B') {
+        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags['store-name'], this.ux) === 'B2B') {
             // replace sfdc_checkout__CheckoutTemplate with $(ls force-app/main/default/flows/*Checkout.flow-meta.xml | sed 's/.*flows\/\(.*\).flow-meta.xml/\1/')
             await this.updateFlowAssociatedToCheckout();
         }
@@ -122,12 +143,22 @@ export class StoreQuickstartSetup extends SfdxCommand {
         // TODO possible turn this into a requires
         if (await this.statusFileManager.getValue('retrievedPackages')) return;
         // Replace the names of the components that will be retrieved. // this should stay as a template so users can modify it to their liking
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         const packageRetrieve = fs
-            .readFileSync(PACKAGE_RETRIEVE_TEMPLATE(this.getStoreType()))
+            .readFileSync(
+                PACKAGE_RETRIEVE_TEMPLATE(
+                    StoreQuickstartSetup.getStoreType(
+                        this.org.getUsername(),
+                        this.flags['store-name'],
+                        this.ux
+                    ).toLowerCase()
+                )
+            )
             .toString()
             .replace('YourCommunitySiteNameHere', this.varargs['communitySiteName'] as string)
             .replace('YourCommunityExperienceBundleNameHere', this.varargs['communityExperienceBundleName'] as string)
             .replace('YourCommunityNetworkNameHere', this.varargs['communityNetworkName'] as string);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         fs.writeFileSync(PACKAGE_RETRIEVE(this.storeDir), packageRetrieve);
         this.ux.log(msgs.getMessage('quickstart.setup.usingToRetrieveStoreInfo', [packageRetrieve]));
         this.ux.log(msgs.getMessage('quickstart.setup.getStoreMetadatFromZip'));
@@ -347,11 +378,17 @@ export class StoreQuickstartSetup extends SfdxCommand {
             .replace(
                 /<networkMemberGroups>([\s|\S]*?)<\/networkMemberGroups>/,
                 `<networkMemberGroups>\n        <profile>Buyer_User_Profile_From_QuickStart${
-                    this.getStoreType().toLowerCase() === 'b2b' ? '_B2B' : ''
+                    StoreQuickstartSetup.getStoreType(
+                        this.org.getUsername(),
+                        this.flags['store-name'],
+                        this.ux
+                    ).toLowerCase() === 'b2b'
+                        ? '_B2B'
+                        : ''
                 }</profile>\n        <profile>admin</profile>\n    </networkMemberGroups>`
             )
             .replace(/<status>.*/, '<status>Live</status>');
-        if (this.getStoreType() === 'B2C')
+        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags['store-name'], this.ux) === 'B2C')
             data.replace(/<enableGuestChatter>.*/, '<enableGuestChatter>true</enableGuestChatter>')
                 .replace(/<enableGuestFileAccess>.*/, '<enableGuestFileAccess>true</enableGuestFileAccess>')
                 .replace(/<selfRegistration>.*/, '<selfRegistration>true</selfRegistration>');
@@ -364,15 +401,33 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const networkMetaFile = `${this.storeDir}/experience-bundle-package/unpackaged/networks/${
             this.varargs['communityNetworkName'] as string
         }.network`;
-        const data = fs
+        let data = fs
             .readFileSync(networkMetaFile)
             .toString()
+            .replace(/<selfRegProfile>.*<\/selfRegProfile>/g, '')
             .replace(
                 '</Network>',
                 `    <selfRegProfile>Buyer_User_Profile_From_QuickStart${
-                    this.getStoreType().toLowerCase() === 'b2b' ? '_B2B' : ''
+                    StoreQuickstartSetup.getStoreType(
+                        this.org.getUsername(),
+                        this.flags['store-name'],
+                        this.ux
+                    ).toLowerCase() === 'b2b'
+                        ? '_B2B'
+                        : ''
                 }</selfRegProfile>\n</Network>`
             );
+        const r = {
+            disableReputationRecordConversations: false,
+            enableDirectMessages: false,
+            enableGuestChatter: true,
+            enableTalkingAboutStats: false,
+            selfRegistration: true,
+        };
+        Object.keys(r).forEach(
+            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+            (v) => (data = data.replace(new RegExp(`<${v}>.*</${v}>`, 'g'), `<${v}>${r[v]}</${v}>`))
+        );
         fs.writeFileSync(networkMetaFile, data);
         shell(
             `cd "${this.storeDir}/experience-bundle-package/unpackaged" && zip -r -X "../${
@@ -525,16 +580,16 @@ export class StoreQuickstartSetup extends SfdxCommand {
 
         // Sharing Rules
         const sharingRulesDirOrg = QUICKSTART_CONFIG() + '/guestbrowsing/sharingRules';
-        const productCatalogShareTemplate = `${sharingRulesDirOrg}/ProductCatalog-template.sharingRules`;
         const sharingRulesDir = this.storeDir + '/experience-bundle-package/unpackaged/sharingRules';
         mkdirSync(sharingRulesDir);
-        const actualProductCatalogShare = sharingRulesDir + '/ProductCatalog.sharingRules';
-        fs.writeFileSync(
-            actualProductCatalogShare,
-            fs
-                .readFileSync(productCatalogShareTemplate)
-                .toString()
-                .replace(/YourStoreName/g, this.varargs['communitySiteName'] as string)
+        ['ProductCatalog-template.sharingRules', 'Product2-template.sharingRules'].forEach((r) =>
+            fs.writeFileSync(
+                sharingRulesDir + '/' + r.replace('-template', ''),
+                fs
+                    .readFileSync(sharingRulesDirOrg + '/' + r)
+                    .toString()
+                    .replace(/YourStoreName/g, this.varargs['communitySiteName'] as string)
+            )
         );
         if (!fs.existsSync(`${this.storeDir}/experience-bundle-package/unpackaged/experiences`)) {
             await this.statusFileManager.setValue('retrievedPackages', false);
@@ -613,28 +668,8 @@ export class StoreQuickstartSetup extends SfdxCommand {
         }
         this.ux.log(msgs.getMessage('quickstart.setup.doneGuestBuyerAccessSetup'));
     }
-    private getStoreType(): string {
-        if (this.storeType) return this.storeType;
-        this.ux.log(msgs.getMessage('quickstart.setup.checkingB2BorB2C'));
-        const storeTypeRes = forceDataSoql(
-            `SELECT Type FROM WebStore WHERE Name = '${this.flags['store-name'] as string}'`,
-            this.org.getUsername()
-        );
-        if (
-            !storeTypeRes.result ||
-            !storeTypeRes.result.records ||
-            storeTypeRes.result.records.length === 0 ||
-            !storeTypeRes.result.records[0]['Type']
-        )
-            throw new SfdxError(msgs.getMessage('quickstart.setup.storeTypeDoesNotExist'));
-        const storeType = storeTypeRes.result.records[0]['Type'] as string;
-        this.ux.log('Store Type = ' + JSON.stringify(storeType));
-        // Update Guest Profile with required CRUD and FLS
-        this.storeType = storeType;
-        return storeType;
-    }
 
-    private async addContactPointAndDeploy(): Promise<void> {
+    private async addContactPointAndDeploy(cnt = 0): Promise<void> {
         let accountId = (await this.statusFileManager.getValue('accountId')) as string;
         if (!accountId) await this.createBuyerUserWithContactAndAccount();
         accountId = (await this.statusFileManager.getValue('accountId')) as string;
@@ -663,10 +698,12 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 ])
             );
 
-        if (this.getStoreType() === 'B2C') {
+        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags['store-name'], this.ux) === 'B2C') {
             this.ux.log(msgs.getMessage('quickstart.setup.settingUpGuestBrowsing'));
             await this.enableGuestBrowsing();
-        } else if (this.getStoreType() === 'B2B') {
+        } else if (
+            StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags['store-name'], this.ux) === 'B2B'
+        ) {
             this.ux.log('Setting up Commerce Diagnostic Event Process Builder');
             const storeId = await StoreCreate.getStoreId(
                 new StatusFileManager(
@@ -678,9 +715,10 @@ export class StoreQuickstartSetup extends SfdxCommand {
             );
             const processMetaFile =
                 this.storeDir + '/experience-bundle-package/unpackaged/flows/Process_CommerceDiagnosticEvents.flow';
-            if (!fs.fileExistsSync(processMetaFile)) {
+            if (!fs.fileExistsSync(processMetaFile) && cnt === 0) {
                 await this.statusFileManager.setValue('retrievedPackages', false);
                 await this.retrievePackages();
+                return await this.addContactPointAndDeploy(++cnt);
             }
             fs.writeFileSync(
                 processMetaFile,
@@ -698,7 +736,11 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 'Something went wrong no experience bundle ' + `${this.storeDir}/experience-bundle-package/unpackaged/`
             );
         fs.copyFileSync(
-            `${QUICKSTART_CONFIG()}/${this.getStoreType()}-package-deploy-template.xml`,
+            `${QUICKSTART_CONFIG()}/${StoreQuickstartSetup.getStoreType(
+                this.org.getUsername(),
+                this.flags['store-name'],
+                this.ux
+            ).toLowerCase()}-package-deploy-template.xml`,
             `${this.storeDir}/experience-bundle-package/unpackaged/package.xml`
         );
         shell(
@@ -729,6 +771,10 @@ export class StoreQuickstartSetup extends SfdxCommand {
                         this.varargs['communityExperienceBundleName'] as string
                     }ToDeploy.zip" --wait -1 --verbose --singlepackage`
                 );
+            } else if (JSON.stringify(e.message).indexOf('Error parsing file') >= 0 && cnt === 0) {
+                await this.statusFileManager.setValue('retrievedPackages', false);
+                await this.retrievePackages();
+                return await this.addContactPointAndDeploy(++cnt);
             } else throw e;
         }
         // Need to add here because: Error happens if done above, "Error: You can only select profiles that are associated with the experience."

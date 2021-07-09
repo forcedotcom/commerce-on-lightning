@@ -40,6 +40,7 @@ export const getOrgInfo = (username: string): Org => {
 
 export const getOrgInfoFast = (username: string): Org => {
     const path = `${SFDX_DIR()}/${username}.json`;
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return
     if (fs.fileExistsSync(path)) return Object.assign(new Org(), fs.readJsonSync(path));
     return undefined;
 };

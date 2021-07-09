@@ -13,12 +13,13 @@ import { filterFlags } from '../../../../lib/utils/args/flagsUtils';
 import { EXAMPLE_DIR } from '../../../../lib/utils/constants/properties';
 import { forceDataRecordCreate, forceDataRecordDelete, forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
 import { shell, shellJsonSfdx } from '../../../../lib/utils/shell';
+import { StoreQuickstartSetup } from '../../store/quickstart/setup';
 
 Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'payments';
 const CMD = `commerce:${TOPIC}:quickstart:setup`;
-const msgs = Messages.loadMessages('commerce', TOPIC);
+const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class PaymentsQuickstartSetup extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -38,7 +39,11 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         const paymentGatewayAdapterName = `${selection}Adapter`;
         const paymentGatewayProviderName = `${selection}PGP`;
         const paymentGatewayName = `${selection}PG`;
-        const examplesDir = `${EXAMPLE_DIR()}/checkout/payment-gateway-integration/${selection}/`;
+        const examplesDir = `${EXAMPLE_DIR()}/${StoreQuickstartSetup.getStoreType(
+            this.org.getUsername(),
+            this.flags['store-name'],
+            this.ux
+        ).toLowerCase()}/checkout/payment-gateway-integration/${selection}/`;
         this.ux.log(
             msgs.getMessage('quickstart.setup.settingUpGatewayConvertingNamedCredentialsGatewayAdapterApex', [
                 selection,

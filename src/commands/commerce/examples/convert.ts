@@ -19,7 +19,7 @@ import { convertStoreScratchDefToExamples, parseStoreScratchDef } from '../../..
 const TOPIC = 'examples';
 const CMD = `commerce:${TOPIC}:convert`;
 Messages.importMessagesDirectory(__dirname);
-const messages = Messages.loadMessages('commerce', TOPIC);
+const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class ExamplesConvert extends SfdxCommand {
     // TODO fix this to use store-def.json file
@@ -33,8 +33,10 @@ export class ExamplesConvert extends SfdxCommand {
     };
 
     public async run(): Promise<AnyJson> {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         if (!this.flags.definitionfile || !fs.existsSync(this.flags.definitionfile)) {
             this.flags.definitionfile = CONFIG_DIR() + '/store-scratch-def.json';
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
             fs.copyFileSync(
                 CONFIG_DIR() + `/${(this.flags.type as string).toLowerCase()}-store-scratch-def.json`,
                 CONFIG_DIR() + '/store-scratch-def.json'

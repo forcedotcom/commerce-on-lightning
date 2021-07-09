@@ -18,7 +18,7 @@ Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:display`;
-const messages = Messages.loadMessages('commerce', TOPIC);
+const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class StoreDisplay extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -28,7 +28,7 @@ export class StoreDisplay extends SfdxCommand {
     protected static flagsConfig = filterFlags(['store-name', 'buyer-username', 'urlpathprefix'], allFlags);
 
     public org: Org;
-    private statusFileManager: StatusFileManager;
+    public statusFileManager: StatusFileManager;
 
     public async run(): Promise<AnyJson> {
         let devhub = (await this.org.getDevHubOrg()).getUsername();
@@ -67,7 +67,6 @@ export class StoreDisplay extends SfdxCommand {
         this.ux.log(
             messages.getMessage('view.info.savingConfigIntoConfig', ['commerce.config-override.js', configFile])
         );
-        this.ux.log(configFile);
         // fs.writeFileSync(B2C_CONFIG_OVERRIDE(), configFile); // Shall we resolve this query - 'should this write it to the scratch org directory?'
         return true;
     }
