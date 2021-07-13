@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>52.0</apiVersion>
+    <description>Store Logo</description>
+    <isExposed>true</isExposed>
+    <masterLabel>Store Logo</masterLabel>
+    <targets>
+        <target>lightningCommunity__Page</target>
+        <target>lightningCommunity__Default</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightningCommunity__Default">
+            <property type="String" name="alignment" label="Logo Alignment" default="Left" datasource="Left, Center, Right"/>
+            <property type="String" name="height" label="Height" default="auto"/>
+            <property type="String" name="width" label="Width" default="auto"/>
+            <property type="ContentReference" name="cmsContentId" label="CMS Content ID" filter="cms_image" />
+            <property type="String" name="imageUrl" label="External URL"/>
+            <property type="String" name="alternateText" label="Alternate Text" default="Home"/>
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>

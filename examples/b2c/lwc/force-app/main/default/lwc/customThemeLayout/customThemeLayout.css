@@ -1,0 +1,19 @@
+.flexContainer {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.mainContent {
+    flex-grow: 1;
+}
+
+.header, .mainContent, .footer {
+    flex-shrink: 0;
+}
+
+@supports (-webkit-touch-callout: none) {
+    .flexContainer {
+        min-height: -webkit-fill-available;
+    }
+}
