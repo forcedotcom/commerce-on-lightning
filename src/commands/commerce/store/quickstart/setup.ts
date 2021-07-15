@@ -606,18 +606,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
         siteConfigMetaFile.isAvailableToGuests = true;
         siteConfigMetaFile.authenticationType = 'AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED';
         fs.writeFileSync(siteConfigMetaFileName, JSON.stringify(siteConfigMetaFile, null, 4));
-        const siteConfigMainAppPageFileName =
-            this.storeDir +
-            `/experience-bundle-package/unpackaged/experiences/${
-                this.varargs['communityExperienceBundleName'] as string
-            }/config/mainAppPage.json`;
-        fs.writeFileSync(
-            siteConfigMainAppPageFileName,
-            fs
-                .readFileSync(siteConfigMainAppPageFileName)
-                .toString()
-                .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
-        );
         const navMenuItemMetaFile =
             this.storeDir + '/experience-bundle-package/unpackaged/navigationMenus/Default_Navigation.navigationMenu';
         fs.writeFileSync(
