@@ -23,7 +23,7 @@ import {
     STORE_DIR,
 } from '../../../../lib/utils/constants/properties';
 import { copyFolderRecursiveSync, mkdirSync, remove } from '../../../../lib/utils/fsUtils';
-import {BuyerUserDef, Org, parseStoreScratchDef, StoreConfig} from '../../../../lib/utils/jsonUtils';
+import { BuyerUserDef, Org, parseStoreScratchDef, StoreConfig } from '../../../../lib/utils/jsonUtils';
 import { Requires } from '../../../../lib/utils/requires';
 import { forceDataRecordCreate, forceDataRecordUpdate, forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
 import { getScratchOrgByUsername } from '../../../../lib/utils/sfdx/forceOrgList';
