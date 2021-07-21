@@ -23,7 +23,7 @@ import {
     STORE_DIR,
 } from '../../../../lib/utils/constants/properties';
 import { copyFolderRecursiveSync, mkdirSync, remove } from '../../../../lib/utils/fsUtils';
-import { BuyerUserDef, Org, StoreConfig } from '../../../../lib/utils/jsonUtils';
+import { BuyerUserDef, Org, parseStoreScratchDef, StoreConfig } from '../../../../lib/utils/jsonUtils';
 import { Requires } from '../../../../lib/utils/requires';
 import { forceDataRecordCreate, forceDataRecordUpdate, forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
 import { getScratchOrgByUsername } from '../../../../lib/utils/sfdx/forceOrgList';
@@ -606,18 +606,22 @@ export class StoreQuickstartSetup extends SfdxCommand {
         siteConfigMetaFile.isAvailableToGuests = true;
         siteConfigMetaFile.authenticationType = 'AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED';
         fs.writeFileSync(siteConfigMetaFileName, JSON.stringify(siteConfigMetaFile, null, 4));
+        const def = parseStoreScratchDef(this.flags.definitionfile);
+        const relaxedLevel = def.settings.isRelaxedCSPLevel;
         const siteConfigMainAppPageFileName =
             this.storeDir +
             `/experience-bundle-package/unpackaged/experiences/${
                 this.varargs['communityExperienceBundleName'] as string
             }/config/mainAppPage.json`;
-        fs.writeFileSync(
+        if (relaxedLevel) {
+            fs.writeFileSync(
             siteConfigMainAppPageFileName,
             fs
                 .readFileSync(siteConfigMainAppPageFileName)
                 .toString()
                 .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
         );
+        }
         const navMenuItemMetaFile =
             this.storeDir + '/experience-bundle-package/unpackaged/navigationMenus/Default_Navigation.navigationMenu';
         fs.writeFileSync(
