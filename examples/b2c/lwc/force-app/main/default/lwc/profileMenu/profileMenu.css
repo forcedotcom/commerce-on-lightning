@@ -1,0 +1,7 @@
+.userDetails{
+    line-height: 1.2rem;
+    max-width: 8rem;
+}
+.slds-dropdown-trigger.slds-dropdown-trigger_click.profileMenuContainer{
+    display: grid;
+}

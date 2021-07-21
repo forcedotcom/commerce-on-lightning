@@ -1,0 +1,40 @@
+.horizontalMenuItemContainer {
+    white-space: nowrap;
+    position: relative;
+}
+
+.horizontalMenuItem {
+    display: inline-flex;
+    align-items: baseline;
+    border: 0px;
+    outline: none;
+    background: unset;
+    font-size: 0.875rem;
+    font-weight: normal;
+    color: var(--dxp-s-anchor-text-color);
+}
+
+.horizontalMenuItem span {
+    max-width: 20rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.horizontalMenuItem:focus {
+    text-decoration: underline;
+}
+nav {
+    display: grid;
+    display: -ms-grid;
+    position: relative;
+    overflow: visible;
+}
+
+ul {
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+}
+ul li:hover {
+    background: var(--dxp-g-root-1);
+}

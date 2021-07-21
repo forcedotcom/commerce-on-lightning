@@ -1,0 +1,15 @@
+<template>
+    <div class="slds-dropdown-trigger slds-dropdown-trigger_click slds-p-around_xxx-small">
+        <a
+                class="slds-button slds-button_icon slds-button_icon slds-button_icon-container slds-button_icon-small"
+                title={iconAssistiveText}
+                href={cartURL}
+                onclick={navigateToCart}
+                onkeydown={navigateToCartKeyDown}
+        >
+            <lightning-icon class="cartIcon" size="small" icon-name="utility:cart"></lightning-icon>
+            <span class="slds-assistive-text">{iconAssistiveText}</span>
+        </a>
+        <span aria-hidden="true" class="slds-notification-badge badgeIcon">{badgeItemsCount}</span>
+    </div>
+</template>
