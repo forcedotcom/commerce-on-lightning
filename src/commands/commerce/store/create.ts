@@ -11,7 +11,7 @@ import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
 import { allFlags } from '../../../lib/flags/commerce/all.flags';
 import { addAllowedArgs, filterFlags, getPassedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
-import { BASE_DIR, BUYER_USER_DEF, SCRATCH_ORG_DIR, STORE_DIR } from '../../../lib/utils/constants/properties';
+import { BASE_DIR, CONFIG_DIR, BUYER_USER_DEF, SCRATCH_ORG_DIR, STORE_DIR } from '../../../lib/utils/constants/properties';
 import { BuyerUserDef, parseStoreScratchDef, replaceErrors, UserInfo } from '../../../lib/utils/jsonUtils';
 import { Requires } from '../../../lib/utils/requires';
 import { forceDataSoql } from '../../../lib/utils/sfdx/forceDataSoql';
