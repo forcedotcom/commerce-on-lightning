@@ -11,7 +11,13 @@ import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
 import { allFlags } from '../../../lib/flags/commerce/all.flags';
 import { addAllowedArgs, filterFlags, getPassedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
-import { BASE_DIR, BUYER_USER_DEF, SCRATCH_ORG_DIR, STORE_DIR } from '../../../lib/utils/constants/properties';
+import {
+    BASE_DIR,
+    BUYER_USER_DEF,
+    CONFIG_DIR,
+    SCRATCH_ORG_DIR,
+    STORE_DIR,
+} from '../../../lib/utils/constants/properties';
 import { BuyerUserDef, parseStoreScratchDef, replaceErrors, UserInfo } from '../../../lib/utils/jsonUtils';
 import { Requires } from '../../../lib/utils/requires';
 import { forceDataSoql } from '../../../lib/utils/sfdx/forceDataSoql';
@@ -154,8 +160,9 @@ export class StoreCreate extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         this.devhubUsername = (await this.org.getDevHubOrg()).getUsername();
         const passedArgs = getPassedArgs(this.argv, this.flags);
+        if (!this.flags.type) this.flags.type = 'b2c';
         if (!Object.keys(passedArgs).includes('definitionfile') && Object.keys(passedArgs).includes('type'))
-            this.flags.definitionfile = (this.flags.type as string) + '-store-scratch-def.json';
+            this.flags.definitionfile = CONFIG_DIR + '/' + (this.flags.type as string) + '-store-scratch-def.json';
         this.scrDef = parseStoreScratchDef(this.flags.definitionfile, this.argv, this.flags);
         // parseStoreScratchDef overrides scrDef with arg flag values, below is needed when none are supplied so we use the values in store def file
         const modifyArgs = [
