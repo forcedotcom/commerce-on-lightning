@@ -126,7 +126,7 @@
         "posttest": "yarn lint && yarn test:deprecation-policy && yarn test:command-reference",
         "precommit": "npm run clean && npm run build && npm run lint && npm run version",
         "prepack": "sf-prepack",
-        "prepare": "sf-install",
+        "prepare": "rm -f .oclif.manifest.json && yarn run prepack",
         "prepublishOnly": "yarn run build && oclif-dev manifest",
         "pretest": "sf-compile-test",
         "prettier": "prettier --write src/**/**/*.ts && prettier --write src/**/*.ts && prettier --write src/*.ts && prettier --write test/**/*.ts && prettier --write test/**/**/*.ts",
