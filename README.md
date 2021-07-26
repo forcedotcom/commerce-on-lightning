@@ -46,7 +46,7 @@ USAGE
 ## Install
 
 ```bash
-sfdx plugins:install https://git@git.soma.salesforce.com:communities/commerce-on-lightning.git
+echo y |  sfdx plugins:install ssh://git@git.soma.salesforce.com:communities/commerce-on-lightning.git
 ```
 
 <!-- installstop -->

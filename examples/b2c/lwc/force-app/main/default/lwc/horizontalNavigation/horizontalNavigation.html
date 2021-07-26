@@ -1,0 +1,82 @@
+<template>
+    <nav role="navigation">
+        <ul
+                role="menu"
+                if:true={showNavigation}
+        >
+            <template for:each={state.items} for:item="item">
+                <li
+                        class="textMenuItem slds-p-vertical_small slds-p-horizontal_small horizontalMenuItemContainer"
+                        key={item.id}
+                        onclosesubmenu={handleCloseSubmenus}
+                        onnavlistregister={handleNavListRegister}
+                        role="presentation"
+                >
+                    <button
+                            if:true={item.subMenu.length}
+                            class="horizontalMenuItem"
+                            aria-expanded={item.isListShown}
+                            data-id={item.id}
+                            data-automation={item.label}
+                            onclick={handleNavigationClicked}
+                            onkeydown={handleKeydownEvent}
+                            role="menuitem"
+                    >
+                        <span data-automation={item.label}>{item.label}</span>
+                        <lightning-icon
+                                if:true={item.subMenu}
+                                icon-name="utility:chevrondown"
+                                variant="bare"
+                                size="xx-small"
+                                class="slds-current-color slds-p-left_x-small slds-float_right"
+                        >
+                        </lightning-icon>
+                    </button>
+                    <!-- use <a> if user is navigated to a different page -->
+                    <a
+                            if:false={item.subMenu.length}
+                            class="horizontalMenuItem"
+                            href={item.href}
+                            data-id={item.id}
+                            tabindex="0"
+                            role="menuitem"
+                            onclick={handleNavigationClicked}
+                            onkeydown={handleKeydownEvent}
+                    >
+                        <span data-automation={item.label}>{item.label}</span>
+                    </a>
+                    <c-vertical-navigation
+                            list-is-shown={item.isListShown}
+                            menu-items={item.subMenu}
+                            is-right-aligned={item.isRightAligned}
+                    >
+                    </c-vertical-navigation>
+                </li>
+            </template>
+            <!-- This is a dummy menu item that is added to measure the width of the overflow menu item. This item should be hidden as soon as
+                    we obtain whatever information we need. -->
+            <li
+                    if:false={isMoreWidthCalculated}
+                    class="slds-p-vertical_x-small slds-p-horizontal_x-small horizontalMenuItemContainer dummyMoreItem"
+                    key={moreMenuItem.id}
+                    role="presentation"
+            >
+                <button
+                        class="horizontalMenuItem"
+                        aria-expanded="true"
+                        data-automation="More"
+                        role="menuitem"
+                >
+                    <span data-automation={moreMenuItem.label}>{moreMenuItem.label}</span>
+                    <lightning-icon
+                            icon-name="utility:chevrondown"
+                            variant="bare"
+                            size="xx-small"
+                            class="slds-current-color slds-p-left_x-small slds-float_right"
+                    >
+                    </lightning-icon>
+                </button>
+            </li>
+        </ul>
+    </nav>
+</template>

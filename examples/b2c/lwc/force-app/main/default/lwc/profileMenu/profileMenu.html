@@ -1,0 +1,26 @@
+<template>
+    <div if:true={sessionContext}>
+        <lightning-button-menu if:true={sessionContext.isLoggedIn}
+                               alternative-text="Show menu"
+                               menu-alignment="auto"
+                               variant="container"
+                               icon-name={loggedInUserIconName}
+                               onselect={navigateToRoute}
+        >
+            <lightning-menu-subheader if:true={userName} label={userName}></lightning-menu-subheader>
+            <template for:each={state.menuItems} for:item="item">
+                <lightning-menu-item key={item.id} value={item.id} label={item.label}></lightning-menu-item>
+            </template>
+        </lightning-button-menu>
+
+        <lightning-button-menu if:false={sessionContext.isLoggedIn}
+                               alternative-text="Show menu"
+                               menu-alignment="auto"
+                               variant="container"
+                               icon-name={guestUserIconName}
+                               onselect={navigateToLogin}
+        >
+            <lightning-menu-item value={guestUserLoginPrompt} label={guestUserLoginPrompt}></lightning-menu-item>
+        </lightning-button-menu>
+    </div>
+</template>
