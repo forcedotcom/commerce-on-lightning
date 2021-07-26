@@ -13,8 +13,8 @@ import { allFlags } from '../../../lib/flags/commerce/all.flags';
 import { addAllowedArgs, filterFlags, getPassedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
 import {
     BASE_DIR,
-    CONFIG_DIR,
     BUYER_USER_DEF,
+    CONFIG_DIR,
     SCRATCH_ORG_DIR,
     STORE_DIR,
 } from '../../../lib/utils/constants/properties';
