@@ -6,7 +6,7 @@
  */
 import { flags } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
-import { BASE_DIR, CONFIG_DIR } from '../../utils/constants/properties';
+import {BASE_DIR, CONFIG_DIR} from "../../utils/constants/properties";
 
 Messages.importMessagesDirectory(__dirname);
 

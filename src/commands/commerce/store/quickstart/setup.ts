@@ -26,7 +26,7 @@ import { copyFolderRecursiveSync, mkdirSync, remove } from '../../../../lib/util
 import { BuyerUserDef, Org, parseStoreScratchDef, StoreConfig } from '../../../../lib/utils/jsonUtils';
 import { Requires } from '../../../../lib/utils/requires';
 import { forceDataRecordCreate, forceDataRecordUpdate, forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
-import { getScratchOrgByUsername } from '../../../../lib/utils/sfdx/forceOrgList';
+import {getHubOrgByUsername, getScratchOrgByUsername} from '../../../../lib/utils/sfdx/forceOrgList';
 import { shell, shellJsonSfdx } from '../../../../lib/utils/shell';
 import { StatusFileManager } from '../../../../lib/utils/statusFileManager';
 import { ProductsImport } from '../../products/import';
@@ -111,8 +111,11 @@ export class StoreQuickstartSetup extends SfdxCommand {
             )
             .build();
         this.storeDir = STORE_DIR(BASE_DIR, this.devHubUsername, this.org.getUsername(), this.flags['store-name']);
-        if (!getScratchOrgByUsername(this.org.getUsername()))
-            throw new SfdxError(msgs.getMessage('quickstart.setup.orgCreationNotCompletedSuccesfully'));
+        if (!getScratchOrgByUsername(this.org.getUsername())) // todo make this a check earlier
+            if(getHubOrgByUsername(this.devHubUsername).connectedStatus.indexOf('expired') >= 0)
+                throw new SfdxError(this.devHubUsername+' is expired or invalid');
+            else
+                throw new SfdxError(msgs.getMessage('quickstart.setup.orgCreationNotCompletedSuccesfully'));
         // TODO might add these (communityNetworkName) to varargs
         this.varargs['communityNetworkName'] ??= this.flags['store-name'] as string;
         // If the name of the store starts with a digit, the CustomSite name will have a prepended X.
