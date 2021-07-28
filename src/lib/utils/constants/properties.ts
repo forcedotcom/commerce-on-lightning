@@ -30,7 +30,7 @@ export const STORE_DIR = (
 export const STATUS_FILE = (dir = BASE_DIR): string => `${mkdirSync(dir)}/status`;
 export const EXAMPLE_DIR = `${mkdirSync(BASE_DIR)}/examples`;
 export const JSON_DIR = (dir = BASE_DIR): string => mkdirSync(`${dir}/json`);
-export const CONFIG_DIR = mkdirSync(BASE_DIR)+'/config';
+export const CONFIG_DIR = mkdirSync(BASE_DIR) + '/config';
 export const BUYER_USER_DEF = (dir = BASE_DIR): string => `${mkdirSync(dir + '/config')}/buyer-user-def.json`;
 export const QUICKSTART_CONFIG = (dir = BASE_DIR): string => `${mkdirSync(dir)}/quickstart-config`;
 export const PACKAGE_RETRIEVE_TEMPLATE = (type?: string, dir = BASE_DIR): string =>
