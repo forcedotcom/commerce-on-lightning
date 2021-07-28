@@ -8,8 +8,6 @@ import os from 'os';
 import path, { resolve } from 'path';
 import { promisify } from 'util';
 import { fs } from '@salesforce/core';
-import { BASE_DIR } from './constants/properties';
-import { shell } from './shell';
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment */
 export function remove(filePath: string): void {
@@ -24,17 +22,6 @@ export function remove(filePath: string): void {
 
 export const readFileSync = (filepath: string): string =>
     fs.readFileSync(filepath.replace('~', os.homedir())).toString();
-
-export function backupRemoveSync(filePath: string): string {
-    if (!fs.existsSync(filePath)) return;
-    const odir = BASE_DIR + '/backups';
-    const name = `${path.basename(filePath)}${new Date().toISOString()}.zip`;
-    const output = `${filePath}${name}`;
-    shell(`zip -r ${output} ${filePath} && rm -rf ${filePath}`);
-    mkdirSync(odir);
-    fs.renameSync(output, odir + '/' + name);
-    return output;
-}
 
 export function cleanName(name: string): string {
     return name.replace('@', 'AT').replace('.', 'DOT');
