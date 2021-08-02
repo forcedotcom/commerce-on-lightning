@@ -10,6 +10,7 @@
         "@oclif/errors": "^1",
         "@salesforce/command": "^3.1.0",
         "@salesforce/core": "^2.20.5",
+        "fast-xml-parser": "^3.19.0",
         "puppeteer": "^7.1.0",
         "string-argv": "^0.3.1",
         "tslib": "^2",
@@ -136,11 +137,11 @@
         "test:command-reference": "./bin/run commandreference:generate --erroronwarnings",
         "test:deprecation-policy": "./bin/run snapshot:compare",
         "test:nuts": "nyc mocha \"**/*.nut.ts\" --slow 4500 --timeout 600000 --parallel",
-        "version": "(oclif-dev readme && sed -i '' -e \"s|$(realpath ~)|~|g\" README.md && git add README.md) || exit 0"
+        "version": "(oclif-dev readme && sed -i.bak -e \"s|$(realpath ~)|~|g\" README.md && git add README.md) || exit 0"
     },
     "husky": {
         "hooks": {
-            "pre-commit": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix; sf-husky-pre-commit",
+            "pre-commit": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix; git --no-pager diff HEAD package.json | egrep '\"version\": \"[0-9]+\\.' || npm --no-git-tag-version version patch; sf-husky-pre-commit",
             "commit-msg": "sf-husky-commit-msg",
             "pre-push": "sf-husky-pre-push"
         }

@@ -8,6 +8,8 @@ import os from 'os';
 import path, { resolve } from 'path';
 import { promisify } from 'util';
 import { fs } from '@salesforce/core';
+import parser from 'fast-xml-parser';
+// import he from 'he';
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment */
 export function remove(filePath: string): void {
@@ -93,4 +95,65 @@ export function formatBytes(bytes: number, decimals = 2): string {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
 
     return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)).toString() + ' ' + sizes[i];
+}
+
+export class XML {
+    /**
+     * Converts an Extensible Markup Language (XML) string into an object.
+     * @param text A valid XML string.
+     * @param options
+     * If a member contains nested objects, the nested objects are transformed before the parent object is.
+     */
+    public static parse(text: string, options?: {}): any {
+        if (!options)
+            options = {
+                // attributeNamePrefix: "@_",
+                // attrNodeName: "attr", //default is 'false'
+                // textNodeName: "#text",
+                ignoreAttributes: false,
+                // ignoreNameSpace: false,
+                // allowBooleanAttributes: false,
+                // parseNodeValue: true,
+                // parseAttributeValue: false,
+                // trimValues: true,
+                // cdataTagName: "__cdata", //default is 'false'
+                // cdataPositionChar: "\\c",
+                // parseTrueNumberOnly: false,
+                // arrayMode: false, //"strict"
+                // attrValueProcessor: (val, attrName) => he.decode(val, {isAttributeValue: true}),//default is a=>a
+                // tagValueProcessor: (val, tagName) => he.decode(val), //default is a=>a
+                // stopNodes: ["parse-me-as-string"]
+            };
+        if (parser.validate(text) === true) {
+            //optional (it'll return an object in case it's not valid)
+            return parser.parse(text, options);
+        }
+
+        // Intermediate obj
+        const tObj = parser.getTraversalObj(text, options);
+        return parser.convertToJson(tObj, options);
+    }
+    /**
+     * Converts a JavaScript value to a Extensible Markup Language (XML) string.
+     * @param value A JavaScript value, usually an object or array, to be converted.
+     * @param replacer A function that transforms the results.
+     * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
+     */
+    public static stringify(value: any, defaultOptions?: {}): string {
+        if (!defaultOptions)
+            defaultOptions = {
+                // attributeNamePrefix : "@_",
+                // attrNodeName: "@", //default is false
+                // textNodeName : "#text",
+                ignoreAttributes: false,
+                // cdataTagName: "__cdata", //default is false
+                // cdataPositionChar: "\\c",
+                format: true,
+                indentBy: '  ',
+                // supressEmptyNode: false,
+                // tagValueProcessor: a=> he.encode(a, { useNamedReferences: true}),// default is a=>a
+                // attrValueProcessor: a=> he.encode(a, {isAttributeValue: isAttribute, useNamedReferences: true})// default is a=>a
+            };
+        return new parser.j2xParser(defaultOptions).parse(value);
+    }
 }

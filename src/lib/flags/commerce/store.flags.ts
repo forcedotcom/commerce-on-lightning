@@ -37,6 +37,7 @@ export const storeFlags = {
         char: 'n',
         default: '1commerce',
         description: messages.getMessage('setup.storeNameDescription'),
+        required: true,
     }),
     urlpathprefix: flags.string({
         char: 'p',
