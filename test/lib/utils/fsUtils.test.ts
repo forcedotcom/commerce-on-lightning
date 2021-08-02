@@ -29,7 +29,10 @@ describe('fsUtils xml', () => {
     });
     it('should turn string to xml', async () => {
         const res = XML.stringify(JSON.parse('{"hi":{"@_r":"m","bye":"a","hello":{"#text":"q","@_z":"w","@_m":"5"}}}'));
-        assert.equal(res, '<hi r="m"><bye>a</bye><hello z="w" m="5">q</hello></hi>');
+        assert.equal(res, '<hi r="m">\n' +
+            '  <bye>a</bye>\n' +
+            '  <hello z="w" m="5">q</hello>\n' +
+            '</hi>\n');
     });
     it('should parse package deploy template', async () => {
         const res = XML.parse(fs.readFileSync(B_DIR + '/quickstart-config/b2c-package-deploy-template.xml').toString());
