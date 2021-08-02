@@ -43,7 +43,7 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
             this.org.getUsername(),
             this.flags['store-name'],
             this.ux
-        ).toLowerCase()}/checkout/payment-gateway-integration/${selection}/`;
+        ).toLowerCase()}/checkout/payment-gateway-integration/${selection[0].toUpperCase() + selection.substr(1)}/`;
         this.ux.log(
             msgs.getMessage('quickstart.setup.settingUpGatewayConvertingNamedCredentialsGatewayAdapterApex', [
                 selection,
