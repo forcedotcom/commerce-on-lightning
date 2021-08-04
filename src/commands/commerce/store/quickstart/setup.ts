@@ -615,12 +615,12 @@ export class StoreQuickstartSetup extends SfdxCommand {
             }/config/mainAppPage.json`;
         if (relaxedLevel) {
             fs.writeFileSync(
-            siteConfigMainAppPageFileName,
-            fs
-                .readFileSync(siteConfigMainAppPageFileName)
-                .toString()
-                .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
-        );
+                siteConfigMainAppPageFileName,
+                fs
+                    .readFileSync(siteConfigMainAppPageFileName)
+                    .toString()
+                    .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
+            );
         }
         const navMenuItemMetaFile =
             this.storeDir + '/experience-bundle-package/unpackaged/navigationMenus/Default_Navigation.navigationMenu';

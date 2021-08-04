@@ -140,7 +140,7 @@
     },
     "husky": {
         "hooks": {
-            "pre-commit": "sf-husky-pre-commit",
+            "pre-commit": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix; git --no-pager diff HEAD package.json | egrep '\"version\": \"[0-9]+\\.' || npm --no-git-tag-version version patch; sf-husky-pre-commit",
             "commit-msg": "sf-husky-commit-msg",
             "pre-push": "sf-husky-pre-push"
         }
