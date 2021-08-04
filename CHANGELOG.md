@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [232.0.2](https://github.com/forcedotcom/commerce-on-lightning/compare/v232.0.1...v232.0.2) (2021-08-04)
+
+
+### Features
+
+* add property to inform CSP level ([fd430be](https://github.com/forcedotcom/commerce-on-lightning/commit/fd430be5365b15d2e9d0114373c665f667bd5ccf))
+* add property to inform CSP Level ([25907b5](https://github.com/forcedotcom/commerce-on-lightning/commit/25907b50754496742048d96ff11104bbee550322))
+
+
+### Bug Fixes
+
+* formatting ([1e81d6b](https://github.com/forcedotcom/commerce-on-lightning/commit/1e81d6b629ef05034abc0cca0af8581a36f328f5))
+
 ### [232.0.1](https://github.com/forcedotcom/commerce-on-lightning/compare/v0.1.5...v232.0.1) (2021-07-09)
 
 
