@@ -43,6 +43,8 @@ For B2B examples components please see:
 
 <!-- usage -->
 
+## Usage
+
 ```sh-session
 $ npm install -g @salesforce/commerce
 $ sfdx COMMAND
