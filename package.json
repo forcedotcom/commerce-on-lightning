@@ -1,6 +1,6 @@
 {
     "name": "@salesforce/commerce",
-    "version": "234.0.3",
+    "version": "234.0.4",
     "author": "Jonathan Arndt",
     "bugs": "https://git.soma.salesforce.com/communities/commerce-on-lightning/issues",
     "dependencies": {

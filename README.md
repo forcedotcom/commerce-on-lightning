@@ -98,7 +98,7 @@ To build the plugin locally, make sure to have yarn installed and run the follow
 
 ```bash
 # Clone the repository
-git clone git@github.com:salesforcecli/plugin-auth
+git clone git@git.soma.salesforce.com:communities/commerce-on-lightning.git
 
 # Install the dependencies and compile
 yarn install
