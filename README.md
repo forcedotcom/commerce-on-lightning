@@ -20,11 +20,27 @@ This plugin requires the [Salesforce CLI](https://developer.salesforce.com/tools
 
 We always recommend using the latest version of these commands, however, you can install a specific version or tag if needed.
 
+-   [Introduction](#introduction)
 -   [Usage](#usage)
 -   [Install](#install)
 -   [Post Install](#now-that-you-have-the-commerce-plugin-installed-please-see)
 -   [Commands](#commands)
 -   [Debugging your plugin](#debugging-your-plugin)
+
+## Introduction
+
+This plugin is designed to setup a test store either B2B or B2C within a scratch org. It will add products and
+users, a guest user, admin user and buyer user.
+This plugin assumes your devhub and scratchorg are already setup.
+
+This repo also contains example components for your store you can load after the fact.
+
+For B2C examples components please see:
+[B2B2C Advanced Reference Components](https://git.soma.salesforce.com/communities/commerce-on-lightning/tree/master/examples/b2c/lwc)
+
+For B2B examples components please see:
+[B2B Advanced Reference Components](https://git.soma.salesforce.com/communities/commerce-on-lightning/tree/master/examples/b2c/lwc)
+
 <!-- usage -->
 
 ```sh-session
@@ -32,7 +48,7 @@ $ npm install -g @salesforce/commerce
 $ sfdx COMMAND
 running command...
 $ sfdx (-v|--version|version)
-@salesforce/commerce/234.0.3 linux-x64 node-v15.5.1
+@salesforce/commerce/234.0.4 darwin-x64 node-v14.3.0
 $ sfdx --help [COMMAND]
 USAGE
   $ sfdx COMMAND
@@ -46,7 +62,7 @@ USAGE
 ## Install
 
 ```bash
-echo y |  sfdx plugins:install ssh://git@git.soma.salesforce.com:communities/commerce-on-lightning.git
+echo y | sfdx plugins:install ssh://git@git.soma.salesforce.com:communities/commerce-on-lightning.git
 ```
 
 <!-- installstop -->
@@ -76,6 +92,8 @@ Agreement. You can do so by going to https://cla.salesforce.com/sign-cla.
 
 ### Build
 
+If you plan to help develop the plugin then these steps are for you.
+
 To build the plugin locally, make sure to have yarn installed and run the following commands:
 
 ```bash
@@ -87,11 +105,12 @@ yarn install
 yarn build
 ```
 
-To use your plugin, run using the local `./bin/run` or `./bin/run.cmd` file.
+To use your plugin, run using the local `./bin/run` or `./bin/run.cmd` file. This is helpful for mostly debugging
+purposes as you can add this command to an IDE.
 
 ```bash
 # Run using local run file.
-./bin/run auth
+./bin/run commerce:store:create
 ```
 
 There should be no differences when running via the Salesforce CLI or using the local run file. However, it can be useful to link the plugin to do some additional testing or run your commands from anywhere on your machine.
@@ -131,8 +150,8 @@ OPTIONS
                                                                                     Directory to output the conversion
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store-
-                                                                                    scratch-def.json] config file
+                                                                                    ~/.commerce/config/store
+                                                                                    -scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
@@ -192,8 +211,8 @@ USAGE
 
 OPTIONS
   -c, --products-file-csv=products-file-csv
-      [default: ~/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass in
-      empty value to do product-less import
+      [default: ~/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass
+      in empty value to do product-less import
 
   -f, --definitionfile=definitionfile
       [default: ~/.commerce/config/store-scratch-def.json] config file
@@ -238,8 +257,8 @@ OPTIONS
                                                                                     buyer's username
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store-
-                                                                                    scratch-def.json] config file
+                                                                                    ~/.commerce/config/store
+                                                                                    -scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
@@ -386,8 +405,8 @@ USAGE
 
 OPTIONS
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store-
-                                                                                    scratch-def.json] config file
+                                                                                    ~/.commerce/config/store
+                                                                                    -scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
