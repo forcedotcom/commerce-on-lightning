@@ -169,7 +169,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
             const res = XML.parse(packageRetrieve);
             res['Package']['types'] = res['Package']['types'].filter((t) => t['members'] !== 'ProductCatalog');
             /* eslint-disable */
-            packageRetrieve = XML.stringify(packageRetrieve);
+            packageRetrieve = XML.stringify(res);
         }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         fs.writeFileSync(PACKAGE_RETRIEVE(this.storeDir), packageRetrieve);
@@ -764,19 +764,24 @@ export class StoreQuickstartSetup extends SfdxCommand {
         );
         // turn sharing rule metadata off by default
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
-            const packageDeploy = XML.parse(`${this.storeDir}/experience-bundle-package/unpackaged/package.xml`);
+            let packageDeploy = XML.parse(
+                fs.readFileSync(`${this.storeDir}/experience-bundle-package/unpackaged/package.xml`).toString()
+            );
             packageDeploy['Package']['types'] = packageDeploy['Package']['types'].filter(
-                (t) => t['members'] !== 'ProductCatalog'
+                (t) => t['members'] !== 'ProductCatalog' && t['members'] !== 'Product2'
             );
             fs.writeFileSync(
                 `${this.storeDir}/experience-bundle-package/unpackaged/package.xml`,
                 XML.stringify(packageDeploy)
             );
+            ['ProductCatalog', 'Product2'].forEach((i) =>
+                remove(`${this.storeDir}/experience-bundle-package/unpackaged/sharingRules/${i}.sharingRules`)
+            );
         }
         shell(
-            `cd "${this.storeDir}/experience-bundle-package/unpackaged" && zip -r -X "../${
+            `cd "${this.storeDir}/experience-bundle-package/unpackaged" && rm -f "../${
                 this.varargs['communityExperienceBundleName'] as string
-            }ToDeploy.zip" ./*`
+            }ToDeploy.zip"; zip -r -X "../${this.varargs['communityExperienceBundleName'] as string}ToDeploy.zip" ./*`
         );
         this.ux.log(msgs.getMessage('quickstart.setup.deployNewZipWithFlowIgnoringWarningsCleanUp'));
         let res;
