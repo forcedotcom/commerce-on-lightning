@@ -1,6 +1,6 @@
 {
     "name": "@salesforce/commerce",
-    "version": "234.0.4",
+    "version": "234.0.5",
     "author": "Jonathan Arndt",
     "bugs": "https://git.soma.salesforce.com/communities/commerce-on-lightning/issues",
     "dependencies": {
@@ -69,7 +69,8 @@
         "/config",
         "/npm-shrinkwrap.json",
         "/oclif.manifest.json",
-        "/.oclif.manifest.json"
+        "/.oclif.manifest.json",
+        "/sfdx-project.json"
     ],
     "homepage": "https://git.soma.salesforce.com/communities/commerce-on-lightning",
     "keywords": [
