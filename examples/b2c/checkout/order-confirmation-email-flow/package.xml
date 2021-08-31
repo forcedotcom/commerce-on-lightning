@@ -22,5 +22,5 @@
         <members>OrderSummary.B2C_Order_Confirmation_Email_Alert</members>
         <name>WorkflowAlert</name>
     </types>
-    <version>51.0</version>
+    <version>53.0</version>
 </Package>
