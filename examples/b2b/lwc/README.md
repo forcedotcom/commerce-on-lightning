@@ -14,7 +14,7 @@ This repository is an SFDX project that you can deploy directly to an org and mo
 
 1. If you haven't already, clone this repository.
 1. If you haven't already, create a B2B Commerce org.
-    Optional: Use the included [project-scratch-def.json](config/project-scratch-def.json), e.g. `sfdx force:org:create -f ./config/project-scratch-def.json`
+   Optional: Use the included [project-scratch-def.json](config/project-scratch-def.json), e.g. `sfdx force:org:create -f ./config/project-scratch-def.json`
 1. Push the source code in this repository to the new org, e.g. `sfdx force:source:push -u <org username>`.
 1. Grant permissions to the APEX class (do this only once):
 
@@ -47,7 +47,7 @@ When LMS is supported in B2B Commerce for Lightning (Safe Harbor), we’ll updat
 The productDetails component demonstrates how to call an external API. In our example, we call a [Demo Inventory Manager](https://inventorymanagerdemo.herokuapp.com/api/inventory/) External Service, which returns a product’s availability as a simple Boolean value. To enable this demo service in your org:
 
 1. From Setup, enter Remote Site Settings in the Quick Find box, then select Remote Site Settings.
-    This page displays a list of any remote sites that are already registered. It provides additional information about each site, including remote site name and URL.
+   This page displays a list of any remote sites that are already registered. It provides additional information about each site, including remote site name and URL.
 1. Click New Remote Site.
 1. For the Remote Site Name, enter Demo Inventory Manager.
 1. For the remote site URL, enter https://inventorymanagerdemo.herokuapp.com.
@@ -56,8 +56,18 @@ The productDetails component demonstrates how to call an external API. In our ex
 
 ## Search-specific Steps (to use Named Credentials)
 
-Connect APIs for search don't have Apex enabled yet. So we can call those Connect APIs only through REST from Apex classes. For security reasons, the Lightning Component framework places restrictions on making API calls from JavaScript. 
+Connect APIs for search don't have Apex enabled yet. So we can call those Connect APIs only through REST from Apex classes. For security reasons, the Lightning Component framework places restrictions on making API calls from JavaScript.
 
-* To call third-party APIs from your component’s JavaScript, add the API endpoint as a CSP Trusted Site.
-* To call Salesforce APIs, make the API calls from your component’s Apex controller. Use a named credential to authenticate to Salesforce. (Documentation is [here](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/apex_api_calls.htm) and [here](https://developer.salesforce.com/docs/atlas.en-us.228.0.apexcode.meta/apexcode/apex_callouts_named_credentials.htm).)
-* Create a Named Credential callout. The steps are documented [here](/examples/lwc/docs/NamedCredentials.md).
+-   To call third-party APIs from your component’s JavaScript, add the API endpoint as a CSP Trusted Site.
+-   To call Salesforce APIs, make the API calls from your component’s Apex controller. Use a named credential to authenticate to Salesforce. (Documentation is [here](https://developer.salesforce.com/docs/atlas.en-us.lightning.meta/lightning/apex_api_calls.htm) and [here](https://developer.salesforce.com/docs/atlas.en-us.228.0.apexcode.meta/apexcode/apex_callouts_named_credentials.htm).)
+-   Create a Named Credential callout. The steps are documented [here](/examples/lwc/docs/NamedCredentials.md).
+
+## Known Issues
+
+### Flow Debugging
+
+Debugging with the flow typically requires impersonating a buyer [Run flow as another user](https://help.salesforce.com/articleView?id=release-notes.rn_ls_debug_flow_as_another_user.htm&type=5&release=232). However, the custom payment component installed as a part of this installation will be run as the user that is debugging, and not the buyer. This typically causes some malfunctioning behavior like missing billing addresses. There are a few workarounds.
+
+1. Don't debug and instead run as the buyer within the store relying on errors sent to the email specified in `Process Automation Settings` to find problems.
+1. If you know the buyer's account you can make a change in [B2BPaymentController.cls](force-app/main/default/classes/B2BPaymentController.cls). Directions are specified near the top of `getPaymentInfo()`.
+1. You can also make a change in the `getUserAccountInfo()` method in [B2BUtils.cls](force-app/main/default/classes/B2BUtils.cls). Here you would put the ID of the user instead of the call to `UserInfo.getUserId();`. This was not documented within the class as the effects would be farther reaching than in B2BPaymentController.cls.
