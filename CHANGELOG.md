@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [232.1.0](https://github.com/forcedotcom/commerce-on-lightning/compare/v232.0.2...v232.1.0) (2021-09-10)
+
+
+### Features
+
+* add in B2B checkout ([e6122cc](https://github.com/forcedotcom/commerce-on-lightning/commit/e6122cccaf22e3e2e0489334bee7a9757d385f3d))
+* add in B2B checkout changes ([7a10e76](https://github.com/forcedotcom/commerce-on-lightning/commit/7a10e76cb9c42771791638c3edc4d689ffd478da))
+* add in changes for 232 ([c8f3cff](https://github.com/forcedotcom/commerce-on-lightning/commit/c8f3cff1927d4f502442a3017bd2f53348fa43fd))
+
 ### [232.0.2](https://github.com/forcedotcom/commerce-on-lightning/compare/v232.0.1...v232.0.2) (2021-08-04)
 
 
