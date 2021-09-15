@@ -6,11 +6,15 @@
     "settings": {
         "checkout": {
             "paymentGatewayIntegration": "Salesforce",
-            "integrations": true
+            "integrations": true,
+            "orderConfirmationEmailFlow": true
         },
         "users": {
             "buyerUserProfileSetup": true,
             "sharingSettingsSetup": true
+        },
+        "diagnostic": {
+            "commerceDiagnosticEventSetup": true
         },
         "cspTrustedSites": {
             "amazonaws": true
