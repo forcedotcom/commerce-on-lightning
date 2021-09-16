@@ -1,5 +1,8 @@
 import { LightningElement, api, track } from 'lwc';
-import { FlowNavigationNextEvent } from 'lightning/flowSupport';
+import {
+    FlowNavigationNextEvent,
+    FlowNavigationBackEvent
+} from 'lightning/flowSupport';
 import * as Constants from './constants';
 
 import getPaymentInfo from '@salesforce/apex/B2BPaymentController.getPaymentInfo';
@@ -10,6 +13,7 @@ import setPayment from '@salesforce/apex/B2BPaymentController.setPayment';
  * and to fill out the required information for the chosen type.
  *
  * @fires FlowNavigationNextEvent
+ * @fires FlowNavigationBackEvent
  * @fires PaymentMethod#submitpayment
  */
 export default class PaymentMethod extends LightningElement {
@@ -21,6 +25,13 @@ export default class PaymentMethod extends LightningElement {
     _purchaseOrderNumber;
     _selectedBillingAddress;
     _selectedPaymentType = Constants.PaymentTypeEnum.PONUMBER;
+
+    /**
+     * Comes from the flow itself and only available in flow. Given this component is only designed
+     * for use in flows, this is probably fine. The actions will tell us if "Previous" is available
+     * so we can display the "Previous" button only when it's available.
+     */
+    @api availableActions;
 
     /**
      * Determines if Purchase Order is a required field.
@@ -101,7 +112,19 @@ export default class PaymentMethod extends LightningElement {
     @api hideCreditCard = false;
 
     /**
-     * The list of labels used in the cmp. 
+     * Text to display on the Previous button. Defaults to "Previous".
+     * @type {String}
+     */
+    @api previousButtonLabel = 'Previous';
+
+    /**
+     * Text to display on the Next button. Defaults to "Next".
+     * @type {String}
+     */
+    @api nextButtonLabel = 'Next';
+
+    /**
+     * The list of labels used in the cmp.
      * @type {String}
      */
     get labels() {
@@ -208,6 +231,17 @@ export default class PaymentMethod extends LightningElement {
     }
 
     /**
+     * Determines if the "Previous" button is available in this flow.
+     * @returns {Boolean} True if "BACK" is found, False otherwise
+     */
+    get canGoPrevious() {
+        return (
+            this.availableActions &&
+            this.availableActions.some((element) => element == 'BACK')
+        );
+    }
+
+    /**
      * Gets the payment types
      * PO Number or Card Payment
      */
@@ -236,7 +270,7 @@ export default class PaymentMethod extends LightningElement {
     get isPoNumberSelected() {
         return (
             this.actualSelectedPaymentType ===
-            Constants.PaymentTypeEnum.PONUMBER && !this.hidePurchaseOrder
+                Constants.PaymentTypeEnum.PONUMBER && !this.hidePurchaseOrder
         );
     }
 
@@ -248,8 +282,10 @@ export default class PaymentMethod extends LightningElement {
      */
     get actualSelectedPaymentType() {
         return this.hidePurchaseOrder
-        ? Constants.PaymentTypeEnum.CARDPAYMENT
-        : (this.hideCreditCard ? Constants.PaymentTypeEnum.PONUMBER : this._selectedPaymentType);
+            ? Constants.PaymentTypeEnum.CARDPAYMENT
+            : this.hideCreditCard
+            ? Constants.PaymentTypeEnum.PONUMBER
+            : this._selectedPaymentType;
     }
 
     /**
@@ -287,24 +323,34 @@ export default class PaymentMethod extends LightningElement {
     }
 
     /**
+     * Navigates to the previous page. Doesn't save any information, so that information is lost on clicking
+     * Previous.
+     */
+    handlePreviousButton() {
+        const navigatePreviousEvent = new FlowNavigationBackEvent();
+        this.dispatchEvent(navigatePreviousEvent);
+    }
+
+    /**
      * Handler for the 'click' event fired from the payment button.
      * If PO Number is selected, make an apex call to set the new values.
      * If Credit Card is selected, check to see that all required fields are filled in first,
      * then makes an apex call which in turns makes a call to Payment.tokenize endpoint
      */
     handlePaymentButton() {
-        //Get the address selected
-        const selectedAddress = this._addresses.filter(add => add.id === this.selectedBillingAddress)[0];
+        const selectedAddressResult = this.getBillingAddress();
 
         if (
             this.selectedPaymentType !== Constants.PaymentTypeEnum.CARDPAYMENT
         ) {
-            const poInput = this.getComponent('[data-po-number]');            
+            if (selectedAddressResult.error) {
+                this._purchaseOrderErrorMessage = selectedAddressResult.error;
+                return;
+            }
+
+            const poInput = this.getComponent('[data-po-number]');
             // Make sure that PO input is valid first
-            if (
-                poInput != null &&
-                !poInput.reportValidity()
-            ) {
+            if (poInput != null && !poInput.reportValidity()) {
                 return;
             }
 
@@ -315,16 +361,23 @@ export default class PaymentMethod extends LightningElement {
             setPayment({
                 paymentType: this.selectedPaymentType,
                 cartId: this.cartId,
-                billingAddress: selectedAddress,
+                billingAddress: selectedAddressResult.address,
                 paymentInfo: paymentInfo
-            }).then(() => {
-                // After making the server calls, navigate NEXT in the flow
-                const navigateNextEvent = new FlowNavigationNextEvent();
-                this.dispatchEvent(navigateNextEvent);
-            }).catch((error) => {
-                this._purchaseOrderErrorMessage = error.body.message;
-            });
+            })
+                .then(() => {
+                    // After making the server calls, navigate NEXT in the flow
+                    const navigateNextEvent = new FlowNavigationNextEvent();
+                    this.dispatchEvent(navigateNextEvent);
+                })
+                .catch((error) => {
+                    this._purchaseOrderErrorMessage = error.body.message;
+                });
         } else {
+            if (selectedAddressResult.error) {
+                this._creditCardErrorMessage = selectedAddressResult.error;
+                return;
+            }
+
             // First let's get the cc data
             const creditPaymentComponent = this.getComponent(
                 '[data-credit-payment-method]'
@@ -341,20 +394,43 @@ export default class PaymentMethod extends LightningElement {
             const creditCardData = this.getCreditCardFromComponent(
                 creditPaymentComponent
             );
-            
+
             setPayment({
                 paymentType: this.selectedPaymentType,
                 cartId: this.cartId,
-                billingAddress: selectedAddress,
+                billingAddress: selectedAddressResult.address,
                 paymentInfo: creditCardData
-            }).then(() => {
-                // After making the server calls, navigate NEXT in the flow
-                const navigateNextEvent = new FlowNavigationNextEvent();
-                this.dispatchEvent(navigateNextEvent);
-            }).catch((error) => {
-                this._creditCardErrorMessage = error.body.message;
-            });
+            })
+                .then(() => {
+                    // After making the server calls, navigate NEXT in the flow
+                    const navigateNextEvent = new FlowNavigationNextEvent();
+                    this.dispatchEvent(navigateNextEvent);
+                })
+                .catch((error) => {
+                    this._creditCardErrorMessage = error.body.message;
+                });
         }
+    }
+
+    /**
+     * @returns The selected billing address in an object { address: <the selected billing address> } or
+     *          { error: <the error message> } if the field is required but missing. It can return an empty
+     *          object if there is no billing address and it's not a required field.
+     */
+    getBillingAddress() {
+        if (!Array.isArray(this._addresses) || !this._addresses.length) {
+            if (this.billingAddressRequired) {
+                return { error: 'Billing Address is required' };
+            }
+        } else {
+            return {
+                address: this._addresses.filter(
+                    (add) => add.id === this.selectedBillingAddress
+                )[0]
+            };
+        }
+
+        return {};
     }
 
     getCreditCardFromComponent(creditPaymentComponent) {
@@ -378,7 +454,7 @@ export default class PaymentMethod extends LightningElement {
      */
     handleChangeSelectedAddress(event) {
         const address = event.detail.address;
-        if (address.id !== null && (address.id).startsWith('8lW')) {
+        if (address.id !== null && address.id.startsWith('8lW')) {
             this._selectedBillingAddress = address.id;
         } else {
             this._selectedBillingAddress = '';
