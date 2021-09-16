@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Flow xmlns="http://soap.sforce.com/2006/04/metadata">
     <actionCalls>
-        <name>B2C_Order_Confirmation_Email_Alert</name>
-        <label>B2C Order Confirmation Email Alert</label>
+        <name>B2B2C_Order_Confirmation_Email_Alert</name>
+        <label>B2B2C Order Confirmation Email Alert</label>
         <locationX>50</locationX>
         <locationY>1706</locationY>
-        <actionName>OrderSummary.B2C_Order_Confirmation_Email_Alert</actionName>
+        <actionName>OrderSummary.B2B2C_Order_Confirmation_Email_Alert</actionName>
         <actionType>emailAlert</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
@@ -210,8 +210,8 @@
         </connector>
     </assignments>
     <decisions>
-        <name>IsB2CStore</name>
-        <label>IsB2CStore</label>
+        <name>IsB2B2CStore</name>
+        <label>IsB2B2CStore</label>
         <locationX>226</locationX>
         <locationY>194</locationY>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
@@ -273,8 +273,8 @@
         <dataType>String</dataType>
         <expression>&quot;  &quot;</expression>
     </formulas>
-    <interviewLabel>B2C Order Confirmation Email Notification Flow {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>B2C Order Confirmation Email Notification Flow</label>
+    <interviewLabel>B2B2C Order Confirmation Email Notification Flow {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>B2B2C Order Confirmation Email Notification Flow</label>
     <loops>
         <name>IterateOrderItems</name>
         <label>IterateOrderItems</label>
@@ -326,10 +326,10 @@
             </value>
         </filters>
         <filters>
-            <field>ProductCode</field>
+            <field>Type</field>
             <operator>NotEqualTo</operator>
             <value>
-                <stringValue></stringValue>
+                <stringValue>Delivery Charge</stringValue>
             </value>
         </filters>
         <getFirstRecordOnly>false</getFirstRecordOnly>
@@ -444,7 +444,7 @@
         <locationX>50</locationX>
         <locationY>1586</locationY>
         <connector>
-            <targetReference>B2C_Order_Confirmation_Email_Alert</targetReference>
+            <targetReference>B2B2C_Order_Confirmation_Email_Alert</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -520,7 +520,7 @@
         <locationX>100</locationX>
         <locationY>0</locationY>
         <connector>
-            <targetReference>IsB2CStore</targetReference>
+            <targetReference>IsB2B2CStore</targetReference>
         </connector>
         <object>OrderSummaryCreatedEvent</object>
         <triggerType>PlatformEvent</triggerType>

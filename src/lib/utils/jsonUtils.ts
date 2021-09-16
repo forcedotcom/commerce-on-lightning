@@ -174,6 +174,7 @@ export class Settings {
     public cspTrustedSites: Record<string, string>;
     public productImport: string[];
     public lwc: LWC;
+    public isRelaxedCSPLevel: boolean;
 }
 
 /* eslint-disable */

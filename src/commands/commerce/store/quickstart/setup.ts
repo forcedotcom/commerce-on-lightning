@@ -22,11 +22,11 @@ import {
     SCRATCH_ORG_DIR,
     STORE_DIR,
 } from '../../../../lib/utils/constants/properties';
-import { copyFolderRecursiveSync, mkdirSync, remove } from '../../../../lib/utils/fsUtils';
-import { BuyerUserDef, Org, StoreConfig } from '../../../../lib/utils/jsonUtils';
+import { copyFolderRecursiveSync, mkdirSync, remove, XML } from '../../../../lib/utils/fsUtils';
+import { BuyerUserDef, Org, parseStoreScratchDef, StoreConfig } from '../../../../lib/utils/jsonUtils';
 import { Requires } from '../../../../lib/utils/requires';
 import { forceDataRecordCreate, forceDataRecordUpdate, forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
-import { getScratchOrgByUsername } from '../../../../lib/utils/sfdx/forceOrgList';
+import { getHubOrgByUsername, getScratchOrgByUsername } from '../../../../lib/utils/sfdx/forceOrgList';
 import { shell, shellJsonSfdx } from '../../../../lib/utils/shell';
 import { StatusFileManager } from '../../../../lib/utils/statusFileManager';
 import { ProductsImport } from '../../products/import';
@@ -59,6 +59,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         'communityNetworkName',
         'communitySiteName',
         'communityExperienceBundleName',
+        'isSharingRuleMetadataNeeded',
     ];
 
     public static examples = [`sfdx ${CMD} --definitionfile store-scratch-def.json`];
@@ -112,7 +113,10 @@ export class StoreQuickstartSetup extends SfdxCommand {
             .build();
         this.storeDir = STORE_DIR(BASE_DIR, this.devHubUsername, this.org.getUsername(), this.flags['store-name']);
         if (!getScratchOrgByUsername(this.org.getUsername()))
-            throw new SfdxError(msgs.getMessage('quickstart.setup.orgCreationNotCompletedSuccesfully'));
+            if (getHubOrgByUsername(this.devHubUsername).connectedStatus.indexOf('expired') >= 0)
+                // todo make this a check earlier
+                throw new SfdxError(this.devHubUsername + ' is expired or invalid');
+            else throw new SfdxError(msgs.getMessage('quickstart.setup.orgCreationNotCompletedSuccesfully'));
         // TODO might add these (communityNetworkName) to varargs
         this.varargs['communityNetworkName'] ??= this.flags['store-name'] as string;
         // If the name of the store starts with a digit, the CustomSite name will have a prepended X.
@@ -145,7 +149,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         if (await this.statusFileManager.getValue('retrievedPackages')) return;
         // Replace the names of the components that will be retrieved. // this should stay as a template so users can modify it to their liking
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        const packageRetrieve = fs
+        let packageRetrieve = fs
             .readFileSync(
                 PACKAGE_RETRIEVE_TEMPLATE(
                     StoreQuickstartSetup.getStoreType(
@@ -159,6 +163,14 @@ export class StoreQuickstartSetup extends SfdxCommand {
             .replace('YourCommunitySiteNameHere', this.varargs['communitySiteName'] as string)
             .replace('YourCommunityExperienceBundleNameHere', this.varargs['communityExperienceBundleName'] as string)
             .replace('YourCommunityNetworkNameHere', this.varargs['communityNetworkName'] as string);
+        // turn sharing rule metadata off by default
+        if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
+            /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
+            const res = XML.parse(packageRetrieve);
+            res['Package']['types'] = res['Package']['types'].filter((t) => t['members'] !== 'ProductCatalog');
+            /* eslint-disable */
+            packageRetrieve = XML.stringify(res);
+        }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         fs.writeFileSync(PACKAGE_RETRIEVE(this.storeDir), packageRetrieve);
         this.ux.log(msgs.getMessage('quickstart.setup.usingToRetrieveStoreInfo', [packageRetrieve]));
@@ -580,18 +592,20 @@ export class StoreQuickstartSetup extends SfdxCommand {
         shell(`cd "${scratchOrgDir}" && sfdx force:source:deploy -p "${tmpDirName}" -u "${this.org.getUsername()}"`);
 
         // Sharing Rules
-        const sharingRulesDirOrg = QUICKSTART_CONFIG() + '/guestbrowsing/sharingRules';
-        const sharingRulesDir = this.storeDir + '/experience-bundle-package/unpackaged/sharingRules';
-        mkdirSync(sharingRulesDir);
-        ['ProductCatalog-template.sharingRules', 'Product2-template.sharingRules'].forEach((r) =>
-            fs.writeFileSync(
-                sharingRulesDir + '/' + r.replace('-template', ''),
-                fs
-                    .readFileSync(sharingRulesDirOrg + '/' + r)
-                    .toString()
-                    .replace(/YourStoreName/g, this.varargs['communitySiteName'] as string)
-            )
-        );
+        if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
+            const sharingRulesDirOrg = QUICKSTART_CONFIG() + '/guestbrowsing/sharingRules';
+            const sharingRulesDir = this.storeDir + '/experience-bundle-package/unpackaged/sharingRules';
+            mkdirSync(sharingRulesDir);
+            ['ProductCatalog-template.sharingRules', 'Product2-template.sharingRules'].forEach((r) =>
+                fs.writeFileSync(
+                    sharingRulesDir + '/' + r.replace('-template', ''),
+                    fs
+                        .readFileSync(sharingRulesDirOrg + '/' + r)
+                        .toString()
+                        .replace(/YourStoreName/g, this.varargs['communitySiteName'] as string)
+                )
+            );
+        }
         if (!fs.existsSync(`${this.storeDir}/experience-bundle-package/unpackaged/experiences`)) {
             await this.statusFileManager.setValue('retrievedPackages', false);
             await this.retrievePackages();
@@ -606,18 +620,22 @@ export class StoreQuickstartSetup extends SfdxCommand {
         siteConfigMetaFile.isAvailableToGuests = true;
         siteConfigMetaFile.authenticationType = 'AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED';
         fs.writeFileSync(siteConfigMetaFileName, JSON.stringify(siteConfigMetaFile, null, 4));
+        const def = parseStoreScratchDef(this.flags.definitionfile);
+        const relaxedLevel = def.settings.isRelaxedCSPLevel;
         const siteConfigMainAppPageFileName =
             this.storeDir +
             `/experience-bundle-package/unpackaged/experiences/${
                 this.varargs['communityExperienceBundleName'] as string
             }/config/mainAppPage.json`;
-        fs.writeFileSync(
-            siteConfigMainAppPageFileName,
-            fs
-                .readFileSync(siteConfigMainAppPageFileName)
-                .toString()
-                .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
-        );
+        if (relaxedLevel) {
+            fs.writeFileSync(
+                siteConfigMainAppPageFileName,
+                fs
+                    .readFileSync(siteConfigMainAppPageFileName)
+                    .toString()
+                    .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
+            );
+        }
         const navMenuItemMetaFile =
             this.storeDir + '/experience-bundle-package/unpackaged/navigationMenus/Default_Navigation.navigationMenu';
         fs.writeFileSync(
@@ -744,10 +762,26 @@ export class StoreQuickstartSetup extends SfdxCommand {
             ).toLowerCase()}-package-deploy-template.xml`,
             `${this.storeDir}/experience-bundle-package/unpackaged/package.xml`
         );
+        // turn sharing rule metadata off by default
+        if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
+            let packageDeploy = XML.parse(
+                fs.readFileSync(`${this.storeDir}/experience-bundle-package/unpackaged/package.xml`).toString()
+            );
+            packageDeploy['Package']['types'] = packageDeploy['Package']['types'].filter(
+                (t) => t['members'] !== 'ProductCatalog' && t['members'] !== 'Product2'
+            );
+            fs.writeFileSync(
+                `${this.storeDir}/experience-bundle-package/unpackaged/package.xml`,
+                XML.stringify(packageDeploy)
+            );
+            ['ProductCatalog', 'Product2'].forEach((i) =>
+                remove(`${this.storeDir}/experience-bundle-package/unpackaged/sharingRules/${i}.sharingRules`)
+            );
+        }
         shell(
-            `cd "${this.storeDir}/experience-bundle-package/unpackaged" && zip -r -X "../${
+            `cd "${this.storeDir}/experience-bundle-package/unpackaged" && rm -f "../${
                 this.varargs['communityExperienceBundleName'] as string
-            }ToDeploy.zip" ./*`
+            }ToDeploy.zip"; zip -r -X "../${this.varargs['communityExperienceBundleName'] as string}ToDeploy.zip" ./*`
         );
         this.ux.log(msgs.getMessage('quickstart.setup.deployNewZipWithFlowIgnoringWarningsCleanUp'));
         let res;
