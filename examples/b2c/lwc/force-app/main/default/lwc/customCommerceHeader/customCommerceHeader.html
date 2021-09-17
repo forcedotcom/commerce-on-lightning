@@ -1,0 +1,38 @@
+<template>
+    <header class="slds-p-bottom_xxx-small">
+        <div class="slds-p-around_medium">
+            <slot name="PromotionBanner"></slot>
+        </div>
+        <div
+            class="slds-is-relative slds-grid slds-wrap slds-gutters_direct-small slds-grid_vertical-align-center slds-m-around_medium"
+        >
+            <div
+                class="slds-col slds-order_2 slds-medium-order_1 slds-large-order_1 slds-size_6-of-12 slds-medium-size_2-of-12"
+            >
+                <slot name="Logo"></slot>
+            </div>
+
+            <div
+                class="slds-col slds-order_1 slds-medium-order_2 slds-large-order_2 slds-size_1-of-12 slds-medium-size_8-of-12 slds-large-size_5-of-12"
+            >
+                <slot name="Navigation"></slot>
+            </div>
+
+            <div
+                class="slds-col slds-grid slds-grid_align-end slds-grid_vertical-align-center slds-order_4 slds-medium-order_3 slds-large-order_4 slds-size_5-of-12 slds-medium-size_2-of-12 slds-large-size_1-of-12"
+            >
+                <div class="slds-col">
+                    <slot name="ProfileMenu"></slot>
+                </div>
+                <div class="slds-col">
+                    <slot name="CartBadge"></slot>
+                </div>
+            </div>
+            <div
+                class="slds-col slds-large-order_3 slds-size_12-of-12 slds-order_4 slds-medium-order_4 slds-large-size_4-of-12 headerSearch"
+            >
+                <slot name="Search"></slot>
+            </div>
+        </div>
+    </header>
+</template>

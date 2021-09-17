@@ -1,7 +1,7 @@
 export const labels = {
     InvalidName: 'Enter a valid name.',
     InvalidCreditCardNumber: 'Enter a valid credit card number.',
-    InvalidCvv: 'Enter a CVV...',
+    InvalidCvv: 'Enter a valid CVV.',
     InvalidCardType: 'Select a card type.',
     InvalidExpiryMonth: 'Select an expiration month.',
     InvalidExpiryYear: 'Select an expiration year.',
@@ -18,7 +18,8 @@ export const labels = {
     ExpiryMonthPlaceholder: 'MM',
     ExpiryYearPlaceholder: 'YYYY',
     CvvPlaceholder: 'Enter a CVV...',
-    CvvInfo: 'Find the CVC/CVV security code on the back of your credit card. The code is three or four digits, depending on the card.'
+    CvvInfo:
+        'Find the CVC/CVV security code on the back of your credit card. The code is three or four digits, depending on the card.'
 };
 
 export const cardLabels = {

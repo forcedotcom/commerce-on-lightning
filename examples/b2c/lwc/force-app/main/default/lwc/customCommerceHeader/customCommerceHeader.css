@@ -1,0 +1,9 @@
+.headerSearch {
+    margin-top: var(--dxp-g-spacing-medium);
+}
+
+@media (min-width: 64em) {
+    .headerSearch {
+        margin-top: 0;
+    }
+}

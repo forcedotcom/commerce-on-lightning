@@ -1,0 +1,31 @@
+<template>
+    <footer class="slds-p-around_large">
+        <div class="slds-grid slds-wrap slds-gutters_medium">
+            <div
+                class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-large-size_1-of-4 slds-shrink-none slds-m-bottom_medium"
+            >
+                <slot name="Footer_Content_Slot_1_of_4"></slot>
+            </div>
+            <div
+                class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-large-size_1-of-4 slds-shrink-none slds-m-bottom_medium"
+            >
+                <slot name="Footer_Content_Slot_2_of_4"></slot>
+            </div>
+            <div
+                class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-large-size_1-of-4 slds-shrink-none slds-m-bottom_medium"
+            >
+                <slot name="Footer_Content_Slot_3_of_4"></slot>
+            </div>
+            <div
+                class="slds-col slds-size_1-of-2 slds-medium-size_1-of-4 slds-large-size_1-of-4 slds-shrink-none slds-m-bottom_medium"
+            >
+                <slot name="Footer_Content_Slot_4_of_4"></slot>
+            </div>
+        </div>
+        <div class="slds-grid">
+            <div class="slds-col slds-size_1-of-1">
+                <slot name="CopyRightBar"></slot>
+            </div>
+        </div>
+    </footer>
+</template>

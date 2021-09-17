@@ -1,0 +1,19 @@
+.searchButton {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.searchIcon {
+    fill: var(--dxp-g-brand-contrast);
+}
+
+.inputTextBox {
+    border: unset;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.inputContainer {
+    border: 1px solid var(--dxp-g-brand);
+    border-radius: 0 0.4rem 0.4rem 0;
+}
