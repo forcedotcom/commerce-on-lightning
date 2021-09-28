@@ -14,11 +14,12 @@
             for="po-number"
         >
             <span class="slds-form-element__label slds-text-title_bold"
-                >{labels.purchaseOrderOptionLabel}</span
+                >{_purchaseOrderOptionLabel}</span
             >
         </label>
 
         <div class="slds-p-top_medium" if:true={isPoNumberSelected}>
+            
             <!-- Purchase Order Error Message -->
             <div
                 if:true={_purchaseOrderErrorMessage}
@@ -41,7 +42,7 @@
                 data-po-number
                 type="text"
                 name="PONumberInput"
-                label={labels.purchaseOrderEntryHeader}
+                label={_purchaseOrderEntryHeadingLabel}
                 value={purchaseOrderNumber}
                 onblur={handleUpdate}
                 required={poRequired}
@@ -54,6 +55,7 @@
                     onsetbillingaddress={handleChangeSelectedAddress}
                     billing-address-required={billingAddressRequired}
                     billing-address-error-message={billingAddressErrorMessage}
+                    title={_billingAddressHeadingLabel}
                 >
                 </c-billing-address-selector>
             </div>
@@ -74,7 +76,7 @@
             for="card-payment"
         >
             <span class="slds-form-element__label slds-text-title_bold"
-                >{labels.cardPaymentOptionLabel}</span
+                >{_cardPaymentOptionLabel}</span
             >
         </label>
         <div class="slds-p-top_medium" if:true={isCardPaymentSelected}>
@@ -99,6 +101,7 @@
                     onsetbillingaddress={handleChangeSelectedAddress}
                     billing-address-required={billingAddressRequired}
                     billing-address-error-message={billingAddressErrorMessage}
+                    title={_billingAddressHeadingLabel}
                 >
                 </c-billing-address-selector>
             </div>
@@ -107,14 +110,15 @@
 
     <!-- Navigation buttons -->
     <div class="slds-card__footer slds-p-vertical_x-small">
+
         <div if:true={canGoPrevious} class="slds-button slds-button_brand">
             <a href="javascript:void(0)" onclick={handlePreviousButton}
-                >{previousButtonLabel}</a
+                >{_previousButtonLabel}</a
             >
         </div>
         <div class="slds-button slds-button_brand">
             <a href="javascript:void(0)" onclick={handlePaymentButton}
-                >{nextButtonLabel}</a
+                >{_nextButtonLabel}</a
             >
         </div>
     </div>
