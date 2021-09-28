@@ -1,8 +1,5 @@
 import { LightningElement, api, track } from 'lwc';
-import {
-    FlowNavigationNextEvent,
-    FlowNavigationBackEvent
-} from 'lightning/flowSupport';
+import { FlowNavigationNextEvent, FlowNavigationBackEvent } from 'lightning/flowSupport';
 import * as Constants from './constants';
 
 import getPaymentInfo from '@salesforce/apex/B2BPaymentController.getPaymentInfo';
@@ -115,20 +112,115 @@ export default class PaymentMethod extends LightningElement {
      * Text to display on the Previous button. Defaults to "Previous".
      * @type {String}
      */
-    @api previousButtonLabel = 'Previous';
+    @api previousButtonLabel;
+
+    /**
+     * Returns the button label for the previous button. If no customized label is provided
+     * then an English only string is used instead.
+     *
+     * @return {String}
+     */
+    get _previousButtonLabel() {
+        return this.previousButtonLabel || 'Previous';
+    }
 
     /**
      * Text to display on the Next button. Defaults to "Next".
      * @type {String}
      */
-    @api nextButtonLabel = 'Next';
+    @api nextButtonLabel;
 
     /**
-     * The list of labels used in the cmp.
+     * Returns the button label for the next button. If no customized label is provided
+     * then an English only string is used instead.
+     *
+     * @return {String}
+     */
+    get _nextButtonLabel() {
+        return this.nextButtonLabel || 'Next';
+    }
+
+    /**
+     * The title label/heading of the billing address selector.
+     */
+    @api billingAddressHeadingLabel;
+
+    /**
+     * Returns the billing address label. If no customized label is provided
+     * then an English only string is used instead.
+     *
+     * @return {String}
+     */
+    get _billingAddressHeadingLabel() {
+        return this.billingAddressHeadingLabel || 'Billing Address';
+    }
+
+    /**
+     * Label of the form "Payment Method" for the name of the payment component.
+     *
      * @type {String}
      */
-    get labels() {
-        return Constants.labels;
+    @api paymentMethodHeadingLabel;
+
+    /**
+     * Returns the payment method heading label. If no customized label is provided
+     * then an English only string is used instead.
+     *
+     * @return {String}
+     */
+    get _paymentMethodHeadingLabel() {
+        return this.paymentMethodHeadingLabel || 'Payment Method';
+    }
+
+    /**
+     * Label of the form "Enter PO Number" for the purchase order field.
+     *
+     * @type {String}
+     */
+    @api purchaseOrderEntryHeadingLabel;
+
+    /**
+     * Returns the purchase order entry heading label. If no customized label is provided
+     * then an English only string is used instead.
+     *
+     * @return {String}
+     */
+    get _purchaseOrderEntryHeadingLabel() {
+        return this.purchaseOrderEntryHeadingLabel || 'Enter Purchase Order';
+    }
+
+    /**
+     * Label of the form "Purchase Order" for the purchase order radio button.
+     *
+     * @type {String}
+     */
+    @api purchaseOrderOptionLabel;
+
+    /**
+     * Returns the purchase order option button label. If no customized label is provided
+     * then an English only string is used instead.
+     *
+     * @return {String}
+     */
+    get _purchaseOrderOptionLabel() {
+        return this.purchaseOrderOptionLabel || 'Purchase Order';
+    }
+
+    /**
+     * Label of the form "Credit Card" for the credit card radio button.
+     *
+     * @type {String}
+     */
+    @api cardPaymentOptionLabel;
+
+    /**
+     * Returns the credit card option button label. If no customized label is provided
+     * then an English only string is used instead.
+     *
+     * @return {String}
+     */
+    get _cardPaymentOptionLabel() {
+        return this.cardPaymentOptionLabel || 'Credit Card';
     }
 
     /**
@@ -235,10 +327,7 @@ export default class PaymentMethod extends LightningElement {
      * @returns {Boolean} True if "BACK" is found, False otherwise
      */
     get canGoPrevious() {
-        return (
-            this.availableActions &&
-            this.availableActions.some((element) => element == 'BACK')
-        );
+        return (this.availableActions && this.availableActions.some(element => element == 'BACK'));
     }
 
     /**
@@ -270,7 +359,7 @@ export default class PaymentMethod extends LightningElement {
     get isPoNumberSelected() {
         return (
             this.actualSelectedPaymentType ===
-                Constants.PaymentTypeEnum.PONUMBER && !this.hidePurchaseOrder
+            Constants.PaymentTypeEnum.PONUMBER && !this.hidePurchaseOrder
         );
     }
 
@@ -282,10 +371,8 @@ export default class PaymentMethod extends LightningElement {
      */
     get actualSelectedPaymentType() {
         return this.hidePurchaseOrder
-            ? Constants.PaymentTypeEnum.CARDPAYMENT
-            : this.hideCreditCard
-            ? Constants.PaymentTypeEnum.PONUMBER
-            : this._selectedPaymentType;
+        ? Constants.PaymentTypeEnum.CARDPAYMENT
+        : (this.hideCreditCard ? Constants.PaymentTypeEnum.PONUMBER : this._selectedPaymentType);
     }
 
     /**
@@ -348,9 +435,12 @@ export default class PaymentMethod extends LightningElement {
                 return;
             }
 
-            const poInput = this.getComponent('[data-po-number]');
+            const poInput = this.getComponent('[data-po-number]');            
             // Make sure that PO input is valid first
-            if (poInput != null && !poInput.reportValidity()) {
+            if (
+                poInput != null &&
+                !poInput.reportValidity()
+            ) {
                 return;
             }
 
@@ -363,15 +453,13 @@ export default class PaymentMethod extends LightningElement {
                 cartId: this.cartId,
                 billingAddress: selectedAddressResult.address,
                 paymentInfo: paymentInfo
-            })
-                .then(() => {
-                    // After making the server calls, navigate NEXT in the flow
-                    const navigateNextEvent = new FlowNavigationNextEvent();
-                    this.dispatchEvent(navigateNextEvent);
-                })
-                .catch((error) => {
-                    this._purchaseOrderErrorMessage = error.body.message;
-                });
+            }).then(() => {
+                // After making the server calls, navigate NEXT in the flow
+                const navigateNextEvent = new FlowNavigationNextEvent();
+                this.dispatchEvent(navigateNextEvent);
+            }).catch((error) => {
+                this._purchaseOrderErrorMessage = error.body.message;
+            });
         } else {
             if (selectedAddressResult.error) {
                 this._creditCardErrorMessage = selectedAddressResult.error;
@@ -394,21 +482,19 @@ export default class PaymentMethod extends LightningElement {
             const creditCardData = this.getCreditCardFromComponent(
                 creditPaymentComponent
             );
-
+            
             setPayment({
                 paymentType: this.selectedPaymentType,
                 cartId: this.cartId,
                 billingAddress: selectedAddressResult.address,
                 paymentInfo: creditCardData
-            })
-                .then(() => {
-                    // After making the server calls, navigate NEXT in the flow
-                    const navigateNextEvent = new FlowNavigationNextEvent();
-                    this.dispatchEvent(navigateNextEvent);
-                })
-                .catch((error) => {
-                    this._creditCardErrorMessage = error.body.message;
-                });
+            }).then(() => {
+                // After making the server calls, navigate NEXT in the flow
+                const navigateNextEvent = new FlowNavigationNextEvent();
+                this.dispatchEvent(navigateNextEvent);
+            }).catch((error) => {
+                this._creditCardErrorMessage = error.body.message;
+            });
         }
     }
 
@@ -423,11 +509,7 @@ export default class PaymentMethod extends LightningElement {
                 return { error: 'Billing Address is required' };
             }
         } else {
-            return {
-                address: this._addresses.filter(
-                    (add) => add.id === this.selectedBillingAddress
-                )[0]
-            };
+            return { address: this._addresses.filter(add => add.id === this.selectedBillingAddress)[0] };
         }
 
         return {};
@@ -454,7 +536,7 @@ export default class PaymentMethod extends LightningElement {
      */
     handleChangeSelectedAddress(event) {
         const address = event.detail.address;
-        if (address.id !== null && address.id.startsWith('8lW')) {
+        if (address.id !== null && (address.id).startsWith('8lW')) {
             this._selectedBillingAddress = address.id;
         } else {
             this._selectedBillingAddress = '';
