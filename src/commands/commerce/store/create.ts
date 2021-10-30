@@ -51,10 +51,14 @@ export class StoreCreate extends SfdxCommand {
             }
         },
     };
-    public static vargsAllowList: string[] = ['buyerEmail', 'existingBuyerAuthentication', 'buyerAlias'].concat(
-        StoreQuickstartSetup.vargsAllowList,
-        StoreQuickstartCreate.vargsAllowList
-    );
+
+    public static get vargsAllowList(): string[] {
+        return ['buyerEmail', 'existingBuyerAuthentication', 'buyerAlias'].concat(
+            StoreQuickstartSetup.vargsAllowList,
+            StoreQuickstartCreate.vargsAllowList
+        );
+    }
+
     public static description = msgs.getMessage('create.cmdDescription');
     public static examples = [`sfdx ${CMD} --store-name test-store`];
     protected static flagsConfig = filterFlags(
