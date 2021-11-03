@@ -1,17 +1,31 @@
-// This must implement the sfdc_checkout.CartShippingCharges interface
-// in order to be processed by the checkout flow for the "Shipping" integration
-global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
-    global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
-        sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
+// This class determines if we can ship to the buyer's shipping address and creates
+// CartDeliveryGroupMethods for the different options and prices the buyer may choose from
+public class B2BSyncDelivery {
+    // This invocable method only expects one ID
+    @InvocableMethod(callout=true label='Prepare the Delivery Method Options' description='Runs a synchronous version of delivery method preparation' category='B2B Commerce')
+    public static void syncDelivery(List<ID> cartIds) {
+        // Validate the input
+        if (cartIds == null || cartIds.size() != 1) {
+            String errorMessage = 'A cart id must be included to B2BSyncDelivery';
+            saveCartValidationOutputError(errorMessage, '');
+            throw new CalloutException (errorMessage);
+        }
+        
+        // Extract cart id and start processing
+        Id cartId = cartIds[0];
+        startCartProcessSync(cartId);
+    }
+
+    private static void startCartProcessSync(Id cartId) {
         try {
             // We need to get the ID of the cart delivery group in order to create the order delivery groups.
             Id cartDeliveryGroupId = [SELECT Id FROM CartDeliveryGroup WHERE CartId = :cartId WITH SECURITY_ENFORCED][0].Id;
-            
+
             // Used to increase the cost by a multiple of the number of items in the cart (useful for testing but should not be done in the final code)
             Integer numberOfUniqueItems = [SELECT count() from cartItem WHERE CartId = :cartId WITH SECURITY_ENFORCED];
 
             // Get shipping options, including aspects like rates and carriers, from the external service. 
-            ShippingOptionsAndRatesFromExternalService[] shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService(numberOfUniqueItems);
+            ShippingOptionsAndRatesFromExternalService[] shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService(cartId, numberOfUniqueItems);
 
             // On re-entry of the checkout flow delete all previous CartDeliveryGroupMethods for the given cartDeliveryGroupId
             delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId WITH SECURITY_ENFORCED];
@@ -28,10 +42,8 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
                                                                   cartId);
                 i+=1;
             }
-            
-            // If everything works well, the charge is added to the cart and our integration has been successfully completed.
-            integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
-
+        } catch (CalloutException e) {
+            throw e;
         // For testing purposes, this example treats exceptions as user errors, which means they are displayed to the buyer user.
         // In production you probably want this to be an admin-type error. In that case, throw the exception here
         // and make sure that a notification system is in place to let the admin know that the error occurred.
@@ -46,24 +58,45 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
                 errorMessage += ' , ';
             }
 
-            return integrationStatusFailedWithCartValidationOutputError(
-                integStatus,
-                errorMessage,
-                jobInfo,
-                cartId
-            );
+            saveCartValidationOutputError(errorMessage, cartId);
+            throw new CalloutException (errorMessage);
         } catch(Exception e) {
-            return integrationStatusFailedWithCartValidationOutputError(
-                integStatus,
-                'An exception of type ' + e.getTypeName() + ' has occurred: ' + e.getMessage(),
-                jobInfo,
-                cartId
-            );
+            String errorMessage = 'An exception of type ' + e.getTypeName() + ' has occurred: ' + e.getMessage();
+            saveCartValidationOutputError(errorMessage, cartId);
+            throw new CalloutException (errorMessage);
         }
-        return integStatus;
     }
 
-    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (Integer numberOfUniqueItems) {
+    // Don't hit Heroku Server: You can uncomment out this if you want to remove the Heroku Service from this class. Comment out the
+    // method below instead.
+    /*
+    private static ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (String id, Integer numberOfUniqueItems) {
+        // Don't actually call heroku
+        ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
+        // To access the service below, you may need to add endpoint = https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
+        // If the request is successful, parse the JSON response.
+        // The response looks like this:
+        // [{"status":"calculated","rate":{"name":"Delivery Method 1","serviceName":"Test Carrier 1","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},
+        // {"status":"calculated","rate":{"name":"Delivery Method 2","serviceName":"Test Carrier 2","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99}}]
+        String body = '[{"status":"calculated","rate":{"name":"Delivery Method 1","serviceName":"Test Carrier 1","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},' +
+                       '{"status":"calculated","rate":{"name":"Delivery Method 2","serviceName":"Test Carrier 2","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99}}]';
+        List<Object> results = (List<Object>) JSON.deserializeUntyped(body);
+        for (Object result: results) {
+            Map<String, Object> subresult = (Map<String, Object>) result;
+            Map<String, Object> providerAndRate = (Map<String, Object>) subresult.get('rate');
+            shippingOptions.add( new ShippingOptionsAndRatesFromExternalService(
+                (String) providerAndRate.get('name'),
+                (String) providerAndRate.get('serviceCode'),
+                (Decimal) providerAndRate.get('shipmentCost') * numberOfUniqueItems,
+                (Decimal) providerAndRate.get('otherCost'),
+                (String) providerAndRate.get('serviceName')
+            ));
+        }
+        return shippingOptions;
+    }*/
+    
+    // Do hit Heroku Server: You can comment this out and uncomment out the above class if you don't want to hit the Heroku Service.
+    private static ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (String cartId, Integer numberOfUniqueItems) {
         final Integer SuccessfulHttpRequest = 200;
 
         ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
@@ -95,7 +128,9 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
             return shippingOptions;
         }
         else {
-            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+            String errorMessage = 'There was a problem with the request. Error: ' + response.getStatusCode();
+            saveCartValidationOutputError(errorMessage, cartId);
+            throw new CalloutException (errorMessage);
         }
     }
 
@@ -137,7 +172,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
     }
 
     // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
-    private void populateCartDeliveryGroupMethodWithShippingOptions(ShippingOptionsAndRatesFromExternalService shippingOption,
+    private static void populateCartDeliveryGroupMethodWithShippingOptions(ShippingOptionsAndRatesFromExternalService shippingOption,
                                                                   Id cartDeliveryGroupId,
                                                                   Id deliveryMethodId,
                                                                   Id webCartId){
@@ -159,9 +194,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         insert(cartDeliveryGroupMethod);
     }
 
-    private sfdc_checkout.IntegrationStatus integrationStatusFailedWithCartValidationOutputError(
-        sfdc_checkout.IntegrationStatus integrationStatus, String errorMessage, sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
-            integrationStatus.status = sfdc_checkout.IntegrationStatus.Status.FAILED;
+    private static void saveCartValidationOutputError(String errorMessage, Id cartId) {
             // In order for the error to be propagated to the user, we need to add a new CartValidationOutput record.
             // The following fields must be populated:
             // BackgroundOperationId: Foreign Key to the BackgroundOperation
@@ -172,26 +205,24 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
             // RelatedEntityId (required): Foreign key to WebCart, CartItem, CartDeliveryGroup
             // Type (required): One of the following - SystemError, Inventory, Taxes, Pricing, Shipping, Entitlement, Other
             CartValidationOutput cartValidationError = new CartValidationOutput(
-                BackgroundOperationId = jobInfo.jobId,
                 CartId = cartId,
                 Level = 'Error',
                 Message = errorMessage.left(255),
-                Name = (String)cartId + ':' + jobInfo.jobId,
+                Name = (String)cartId,
                 RelatedEntityId = cartId,
                 Type = 'Shipping'
             );
             insert(cartValidationError);
-            return integrationStatus;
     }
 
-    private Id getShippingChargeProduct2Id(Id orderDeliveryMethodId) {
+    private static Id getShippingChargeProduct2Id(Id orderDeliveryMethodId) {
         // The Order Delivery Method should have a Product2 associated with it, because we added that in getDefaultOrderDeliveryMethod if it didn't exist.
         List<OrderDeliveryMethod> orderDeliveryMethods = [SELECT ProductId FROM OrderDeliveryMethod WHERE Id = :orderDeliveryMethodId WITH SECURITY_ENFORCED];
         return orderDeliveryMethods[0].ProductId;
     }
 
-    private List<Id> getOrderDeliveryMethods(List<ShippingOptionsAndRatesFromExternalService> shippingOptions) {
-        String defaultDeliveryMethodName = 'Order Delivery Method';
+    private static List<Id> getOrderDeliveryMethods(List<ShippingOptionsAndRatesFromExternalService> shippingOptions) {
+        String defaultDeliveryMethodName = 'Delivery Method ';
         Id product2IdForThisDeliveryMethod = getDefaultShippingChargeProduct2Id();
 
         // Check to see if a default OrderDeliveryMethod already exists.
@@ -236,7 +267,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         return orderDeliveryMethodIds;
     }
 
-    private Id getDefaultShippingChargeProduct2Id() {
+    private static Id getDefaultShippingChargeProduct2Id() {
         // In this example we will name the product representing shipping charges 'Shipping Charge for this delivery method'.
         // Check to see if a Product2 with that name already exists.
         // If it doesn't exist, create one.

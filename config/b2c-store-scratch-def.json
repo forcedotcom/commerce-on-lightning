@@ -2,9 +2,7 @@
     "storeName": "Test B2C Company",
     "edition": "B2C",
     "template": "b2c-lite-storefront",
-    "features": [
-        "GuestUser"
-    ],
+    "features": ["GuestUser"],
     "settings": {
         "checkout": {
             "paymentGatewayIntegration": "Salesforce",
@@ -21,8 +19,6 @@
         "cspTrustedSites": {
             "amazonaws": true
         },
-        "productImport": [
-            "Alpine-small.csv"
-        ]
+        "productImport": ["Alpine-small.csv"]
     }
 }
