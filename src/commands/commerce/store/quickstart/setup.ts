@@ -55,12 +55,14 @@ export class StoreQuickstartSetup extends SfdxCommand {
             }
         },
     };
-    public static vargsAllowList: string[] = [
-        'communityNetworkName',
-        'communitySiteName',
-        'communityExperienceBundleName',
-        'isSharingRuleMetadataNeeded',
-    ];
+    public static get vargsAllowList(): string[] {
+        return [
+            'communityNetworkName',
+            'communitySiteName',
+            'communityExperienceBundleName',
+            'isSharingRuleMetadataNeeded',
+        ];
+    }
 
     public static examples = [`sfdx ${CMD} --definitionfile store-scratch-def.json`];
 

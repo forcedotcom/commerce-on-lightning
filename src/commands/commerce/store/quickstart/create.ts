@@ -27,15 +27,17 @@ export class StoreQuickstartCreate extends SfdxCommand {
         required: false,
         validator: (name: string): void => {
             // Whitelist varargs parameter names
-            if (!['urlpathprefix', 'description'].includes(name)) {
+            if (!StoreQuickstartCreate.vargsAllowList.includes(name)) {
                 const errMsg = `Invalid parameter [${name}] found`;
                 const errName = 'InvalidVarargName';
-                const errAction = `Choose one of these parameter names: ${['urlpathprefix', 'description'].join()}`;
+                const errAction = `Choose one of these parameter names: ${StoreQuickstartCreate.vargsAllowList.join()}`;
                 throw new SfdxError(errMsg, errName, [errAction]);
             }
         },
     };
-    public static vargsAllowList: string[] = ['urlpathprefix', 'description'];
+    public static get vargsAllowList(): string[] {
+        return ['urlpathprefix', 'description'];
+    }
 
     protected static flagsConfig = {
         ...filterFlags(['templatename', 'store-name'], storeFlags),
