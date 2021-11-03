@@ -51,10 +51,14 @@ export class StoreCreate extends SfdxCommand {
             }
         },
     };
-    public static vargsAllowList: string[] = ['buyerEmail', 'existingBuyerAuthentication', 'buyerAlias'].concat(
-        StoreQuickstartSetup.vargsAllowList,
-        StoreQuickstartCreate.vargsAllowList
-    );
+
+    public static get vargsAllowList(): string[] {
+        return ['buyerEmail', 'existingBuyerAuthentication', 'buyerAlias'].concat(
+            StoreQuickstartSetup.vargsAllowList,
+            StoreQuickstartCreate.vargsAllowList
+        );
+    }
+
     public static description = msgs.getMessage('create.cmdDescription');
     public static examples = [`sfdx ${CMD} --store-name test-store`];
     protected static flagsConfig = filterFlags(
@@ -270,6 +274,9 @@ export class StoreCreate extends SfdxCommand {
         this.ux.startSpinner(msgs.getMessage('create.pushingStoreSources'));
         try {
             this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:source:push']));
+            shellJsonSfdx(
+                `cd ${scratchOrgDir} && echo y | sfdx force:source:tracking:clear -u "${this.org.getUsername()}"`
+            );
             shellJsonSfdx(`cd ${scratchOrgDir} && sfdx force:source:push -f -u "${this.org.getUsername()}"`);
         } catch (e) {
             if (e.message && JSON.stringify(e.message).indexOf(msgs.getMessage('create.checkInvalidSession')) >= 0) {
