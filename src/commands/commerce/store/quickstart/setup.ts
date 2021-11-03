@@ -47,30 +47,22 @@ export class StoreQuickstartSetup extends SfdxCommand {
         required: false,
         validator: (name: string): void => {
             // Whitelist varargs parameter names
-            if (![
-                'communityNetworkName',
-                'communitySiteName',
-                'communityExperienceBundleName',
-                'isSharingRuleMetadataNeeded',
-            ].includes(name)) {
+            if (!StoreCreate.vargsAllowList.includes(name)) {
                 const errMsg = `Invalid parameter [${name}] found`;
                 const errName = 'InvalidVarargName';
-                const errAction = `Choose one of these parameter names: ${[
-                    'communityNetworkName',
-                    'communitySiteName',
-                    'communityExperienceBundleName',
-                    'isSharingRuleMetadataNeeded',
-                ].join()}`;
+                const errAction = `Choose one of these parameter names: ${StoreCreate.vargsAllowList.join()}`;
                 throw new SfdxError(errMsg, errName, [errAction]);
             }
         },
     };
-    public static vargsAllowList: string[] = [
-        'communityNetworkName',
-        'communitySiteName',
-        'communityExperienceBundleName',
-        'isSharingRuleMetadataNeeded',
-    ];
+    public static get vargsAllowList(): string[] {
+        return [
+            'communityNetworkName',
+            'communitySiteName',
+            'communityExperienceBundleName',
+            'isSharingRuleMetadataNeeded',
+        ];
+    }
 
     public static examples = [`sfdx ${CMD} --definitionfile store-scratch-def.json`];
 
