@@ -27,10 +27,10 @@ export class StoreQuickstartCreate extends SfdxCommand {
         required: false,
         validator: (name: string): void => {
             // Whitelist varargs parameter names
-            if (!StoreQuickstartCreate.vargsAllowList.includes(name)) {
+            if (!['urlpathprefix', 'description'].includes(name)) {
                 const errMsg = `Invalid parameter [${name}] found`;
                 const errName = 'InvalidVarargName';
-                const errAction = `Choose one of these parameter names: ${StoreQuickstartCreate.vargsAllowList.join()}`;
+                const errAction = `Choose one of these parameter names: ${['urlpathprefix', 'description'].join()}`;
                 throw new SfdxError(errMsg, errName, [errAction]);
             }
         },

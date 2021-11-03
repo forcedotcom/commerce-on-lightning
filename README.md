@@ -48,7 +48,7 @@ $ npm install -g @salesforce/commerce
 $ sfdx COMMAND
 running command...
 $ sfdx (-v|--version|version)
-@salesforce/commerce/234.0.6 darwin-x64 node-v14.3.0
+@salesforce/commerce/234.0.6 linux-x64 node-v15.5.1
 $ sfdx --help [COMMAND]
 USAGE
   $ sfdx COMMAND
@@ -150,8 +150,8 @@ OPTIONS
                                                                                     Directory to output the conversion
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store
-                                                                                    -scratch-def.json] config file
+                                                                                    ~/.commerce/config/store-
+                                                                                    scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
@@ -211,8 +211,8 @@ USAGE
 
 OPTIONS
   -c, --products-file-csv=products-file-csv
-      [default: ~/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass
-      in empty value to do product-less import
+      [default: ~/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass in
+      empty value to do product-less import
 
   -f, --definitionfile=definitionfile
       [default: ~/.commerce/config/store-scratch-def.json] config file
@@ -257,8 +257,8 @@ OPTIONS
                                                                                     buyer's username
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store
-                                                                                    -scratch-def.json] config file
+                                                                                    ~/.commerce/config/store-
+                                                                                    scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
@@ -405,8 +405,8 @@ USAGE
 
 OPTIONS
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store
-                                                                                    -scratch-def.json] config file
+                                                                                    ~/.commerce/config/store-
+                                                                                    scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
