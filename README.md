@@ -8,6 +8,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/1commerce/1commerce/badge.svg)](https://snyk.io/test/github/1commerce/1commerce)
 [![Downloads/week](https://img.shields.io/npm/dw/1commerce.svg)](https://npmjs.org/package/1commerce)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-brightgreen.svg)](https://raw.githubusercontent.com/salesforcecli/plugin-auth/main/LICENSE.txt)
+==============
 
 Commerce commands for Salesforce CLI.
 
@@ -19,6 +20,20 @@ This plugin is used to create and setup either a B2B or a B2C store with data wi
 This plugin requires the [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli). For more information on the CLI, read the [getting started guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm).
 
 We always recommend using the latest version of these commands, however, you can install a specific version or tag if needed.
+
+
+
+[commerce-on-lightning-dev](https://git.soma.salesforce.com/communities/commerce-on-lightning-dev) - commerce-dev     
+- devhubs (local development)
+
+[commerce-on-lightning-orchestration](https://git.soma.salesforce.com/communities/commerce-on-lightning-orchestration) - commerce-orchestration
+- scratchorgs
+
+[commerce-on-lightning](https://git.soma.salesforce.com/communities/commerce-on-lightning-orchestration) - @salesforce/commerce <---- THIS PLUGIN
+- store
+
+==============
+
 
 -   [Introduction](#introduction)
 -   [Usage](#usage)
