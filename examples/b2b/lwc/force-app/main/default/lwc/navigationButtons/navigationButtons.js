@@ -1,8 +1,5 @@
 import { LightningElement, api } from 'lwc';
-import {
-    FlowNavigationNextEvent,
-    FlowNavigationBackEvent
-} from 'lightning/flowSupport';
+import { FlowNavigationNextEvent, FlowNavigationBackEvent } from 'lightning/flowSupport';
 
 /**
  * This class allows for more complicated navigation paths than flows typically allow. Because
@@ -35,17 +32,14 @@ export default class NavigationButtons extends LightningElement {
      * Text to display on the Next button. Defaults to "Next".
      * @type {String}
      */
-    @api nextButtonLabel = 'Next';
+    @api nextButtonLabel = 'Next'
 
     /**
      * Determines if the "Previous" button is available in this flow.
      * @returns {Boolean} True if "BACK" is found, False otherwise
      */
     get canGoPrevious() {
-        return (
-            this.availableActions &&
-            this.availableActions.some((element) => element == 'BACK')
-        );
+        return (this.availableActions && this.availableActions.some(element => element == 'BACK'));
     }
 
     /**
