@@ -160,9 +160,9 @@ export class StoreCreate extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         this.devhubUsername = (await this.org.getDevHubOrg()).getUsername();
         const passedArgs = getPassedArgs(this.argv, this.flags);
-        if (!this.flags.type || this.flags.type !== 'b2c' || this.flags.type !== 'b2b') this.flags.type = 'b2c';
+        if (!this.flags.type || (this.flags.type !== 'b2c' && this.flags.type !== 'b2b')) this.flags.type = 'b2c';
         if (!Object.keys(passedArgs).includes('definitionfile') && Object.keys(passedArgs).includes('type'))
-            this.flags.definitionfile = CONFIG_DIR + '/' + (this.flags.type as string) + '-store-scratch-def.json';
+            this.flags.definitionfile = CONFIG_DIR + '/' + (passedArgs.type as string) + '-store-scratch-def.json';
         this.scrDef = parseStoreScratchDef(this.flags.definitionfile, this.argv, this.flags);
         // parseStoreScratchDef overrides scrDef with arg flag values, below is needed when none are supplied so we use the values in store def file
         const modifyArgs = [
