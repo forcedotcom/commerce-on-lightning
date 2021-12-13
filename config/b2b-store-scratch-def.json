@@ -18,7 +18,7 @@
         "tests": {
             "integration": true
         },
-        "checkoutAsync": true,
+        "checkoutMain": true,
         "lwc": {
             "classes": [
                 "B2BGetInfo.cls*",
@@ -26,14 +26,8 @@
                 "B2BPaymentController.cls*",
                 "B2BAuthorizeTokenizedPayment.cls*"
             ],
-            "lwc": [
-                "paymentMethod",
-                "billingAddressSelector",
-                "cardPaymentMethod"
-            ]
+            "lwc": ["paymentMethod", "billingAddressSelector", "cardPaymentMethod", "navigationButtons"]
         },
-        "productImport": [
-            "Alpine-small.csv"
-        ]
+        "productImport": ["Alpine-small.csv"]
     }
 }

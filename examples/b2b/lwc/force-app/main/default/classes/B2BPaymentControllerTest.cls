@@ -29,16 +29,16 @@ public class B2BPaymentControllerTest {
         insert cpa1;
         insert cpa2;
         insert cpaShipping;
-
+        
         // This profile name is the name of the buyer profile. The name specified here is what is installed using
         // SFDX and may be different for you.
-        Profile profile = [SELECT Id FROM Profile WHERE Name='Buyer_User_Profile_From_QuickStart_B2B' LIMIT 1];
+        Profile profile = [SELECT Id FROM Profile WHERE Name='Buyer_User_Profile_From_QuickStart' LIMIT 1];
         User user = new User(Alias='buyer', Email='buyer@example.com', LastName='Buyer',
                 TimeZoneSidKey='GMT', LocaleSidKey='en_US', Username='buyer@example.com',
                 EmailEncodingKey='UTF-8', ProfileId=profile.Id, LanguageLocaleKey='en_US',
                 ContactId=contact.Id);
         insert user;
-
+        
         insertCartItem(cart.Id, cartDeliveryGroup.Id);
     }
 
@@ -54,7 +54,7 @@ public class B2BPaymentControllerTest {
                                     FROM ContactPointAddress WHERE Name='CPA2'];
 
         Test.startTest();
-
+        
         // Get the payment info as a buyer so that the buyer's account is used in the method call
         Map<String, Object> paymentInfo;
         System.runAs(buyer) {
@@ -67,16 +67,16 @@ public class B2BPaymentControllerTest {
         // Verify the addresses returned were correct
         List<Map<String, Object>> addresses = (List<Map<String, Object>>) paymentInfo.get('addresses');
         System.assertEquals(2, addresses.size());
-
+        
         Map<String, Object> address1 = addresses.get(0);
         Map<String, Object> address2 = addresses.get(1);
-
+        
         testAddressMatches(address1, cpa1.Id, cpa1.Name, cpa1.Street, cpa1.City, cpa1.State, cpa1.Country, cpa1.PostalCode, cpa1.IsDefault, false);
         testAddressMatches(address2, cpa2.Id, cpa2.Name, cpa2.Street, cpa2.City, cpa2.State, cpa2.Country, cpa2.PostalCode, cpa2.IsDefault, false);
-
+        
         Test.stopTest();
     }
-
+    
     // Here, the user has previously selected an address and so we should show that address as having been selected
     @isTest static void testSelectedAddressMatchesAnAddress() {
         // Get the data we'll need to use for running the test or for verification
@@ -94,7 +94,7 @@ public class B2BPaymentControllerTest {
         // try/finally ensures the test data is always removed even if there is a failure in the test
         try {
             Test.startTest();
-
+        
             // Get the payment info as a buyer so that the buyer's account is used in the method call
             Map<String, Object> paymentInfo;
             System.runAs(buyer) {
@@ -107,13 +107,13 @@ public class B2BPaymentControllerTest {
             // Verify the addresses returned were correct
             List<Map<String, Object>> addresses = (List<Map<String, Object>>) paymentInfo.get('addresses');
             System.assertEquals(2, addresses.size());
-
+        
             Map<String, Object> address1 = addresses.get(0);
             Map<String, Object> address2 = addresses.get(1);
-
+        
             testAddressMatches(address1, cpa1.Id, cpa1.Name, cpa1.Street, cpa1.City, cpa1.State, cpa1.Country, cpa1.PostalCode, cpa1.IsDefault, true);
             testAddressMatches(address2, cpa2.Id, cpa2.Name, cpa2.Street, cpa2.City, cpa2.State, cpa2.Country, cpa2.PostalCode, cpa2.IsDefault, false);
-
+    
             Test.stopTest();
         } finally {
             // Revert the change made at the beginning of the test where we set the selected address into the cart
@@ -141,7 +141,7 @@ public class B2BPaymentControllerTest {
         // try/finally ensures the test data is always removed even if there is a failure in the test
         try {
             Test.startTest();
-
+        
             // Get the payment info as a buyer so that the buyer's account is used in the method call
             Map<String, Object> paymentInfo;
             System.runAs(buyer) {
@@ -155,7 +155,7 @@ public class B2BPaymentControllerTest {
             List<Map<String, Object>> addresses = (List<Map<String, Object>>) paymentInfo.get('addresses');
             System.assertEquals(3, addresses.size());
 
-            Map<String, Object> selectedAddress = addresses.get(0);
+            Map<String, Object> selectedAddress = addresses.get(0);        
             Map<String, Object> address1 = addresses.get(1);
             Map<String, Object> address2 = addresses.get(2);
 
@@ -164,7 +164,7 @@ public class B2BPaymentControllerTest {
                    webCartBillingAddress.State, webCartBillingAddress.Country, webCartBillingAddress.PostalCode, false, true);
             testAddressMatches(address1, cpa1.Id, cpa1.Name, cpa1.Street, cpa1.City, cpa1.State, cpa1.Country, cpa1.PostalCode, cpa1.IsDefault, false);
             testAddressMatches(address2, cpa2.Id, cpa2.Name, cpa2.Street, cpa2.City, cpa2.State, cpa2.Country, cpa2.PostalCode, cpa2.IsDefault, false);
-
+    
             Test.stopTest();
         } finally {
             // Revert the change made at the beginning of the test where we set the selected address into the cart
@@ -184,16 +184,16 @@ public class B2BPaymentControllerTest {
         Map<String, Object> billingAddress = createBillingMapFromAddress(cpa1.Address);
         Map<String, Object> paymentInfo = new Map<String, Object>();
         paymentInfo.put('poNumber', expectedPONumber);
-
+        
         Test.startTest();
-
+        
         B2BPaymentController.setPayment(paymentType, cartId, billingAddress, paymentInfo);
 
         // Get the updated cart
         WebCart updatedCart = [SELECT PaymentMethodId, PONumber FROM WebCart WHERE Name='Cart' LIMIT 1];
-        System.assertEquals(null, updatedCart.PaymentMethodId);
+        System.assertEquals(null, updatedCart.PaymentMethodId);        
         System.assertEquals(expectedPONumber, updatedCart.PONumber);
-
+        
         Test.stopTest();
     }
 
@@ -207,9 +207,9 @@ public class B2BPaymentControllerTest {
         String cartId = webCart.Id;
         Map<String, Object> billingAddress = createBillingMapFromAddress(cpa1.Address);
         Map<String, Object> paymentInfo = new Map<String, Object>();
-
+        
         Test.startTest();
-
+        
         try {
             B2BPaymentController.setPayment(paymentType, cartId, billingAddress, paymentInfo);
             // Exception should have been thrown
@@ -220,7 +220,7 @@ public class B2BPaymentControllerTest {
             // However, the way the auraHandledException is thrown, this isn't available unless we call setMessage() prior to
             // throwing the exception. So, we'll make due with a generic exception message for this reference
         }
-
+        
         Test.stopTest();
 
     }
@@ -235,7 +235,7 @@ public class B2BPaymentControllerTest {
         billingMap.put('postalCode', address.PostalCode);
         billingMap.put('latitude', address.Latitude);
         billingMap.put('longitude', address.Longitude);
-
+        
         return billingMap;
     }
 
@@ -271,21 +271,21 @@ public class B2BPaymentControllerTest {
 
         insertCartItem(cartId, cartDeliveryGroups.get(0).Id);
     }
-
+    
     // Inserts a cart item that matches the cart and cart delivery group
     static void insertCartItem(String cartId, String cartDeliveryGroupId) {
         CartItem cartItem = new CartItem(
-            CartId=cartId,
-            Sku='SKU_Test1',
-            Quantity=3.0,
-            Type='Product',
-            Name='TestProduct',
+            CartId=cartId, 
+            Sku='SKU_Test1', 
+            Quantity=3.0, 
+            Type='Product', 
+            Name='TestProduct', 
             CartDeliveryGroupId=cartDeliveryGroupId
         );
         insert cartItem;
     }
 
-    // Deletes the single cart item
+    // Deletes the single cart item    
     static void deleteCartItem() {
         CartItem cartItem = [SELECT Id FROM CartItem WHERE Name = 'TestProduct' LIMIT 1];
         delete cartItem;
