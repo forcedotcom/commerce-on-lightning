@@ -1,6 +1,6 @@
 {
     "name": "@salesforce/commerce",
-    "version": "234.0.6",
+    "version": "234.0.13",
     "author": "Jonathan Arndt",
     "bugs": "https://git.soma.salesforce.com/communities/commerce-on-lightning/issues",
     "dependencies": {
@@ -142,7 +142,7 @@
     },
     "husky": {
         "hooks": {
-            "pre-commit": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix; git --no-pager diff HEAD package.json | egrep '\"version\": \"[0-9]+\\.' || npm --no-git-tag-version version patch; sf-husky-pre-commit",
+            "pre-commit": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix; git --no-pager diff HEAD package.json | egrep '\"version\": \"[0-9]+\\.' || npm --no-git-tag-version version patch; git add package.json; sf-husky-pre-commit",
             "commit-msg": "sf-husky-commit-msg",
             "pre-push": "sf-husky-pre-push"
         }
