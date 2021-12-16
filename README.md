@@ -63,7 +63,7 @@ $ npm install -g @salesforce/commerce
 $ sfdx COMMAND
 running command...
 $ sfdx (-v|--version|version)
-@salesforce/commerce/234.0.8 linux-x64 node-v15.5.1
+@salesforce/commerce/234.0.14 linux-x64 node-v15.5.1
 $ sfdx --help [COMMAND]
 USAGE
   $ sfdx COMMAND
@@ -259,7 +259,7 @@ EXAMPLE
 
 ## `sfdx commerce:store:create [name=value...] -n <string> [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
-Create and set up a store
+Comprehensive create and set up a store. This will create your community/store push store sources, create buyer user, import products, create search index.
 
 ```
 USAGE
@@ -380,7 +380,7 @@ EXAMPLES
 
 ## `sfdx commerce:store:quickstart:create [name=value...] -n <string> [-t <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
-Create a store
+Use this command to just create a community. It will use sfdx force:community:create until a community is created or failed.
 
 ```
 USAGE

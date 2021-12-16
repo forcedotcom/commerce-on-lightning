@@ -12,7 +12,7 @@
         "storeNameDescription": "name of the site to create"
     },
     "create": {
-        "cmdDescription": "Create and set up a store",
+        "cmdDescription": "Comprehensive create and set up a store.  This will create your community/store push store sources, create buyer user, import products, create search index.",
         "webStoreNotSupported": "'WebStore' is not supported",
         "automaticallySettingPermFailedPleaseDoItManually": "Automatically setting perm failed, please do it manually. \nIn the opened page, search for B2CLiteAccess and CommerceEnabled, and make sure they are checked. If not, check them and click Save\nIf the page asks for a username/password, the org is still being created. If so, wait five minutes then re-run the command below until sfdx logs you in automatically.",
         "pressEnterWhenPermIsSet": "Press [ENTER] when you've set the perm",
@@ -100,7 +100,7 @@
             "publishingCommunityStep7": "7. Publishing the community."
         },
         "create": {
-            "cmdDescription": "Create a store",
+            "cmdDescription": "Use this command to just create a community.  It will use sfdx force:community:create until a community is created or failed.",
             "creatingNewStoreInQueUpTo10Minutes": "Creating a new store, this may take up to 10 minutes until it's available.\n",
             "storeName": "Store name: %s\n",
             "communityTemplate": "Community Template: %s\n",
