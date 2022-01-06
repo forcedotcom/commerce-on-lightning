@@ -112,115 +112,20 @@ export default class PaymentMethod extends LightningElement {
      * Text to display on the Previous button. Defaults to "Previous".
      * @type {String}
      */
-    @api previousButtonLabel;
-
-    /**
-     * Returns the button label for the previous button. If no customized label is provided
-     * then an English only string is used instead.
-     *
-     * @return {String}
-     */
-    get _previousButtonLabel() {
-        return this.previousButtonLabel || 'Previous';
-    }
+    @api previousButtonLabel = 'Previous';
 
     /**
      * Text to display on the Next button. Defaults to "Next".
      * @type {String}
      */
-    @api nextButtonLabel;
+    @api nextButtonLabel = 'Next';
 
     /**
-     * Returns the button label for the next button. If no customized label is provided
-     * then an English only string is used instead.
-     *
-     * @return {String}
-     */
-    get _nextButtonLabel() {
-        return this.nextButtonLabel || 'Next';
-    }
-
-    /**
-     * The title label/heading of the billing address selector.
-     */
-    @api billingAddressHeadingLabel;
-
-    /**
-     * Returns the billing address label. If no customized label is provided
-     * then an English only string is used instead.
-     *
-     * @return {String}
-     */
-    get _billingAddressHeadingLabel() {
-        return this.billingAddressHeadingLabel || 'Billing Address';
-    }
-
-    /**
-     * Label of the form "Payment Method" for the name of the payment component.
-     *
+     * The list of labels used in the cmp. 
      * @type {String}
      */
-    @api paymentMethodHeadingLabel;
-
-    /**
-     * Returns the payment method heading label. If no customized label is provided
-     * then an English only string is used instead.
-     *
-     * @return {String}
-     */
-    get _paymentMethodHeadingLabel() {
-        return this.paymentMethodHeadingLabel || 'Payment Method';
-    }
-
-    /**
-     * Label of the form "Enter PO Number" for the purchase order field.
-     *
-     * @type {String}
-     */
-    @api purchaseOrderEntryHeadingLabel;
-
-    /**
-     * Returns the purchase order entry heading label. If no customized label is provided
-     * then an English only string is used instead.
-     *
-     * @return {String}
-     */
-    get _purchaseOrderEntryHeadingLabel() {
-        return this.purchaseOrderEntryHeadingLabel || 'Enter Purchase Order';
-    }
-
-    /**
-     * Label of the form "Purchase Order" for the purchase order radio button.
-     *
-     * @type {String}
-     */
-    @api purchaseOrderOptionLabel;
-
-    /**
-     * Returns the purchase order option button label. If no customized label is provided
-     * then an English only string is used instead.
-     *
-     * @return {String}
-     */
-    get _purchaseOrderOptionLabel() {
-        return this.purchaseOrderOptionLabel || 'Purchase Order';
-    }
-
-    /**
-     * Label of the form "Credit Card" for the credit card radio button.
-     *
-     * @type {String}
-     */
-    @api cardPaymentOptionLabel;
-
-    /**
-     * Returns the credit card option button label. If no customized label is provided
-     * then an English only string is used instead.
-     *
-     * @return {String}
-     */
-    get _cardPaymentOptionLabel() {
-        return this.cardPaymentOptionLabel || 'Credit Card';
+    get labels() {
+        return Constants.labels;
     }
 
     /**

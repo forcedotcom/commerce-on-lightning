@@ -35,7 +35,9 @@ export class StoreQuickstartCreate extends SfdxCommand {
             }
         },
     };
-    public static vargsAllowList: string[] = ['urlpathprefix', 'description'];
+    public static get vargsAllowList(): string[] {
+        return ['urlpathprefix', 'description'];
+    }
 
     protected static flagsConfig = {
         ...filterFlags(['templatename', 'store-name'], storeFlags),
