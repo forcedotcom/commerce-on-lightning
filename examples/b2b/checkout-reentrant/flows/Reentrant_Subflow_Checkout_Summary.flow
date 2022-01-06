@@ -3,7 +3,11 @@
     <apiVersion>52.0</apiVersion>
     <interviewLabel>Checkout Summary {!$Flow.CurrentDateTime}</interviewLabel>
     <isTemplate>true</isTemplate>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Checkout_Summary.flow
+    <label>(Async) Subflow - Checkout Summary</label>
+=======
     <label>(Re-entrant) Subflow - Checkout Summary</label>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Checkout_Summary.flow
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -103,7 +107,11 @@
         <label>Set State</label>
         <locationX>400</locationX>
         <locationY>250</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Checkout_Summary.flow
+        <flowName>Async_Subflow_Update_Checkout_State</flowName>
+=======
         <flowName>Reentrant_Subflow_Update_Checkout_State</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Checkout_Summary.flow
         <inputAssignments>
             <name>cartId</name>
             <value>

@@ -2,32 +2,34 @@
     <div>
         <!--Hamburger Menu for Mobile-->
         <lightning-button-icon
-                if:true={shouldShowMobileTrigger}
-                icon-name="utility:rows"
-                variant="bare"
-                alternative-text="Toggle Sidebar"
-                size="large"
-                onclick={handleNavigationTriggerClicked}
+            if:true="{shouldShowMobileTrigger}"
+            icon-name="utility:rows"
+            variant="bare"
+            alternative-text="Toggle Sidebar"
+            size="large"
+            onclick="{handleNavigationTriggerClicked}"
         >
         </lightning-button-icon>
 
         <!--Horizontal Base Menu-->
         <c-horizontal-navigation
-                if:true={isHorizontalOrientation}
-                menu-items={state.menuItems}
-                onnavigatetopage={handleNavigateToPage}>
+            if:true="{isHorizontalOrientation}"
+            menu-items="{state.menuItems}"
+            onnavigatetopage="{handleNavigateToPage}"
         >
+            >
         </c-horizontal-navigation>
 
         <!--Vertical Base Menu for mobile-->
         <c-vertical-navigation
-                if:true={state.isVerticalMenuShown}
-                menu-items={state.menuItems}
-                orientation={state.orientation}
-                onnavigationlistclosed={handleNavigationListClosed}
-                show-mobile-trigger={shouldShowMobileTrigger}
-                onnavigatetopage={handleNavigateToPage}>
+            if:true="{state.isVerticalMenuShown}"
+            menu-items="{state.menuItems}"
+            orientation="{state.orientation}"
+            onnavigationlistclosed="{handleNavigationListClosed}"
+            show-mobile-trigger="{shouldShowMobileTrigger}"
+            onnavigatetopage="{handleNavigateToPage}"
         >
+            >
         </c-vertical-navigation>
     </div>
 </template>

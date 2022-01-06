@@ -1,6 +1,6 @@
-import {LightningElement, wire, api, track} from 'lwc';
-import {NavigationMixin} from 'lightning/navigation';
-import communityId from "@salesforce/community/Id";
+import { LightningElement, wire, api, track } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
+import communityId from '@salesforce/community/Id';
 
 // The Apex method will allow us to retrieve the items
 import getNavItems from '@salesforce/apex/NavigationItemsService.getConnectNavigationItems';
@@ -22,7 +22,7 @@ export default class NavigationMenu extends NavigationMixin(LightningElement) {
     navigationLinkSetDevName;
 
     @api
-    showHomeLink
+    showHomeLink;
 
     renderedCallback() {
         this.computeOrientation();
@@ -60,28 +60,29 @@ export default class NavigationMenu extends NavigationMixin(LightningElement) {
     @wire(getNavItems, {
         communityId: communityId,
         navigationLinkSetDeveloperName: '$navigationLinkSetDevName',
-        showHomeLink: '$showHomeLink'
+        showHomeLink: '$showHomeLink',
     })
-    wiredNavigationItems({error, data}) {
+    wiredNavigationItems({ error, data }) {
         if (data && data.menuItems) {
             // Create a copy of the data to modify it
-            this.state.menuItems = data.menuItems.reduce(
-                (menuItems, menuItem, index) => {
-                    let currItem = {
-                        ...menuItem,
-                        id: index,
-                        level: 0,
-                        subMenu: menuItem.subMenu && menuItem.subMenu.length ? this.expandSubMenu({
-                            ...menuItem
-                            , id: index
-                            , level: 0,
-                        }) : [],
-                    };
-                    menuItems.push(currItem);
-                    this._menuItemsMap[currItem.id] = currItem;
-                    return menuItems;
-                }, []
-            );
+            this.state.menuItems = data.menuItems.reduce((menuItems, menuItem, index) => {
+                let currItem = {
+                    ...menuItem,
+                    id: index,
+                    level: 0,
+                    subMenu:
+                        menuItem.subMenu && menuItem.subMenu.length
+                            ? this.expandSubMenu({
+                                  ...menuItem,
+                                  id: index,
+                                  level: 0,
+                              })
+                            : [],
+                };
+                menuItems.push(currItem);
+                this._menuItemsMap[currItem.id] = currItem;
+                return menuItems;
+            }, []);
         }
     }
 
@@ -154,8 +155,8 @@ export default class NavigationMenu extends NavigationMixin(LightningElement) {
         this.pageReference = {
             type: STANDARD_WEBPAGE,
             attributes: {
-                url: menuItem.actionValue
-            }
+                url: menuItem.actionValue,
+            },
         };
         // use the NavigationMixin from lightning/navigation to navigate to the page reference.
         if (this.pageReference) {

@@ -31,7 +31,11 @@
     <apiVersion>52.0</apiVersion>
     <interviewLabel>View Address {!$Flow.CurrentDateTime}</interviewLabel>
     <isTemplate>true</isTemplate>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Delivery_Method.flow
+    <label>(Async) Subflow - Delivery Method</label>
+=======
     <label>(Re-entrant) Subflow - Delivery Method</label>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Delivery_Method.flow
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -102,7 +106,11 @@
         <label>Set State</label>
         <locationX>950</locationX>
         <locationY>250</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Delivery_Method.flow
+        <flowName>Async_Subflow_Update_Checkout_State</flowName>
+=======
         <flowName>Reentrant_Subflow_Update_Checkout_State</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Delivery_Method.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -128,7 +136,11 @@
         <label>Show Error</label>
         <locationX>682</locationX>
         <locationY>508</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Delivery_Method.flow
+        <flowName>Async_Subflow_Error</flowName>
+=======
         <flowName>Reentrant_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Delivery_Method.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -151,7 +163,11 @@
         <connector>
             <targetReference>Set_Checkout_Delivery_Method</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Delivery_Method.flow
+        <flowName>Async_Subflow_Checkout_Session</flowName>
+=======
         <flowName>Reentrant_Subflow_Checkout_Session</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Delivery_Method.flow
         <inputAssignments>
             <name>cartId</name>
             <value>

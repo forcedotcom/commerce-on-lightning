@@ -70,7 +70,11 @@
     </decisions>
     <interviewLabel>Order Confirmation {!$Flow.CurrentDateTime}</interviewLabel>
     <isTemplate>true</isTemplate>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Order_Confirmation.flow
+    <label>(Async) Subflow - Order Confirmation</label>
+=======
     <label>(Re-entrant) Subflow - Order Confirmation</label>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Order_Confirmation.flow
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -215,7 +219,11 @@
         <label>Show Error</label>
         <locationX>275</locationX>
         <locationY>750</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Order_Confirmation.flow
+        <flowName>Async_Subflow_Error</flowName>
+=======
         <flowName>Reentrant_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Order_Confirmation.flow
         <inputAssignments>
             <name>cartId</name>
             <value>

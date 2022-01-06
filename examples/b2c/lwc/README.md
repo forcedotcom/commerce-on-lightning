@@ -30,7 +30,7 @@ This repository is an SFDX project that you can deploy directly to an org and mo
 1. Go to the Commerce app, and select the store.
 1. Open Experience Builder.
 1. Open the Home page's settings by clicking on the gear Icon in the top nav bar.
-1. Scroll down under the Properties window and check the `Override the default theme layout for this page.`. 
+1. Scroll down under the Properties window and check the `Override the default theme layout for this page.`.
 1. Choose `Custom Commerce Layout` from the `Theme Layout` dropdown list.
 1. Open the Builder component palette and add the `Custom Commerce Header` and `Custom Commerce Footer` to the page.
 1. Drag and drop the relevant components into the different slots of the custom header and footer components.

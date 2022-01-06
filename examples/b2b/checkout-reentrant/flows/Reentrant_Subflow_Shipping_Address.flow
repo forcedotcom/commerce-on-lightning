@@ -36,7 +36,11 @@
     </decisions>
     <interviewLabel>View Address {!$Flow.CurrentDateTime}</interviewLabel>
     <isTemplate>true</isTemplate>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Shipping_Address.flow
+    <label>(Async) Subflow - Shipping Address</label>
+=======
     <label>(Re-entrant) Subflow - Shipping Address</label>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Shipping_Address.flow
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -252,7 +256,11 @@
         <label>Set State</label>
         <locationX>1250</locationX>
         <locationY>250</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Shipping_Address.flow
+        <flowName>Async_Subflow_Update_Checkout_State</flowName>
+=======
         <flowName>Reentrant_Subflow_Update_Checkout_State</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Shipping_Address.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -277,7 +285,11 @@
         <label>Show Error</label>
         <locationX>870</locationX>
         <locationY>750</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Shipping_Address.flow
+        <flowName>Async_Subflow_Error</flowName>
+=======
         <flowName>Reentrant_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Shipping_Address.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -300,7 +312,11 @@
         <connector>
             <targetReference>Update_address_if_changed</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Shipping_Address.flow
+        <flowName>Async_Subflow_Checkout_Session</flowName>
+=======
         <flowName>Reentrant_Subflow_Checkout_Session</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Shipping_Address.flow
         <inputAssignments>
             <name>cartId</name>
             <value>

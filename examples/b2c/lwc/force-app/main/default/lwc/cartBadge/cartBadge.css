@@ -1,6 +1,6 @@
 .badgeIcon {
     opacity: 1;
 }
-.cartIcon{
+.cartIcon {
     --sds-c-icon-color-foreground-default: var(--dxp-g-brand);
 }

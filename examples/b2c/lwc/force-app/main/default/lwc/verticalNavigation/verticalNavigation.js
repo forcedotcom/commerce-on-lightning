@@ -1,4 +1,4 @@
-import {LightningElement, api, track} from 'lwc';
+import { LightningElement, api, track } from 'lwc';
 const NAVIGATE_TO_PAGE_EVENT = 'navigatetopage';
 const HORIZONTAL = 'horizontal';
 const VERTICAL = 'vertical';

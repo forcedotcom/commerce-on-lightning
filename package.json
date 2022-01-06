@@ -2,7 +2,7 @@
     "name": "@salesforce/commerce",
     "version": "234.0.13",
     "author": "Jonathan Arndt",
-    "bugs": "https://git.soma.salesforce.com/communities/commerce-on-lightning/issues",
+    "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
     "dependencies": {
         "@mshanemc/plugin-helpers": "^2.1.0",
         "@oclif/command": "^1",
@@ -72,7 +72,7 @@
         "/.oclif.manifest.json",
         "/sfdx-project.json"
     ],
-    "homepage": "https://git.soma.salesforce.com/communities/commerce-on-lightning",
+    "homepage": "https://github.com/forcedotcom/commerce-on-lightning",
     "keywords": [
         "force",
         "salesforce",
@@ -112,7 +112,7 @@
             "init": "./lib/hooks/init/download"
         }
     },
-    "repository": "https://git.soma.salesforce.com/communities/commerce-on-lightning",
+    "repository": "https://github.com/forcedotcom/commerce-on-lightning",
     "scripts": {
         "build": "sf-build",
         "clean": "sf-clean",

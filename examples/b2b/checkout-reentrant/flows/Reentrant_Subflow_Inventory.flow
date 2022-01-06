@@ -61,7 +61,11 @@
     <description>For your checkout flow to function properly, you need working integrations. Use our reference implementations as a starting point or create your own. For more information, navigate to the Commerce app, find your store, and choose Administration &gt; Store Integrations.</description>
     <interviewLabel>Inventory {!$Flow.CurrentDateTime}</interviewLabel>
     <isTemplate>true</isTemplate>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Inventory.flow
+    <label>(Async) Subflow - Inventory</label>
+=======
     <label>(Re-entrant) Subflow - Inventory</label>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Inventory.flow
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -94,7 +98,11 @@
         <label>Show Error Fault</label>
         <locationX>275</locationX>
         <locationY>500</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Inventory.flow
+        <flowName>Async_Subflow_Error</flowName>
+=======
         <flowName>Reentrant_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Inventory.flow
         <inputAssignments>
             <name>cartId</name>
             <value>

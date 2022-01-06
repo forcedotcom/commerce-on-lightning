@@ -323,7 +323,11 @@ Asynchronous invocable actions set mainCheckoutSession.isProcess = True.</descri
     <description>B2B Commerce stores use the checkout flow to convert carts to activated orders. It supports asynchronous invocable actions that can be customized to call external systems. If async calls take too long, end users can close the page and resume the checkout later.</description>
     <interviewLabel>Checkout Flow {!$Flow.CurrentDateTime}</interviewLabel>
     <isTemplate>true</isTemplate>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+    <label>(Async) Checkout Flow</label>
+=======
     <label>(Re-entrant) Checkout Flow</label>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -538,7 +542,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Loop</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Authorize_Payment</flowName>
+=======
         <flowName>Reentrant_Subflow_Authorize_Payment</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -644,7 +652,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Loop</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Checkout_Summary</flowName>
+=======
         <flowName>Reentrant_Subflow_Checkout_Summary</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -673,7 +685,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Loop</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Confirm_Price</flowName>
+=======
         <flowName>Reentrant_Subflow_Confirm_Price</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -707,7 +723,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Loop</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Delivery_Method</flowName>
+=======
         <flowName>Reentrant_Subflow_Delivery_Method</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -734,7 +754,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <label>Error</label>
         <locationX>807</locationX>
         <locationY>617</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Error</flowName>
+=======
         <flowName>Reentrant_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -751,7 +775,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Debug_Screen_Decision</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Checkout_Session</flowName>
+=======
         <flowName>Reentrant_Subflow_Checkout_Session</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -772,7 +800,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Loop</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Inventory</flowName>
+=======
         <flowName>Reentrant_Subflow_Inventory</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -807,7 +839,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Loop</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Order_Confirmation</flowName>
+=======
         <flowName>Reentrant_Subflow_Order_Confirmation</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -854,7 +890,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Loop</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Payment_Billing_Address</flowName>
+=======
         <flowName>Reentrant_Subflow_Payment_Billing_Address</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -889,7 +929,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Debug_Screen_Decision</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Checkout_Session</flowName>
+=======
         <flowName>Reentrant_Subflow_Checkout_Session</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -910,7 +954,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Loop</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Shipping_Address</flowName>
+=======
         <flowName>Reentrant_Subflow_Shipping_Address</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -939,7 +987,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Loop</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Shipping_Cost</flowName>
+=======
         <flowName>Reentrant_Subflow_Shipping_Cost</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -974,7 +1026,11 @@ When async invocable actions complete, they change session.isProcessing to false
         <connector>
             <targetReference>Loop</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Checkout.flow
+        <flowName>Async_Subflow_Taxes</flowName>
+=======
         <flowName>Reentrant_Subflow_Taxes</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>

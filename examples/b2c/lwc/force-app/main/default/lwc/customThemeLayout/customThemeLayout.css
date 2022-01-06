@@ -8,7 +8,9 @@
     flex-grow: 1;
 }
 
-.header, .mainContent, .footer {
+.header,
+.mainContent,
+.footer {
     flex-shrink: 0;
 }
 

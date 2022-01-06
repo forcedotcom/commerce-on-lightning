@@ -77,7 +77,11 @@
     </decisions>
     <interviewLabel>View Address {!$Flow.CurrentDateTime}</interviewLabel>
     <isTemplate>true</isTemplate>
+<<<<<<< HEAD:examples/b2b/checkout-main/flows/Sync_Subflow_Error.flow
+    <label>(Sync) Subflow - Error</label>
+=======
     <label>(Checkout) Subflow - Error</label>
+>>>>>>> main:examples/b2b/checkout-main/flows/Checkout_Subflow_Error.flow
     <loops>
         <description>Loops through the list of CartValidationOutput messages.</description>
         <name>Loop</name>

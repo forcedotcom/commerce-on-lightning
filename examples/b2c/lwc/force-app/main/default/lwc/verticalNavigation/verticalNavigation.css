@@ -30,7 +30,8 @@ ul {
 .dropDownListParent button {
     align-items: center;
 }
-.dropDownListItem button, .dropDownListItem a {
+.dropDownListItem button,
+.dropDownListItem a {
     border: 0;
     text-align: start;
     outline: none;
@@ -44,22 +45,28 @@ ul {
 .dropDownListChild button {
     justify-content: space-between;
 }
-.dropDownListItem button span, .dropDownListItem a span {
+.dropDownListItem button span,
+.dropDownListItem a span {
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.dropDownListItem button:hover, .dropDownListItem button:focus, .dropDownListItem a:hover, .dropDownListItem a:focus {
+.dropDownListItem button:hover,
+.dropDownListItem button:focus,
+.dropDownListItem a:hover,
+.dropDownListItem a:focus {
     text-decoration: none;
     background: var(--dxp-g-root-1);
 }
 /* * Setting bottom border color same as the hover color to avoid jarring effect. */
-.dropDownListItem:hover, .dropDownListItem:focus {
+.dropDownListItem:hover,
+.dropDownListItem:focus {
     border-bottom-color: currentColor;
 }
 /*Mobile screens*/
 @media only screen and (max-width: 48em) {
-    .verticalPositioning, .verticalPositioningWithExternalTrigger {
+    .verticalPositioning,
+    .verticalPositioningWithExternalTrigger {
         width: 100%;
     }
     .dropDownListParent button {
@@ -80,11 +87,13 @@ ul {
 /*Desktop and tablet screens*/
 @media only screen and (min-width: 48em) {
     /** * The radius is set to 4px because it aligns well with the containing <li> */
-    .dropDownListItem:first-child button, .dropDownListItem:first-child a {
+    .dropDownListItem:first-child button,
+    .dropDownListItem:first-child a {
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
     }
-    .dropDownListItem:last-child button, .dropDownListItem:last-child a {
+    .dropDownListItem:last-child button,
+    .dropDownListItem:last-child a {
         border-bottom-left-radius: 4px;
         border-bottom-right-radius: 4px;
     }

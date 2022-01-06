@@ -63,7 +63,11 @@
     <apiVersion>52.0</apiVersion>
     <interviewLabel>Cart To Order {!$Flow.CurrentDateTime}</interviewLabel>
     <isTemplate>true</isTemplate>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Cart_To_Order.flow
+    <label>(Async) Subflow - Cart To Order</label>
+=======
     <label>(Re-entrant) Subflow - Cart To Order</label>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Cart_To_Order.flow
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -96,7 +100,11 @@
         <label>Show Error</label>
         <locationX>275</locationX>
         <locationY>500</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Cart_To_Order.flow
+        <flowName>Async_Subflow_Error</flowName>
+=======
         <flowName>Reentrant_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Cart_To_Order.flow
         <inputAssignments>
             <name>cartId</name>
             <value>

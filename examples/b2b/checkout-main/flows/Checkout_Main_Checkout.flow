@@ -411,8 +411,13 @@ There&apos;s more smarts that could be here by adding other outcomes of the stat
         <description>Ensures that if the buyer starts a second checkout that we don&apos;t attempt to progress this duplicate checkout.</description>
         <name>Is_Session_Still_Valid_After_Delivery</name>
         <label>Is Session Still Valid After Delivery?</label>
+<<<<<<< HEAD:examples/b2b/checkout-main/flows/Sync_B2B_Checkout.flow
+        <locationX>2875</locationX>
+        <locationY>1323</locationY>
+=======
         <locationX>2500</locationX>
         <locationY>1330</locationY>
+>>>>>>> main:examples/b2b/checkout-main/flows/Checkout_Main_Checkout.flow
         <defaultConnector>
             <targetReference>Set_Checkout_Delivery_Method</targetReference>
         </defaultConnector>
@@ -543,6 +548,7 @@ There&apos;s more smarts that could be here by adding other outcomes of the stat
                 <operator>IsNull</operator>
                 <rightValue>
                     <booleanValue>true</booleanValue>
+<<<<<<< HEAD:examples/b2b/checkout-main/flows/Sync_B2B_Checkout.flow
                 </rightValue>
             </conditions>
             <conditions>
@@ -553,6 +559,18 @@ There&apos;s more smarts that could be here by adding other outcomes of the stat
                 </rightValue>
             </conditions>
             <conditions>
+=======
+                </rightValue>
+            </conditions>
+            <conditions>
+                <leftValueReference>webCart.PaymentMethodId</leftValueReference>
+                <operator>IsNull</operator>
+                <rightValue>
+                    <booleanValue>true</booleanValue>
+                </rightValue>
+            </conditions>
+            <conditions>
+>>>>>>> main:examples/b2b/checkout-main/flows/Checkout_Main_Checkout.flow
                 <leftValueReference>webCart.GrandTotalAmount</leftValueReference>
                 <operator>NotEqualTo</operator>
                 <rightValue>
@@ -565,9 +583,14 @@ There&apos;s more smarts that could be here by adding other outcomes of the stat
             <label>No Purchase Order or Payment</label>
         </rules>
     </decisions>
+<<<<<<< HEAD:examples/b2b/checkout-main/flows/Sync_B2B_Checkout.flow
+    <interviewLabel>(Sync) B2B Checkout {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>(Sync) B2B Checkout</label>
+=======
     <description>Most of the logic for the checkout lives in this flow. This is where the checkout starts and ends. It will terminate by redirecting to the Order Confirmation page or on an error page if an error occurs. Most of the integrations are run synchronously, though a few have to put on MQ for standard pricing and promotions.</description>
     <interviewLabel>(Checkout) Main B2B Checkout {!$Flow.CurrentDateTime}</interviewLabel>
     <label>(Checkout) Main Checkout</label>
+>>>>>>> main:examples/b2b/checkout-main/flows/Checkout_Main_Checkout.flow
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -1249,7 +1272,11 @@ There&apos;s more smarts that could be here by adding other outcomes of the stat
         <label>Error</label>
         <locationX>912</locationX>
         <locationY>408</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-main/flows/Sync_B2B_Checkout.flow
+        <flowName>Sync_Subflow_Error</flowName>
+=======
         <flowName>Checkout_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-main/flows/Checkout_Main_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -1270,7 +1297,11 @@ There&apos;s more smarts that could be here by adding other outcomes of the stat
         <label>Error</label>
         <locationX>2025</locationX>
         <locationY>379</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-main/flows/Sync_B2B_Checkout.flow
+        <flowName>Sync_Subflow_Error</flowName>
+=======
         <flowName>Checkout_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-main/flows/Checkout_Main_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -1290,7 +1321,11 @@ There&apos;s more smarts that could be here by adding other outcomes of the stat
         <label>Error</label>
         <locationX>4597</locationX>
         <locationY>250</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-main/flows/Sync_B2B_Checkout.flow
+        <flowName>Sync_Subflow_Error</flowName>
+=======
         <flowName>Checkout_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-main/flows/Checkout_Main_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -1311,7 +1346,11 @@ There&apos;s more smarts that could be here by adding other outcomes of the stat
         <label>Error</label>
         <locationX>3049</locationX>
         <locationY>358</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-main/flows/Sync_B2B_Checkout.flow
+        <flowName>Sync_Subflow_Error</flowName>
+=======
         <flowName>Checkout_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-main/flows/Checkout_Main_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -1331,7 +1370,11 @@ There&apos;s more smarts that could be here by adding other outcomes of the stat
         <label>Error - Invalid Session</label>
         <locationX>3238</locationX>
         <locationY>2198</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-main/flows/Sync_B2B_Checkout.flow
+        <flowName>Sync_Subflow_Error</flowName>
+=======
         <flowName>Checkout_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-main/flows/Checkout_Main_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -1352,7 +1395,11 @@ There&apos;s more smarts that could be here by adding other outcomes of the stat
         <label>Session had an Error</label>
         <locationX>4758</locationX>
         <locationY>1752</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-main/flows/Sync_B2B_Checkout.flow
+        <flowName>Sync_Subflow_Error</flowName>
+=======
         <flowName>Checkout_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-main/flows/Checkout_Main_Checkout.flow
         <inputAssignments>
             <name>cartId</name>
             <value>

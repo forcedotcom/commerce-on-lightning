@@ -1,21 +1,26 @@
 <template>
     <p class="slds-text-heading_medium slds-m-bottom_small">{menuHeader}</p>
-    <template if:true={items}>
+    <template if:true="{items}">
         <ul>
-            <template for:each={items} for:item="item">
-                <li class="slds-truncate" key={item.id} data-id={item.id}>
-                    <template if:true={item.isExternal}>
-                        <a class="listItem" rel="nofollow noopener noreferrer" target="_blank" href={item.actionValue}>
+            <template for:each="{items}" for:item="item">
+                <li class="slds-truncate" key="{item.id}" data-id="{item.id}">
+                    <template if:true="{item.isExternal}">
+                        <a
+                            class="listItem"
+                            rel="nofollow noopener noreferrer"
+                            target="_blank"
+                            href="{item.actionValue}"
+                        >
                             {item.label}
                         </a>
                     </template>
-                    <template if:false={item.isExternal}>
+                    <template if:false="{item.isExternal}">
                         <a
-                                data-id={item.id}
-                                class="listItem"
-                                href={item.actionValue}
-                                onclick={handleNavigateToPage}
-                        >{item.label}
+                            data-id="{item.id}"
+                            class="listItem"
+                            href="{item.actionValue}"
+                            onclick="{handleNavigateToPage}"
+                            >{item.label}
                         </a>
                     </template>
                 </li>

@@ -1,7 +1,7 @@
-import {LightningElement, wire} from 'lwc';
-import {NavigationMixin} from 'lightning/navigation';
+import { LightningElement, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import basePath from '@salesforce/community/basePath';
-import {CartSummaryAdapter} from 'commerce/cartApi';
+import { CartSummaryAdapter } from 'commerce/cartApi';
 
 const STANDARD_WEBPAGE = 'standard__webPage';
 const ENTER_KEY = 'Enter';
@@ -9,7 +9,6 @@ const CART_PAGE = '/cart';
 const MAX_CART_ITEMS = 99;
 const PLUS_SIGN = '+';
 export default class CartBadge extends NavigationMixin(LightningElement) {
-
     iconAssistiveText = 'cart';
     badgeItemsCount = 0;
     pageReference;
@@ -32,8 +31,8 @@ export default class CartBadge extends NavigationMixin(LightningElement) {
         this.pageReference = {
             type: STANDARD_WEBPAGE,
             attributes: {
-                url: this.cartURL
-            }
+                url: this.cartURL,
+            },
         };
         if (this.pageReference) {
             this[NavigationMixin.Navigate](this.pageReference);

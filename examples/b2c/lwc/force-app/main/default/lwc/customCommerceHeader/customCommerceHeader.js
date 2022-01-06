@@ -1,4 +1,4 @@
-import {LightningElement} from 'lwc';
+import { LightningElement } from 'lwc';
 /**
  * @slot PromotionBanner
  * @slot Logo
@@ -7,5 +7,4 @@ import {LightningElement} from 'lwc';
  * @slot ProfileMenu
  * @slot CartBadge
  */
-export default class CustomCommerceHeader extends LightningElement {
-}
+export default class CustomCommerceHeader extends LightningElement {}

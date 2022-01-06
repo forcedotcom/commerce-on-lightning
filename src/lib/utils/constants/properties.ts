@@ -13,7 +13,7 @@ export const ENABLED = 'enabled';
 // File Paths
 const homedir = os.homedir();
 export const B_DIR = `${__dirname}/../../../..`;
-export const BASE_DIR = homedir + '/.commerce'; // ; `${__dirname}/../../../..` // use commented if you just want to do local
+export const BASE_DIR = homedir + '/.commerce';
 export const DEVHUB_DIR = (dir = BASE_DIR, hubOrgAdminUsername?: string): string =>
     `${mkdirSync(dir)}/devhubs${hubOrgAdminUsername ? '/' + cleanName(hubOrgAdminUsername) : ''}`;
 export const SCRATCH_ORG_DIR = (dir = BASE_DIR, hubOrgAdminUsername: string, scratchOrgAdminUsername: string): string =>

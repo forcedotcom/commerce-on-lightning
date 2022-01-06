@@ -1,20 +1,19 @@
-import {LightningElement,api} from 'lwc';
-import {NavigationMixin} from 'lightning/navigation';
+import { LightningElement, api } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import basePath from '@salesforce/community/basePath';
 
 const ENTER_KEY = 'Enter';
 const STANDARD_WEBPAGE = 'standard__webPage';
-const SEARCH_ICON_PATH = "/_slds/icons/utility-sprite/svg/symbols.svg?#search";
+const SEARCH_ICON_PATH = '/_slds/icons/utility-sprite/svg/symbols.svg?#search';
 const SEARCH_ENDPOINT = basePath + '/global-search/';
 export default class SearchBox extends NavigationMixin(LightningElement) {
-
     @api
-    placeHolderText='Default';
+    placeHolderText = 'Default';
 
     _searchText;
     _pageReference;
 
-    get searchIconPath(){
+    get searchIconPath() {
         return SEARCH_ICON_PATH;
     }
 
@@ -29,12 +28,12 @@ export default class SearchBox extends NavigationMixin(LightningElement) {
      * Handles search button click.
      */
     handleSearchButtonClick() {
-        if (this._searchText && this._searchText.trim().length > 0){
+        if (this._searchText && this._searchText.trim().length > 0) {
             this._pageReference = {
                 type: STANDARD_WEBPAGE,
                 attributes: {
-                    url: SEARCH_ENDPOINT + this._searchText
-                }
+                    url: SEARCH_ENDPOINT + this._searchText,
+                },
             };
             this[NavigationMixin.Navigate](this._pageReference);
         }

@@ -75,7 +75,11 @@
     </decisions>
     <interviewLabel>Basic Checkout Flow {!$Flow.CurrentDateTime}</interviewLabel>
     <isTemplate>true</isTemplate>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Checkout_Session.flow
+    <label>(Async) Subflow - Checkout Session</label>
+=======
     <label>(Re-entrant) Subflow - Checkout Session</label>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Checkout_Session.flow
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -138,7 +142,11 @@
         <label>Refresh page</label>
         <locationX>658</locationX>
         <locationY>500</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Checkout_Session.flow
+        <flowName>Async_Subflow_Error</flowName>
+=======
         <flowName>Reentrant_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Checkout_Session.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -158,7 +166,11 @@
         <label>Show Error</label>
         <locationX>275</locationX>
         <locationY>500</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Checkout_Session.flow
+        <flowName>Async_Subflow_Error</flowName>
+=======
         <flowName>Reentrant_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Checkout_Session.flow
         <inputAssignments>
             <name>cartId</name>
             <value>

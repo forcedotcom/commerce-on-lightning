@@ -44,7 +44,11 @@
     </decisions>
     <interviewLabel>Shipping {!$Flow.CurrentDateTime}</interviewLabel>
     <isTemplate>true</isTemplate>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Update_Checkout_State.flow
+    <label>(Async) Subflow - Update Checkout State</label>
+=======
     <label>(Re-entrant) Subflow - Update Checkout State</label>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Update_Checkout_State.flow
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
@@ -91,7 +95,11 @@
         <connector>
             <targetReference>Check_Session_isProcessing</targetReference>
         </connector>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Update_Checkout_State.flow
+        <flowName>Async_Subflow_Checkout_Session</flowName>
+=======
         <flowName>Reentrant_Subflow_Checkout_Session</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Update_Checkout_State.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -114,7 +122,11 @@
         <label>Refresh page</label>
         <locationX>400</locationX>
         <locationY>500</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Update_Checkout_State.flow
+        <flowName>Async_Subflow_Error</flowName>
+=======
         <flowName>Reentrant_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Update_Checkout_State.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
@@ -134,7 +146,11 @@
         <label>Show Error</label>
         <locationX>900</locationX>
         <locationY>500</locationY>
+<<<<<<< HEAD:examples/b2b/checkout-reentrant/flows/Async_Subflow_Update_Checkout_State.flow
+        <flowName>Async_Subflow_Error</flowName>
+=======
         <flowName>Reentrant_Subflow_Error</flowName>
+>>>>>>> main:examples/b2b/checkout-reentrant/flows/Reentrant_Subflow_Update_Checkout_State.flow
         <inputAssignments>
             <name>cartId</name>
             <value>
