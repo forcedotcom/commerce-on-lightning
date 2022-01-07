@@ -10,7 +10,7 @@ workflows:
             - release-management/validate-pr:
                   filters:
                       branches:
-                          ignore: main
+                          ignore: main-2
             - release-management/test-package:
                   name: node-latest
                   node_version: latest
@@ -23,7 +23,7 @@ workflows:
                       - node-latest
                   filters:
                       branches:
-                          only: main
+                          only: main-2
                   context: CLI_CTC
     test-ts-update:
         triggers:
@@ -32,6 +32,6 @@ workflows:
                   filters:
                       branches:
                           only:
-                              - main
+                              - main-2
         jobs:
             - release-management/test-ts-update
