@@ -21,19 +21,19 @@ This plugin requires the [Salesforce CLI](https://developer.salesforce.com/tools
 
 We always recommend using the latest version of these commands, however, you can install a specific version or tag if needed.
 
+[commerce-on-lightning-dev](https://git.soma.salesforce.com/communities/commerce-on-lightning-dev) - commerce-dev
 
-
-[commerce-on-lightning-dev](https://git.soma.salesforce.com/communities/commerce-on-lightning-dev) - commerce-dev     
-- devhubs (local development)
+-   devhubs (local development)
 
 [commerce-on-lightning-orchestration](https://git.soma.salesforce.com/communities/commerce-on-lightning-orchestration) - commerce-orchestration
-- scratchorgs
+
+-   scratchorgs
 
 [commerce-on-lightning](https://git.soma.salesforce.com/communities/commerce-on-lightning-orchestration) - @salesforce/commerce <---- THIS PLUGIN
-- store
+
+-   store
 
 ==============
-
 
 -   [Introduction](#introduction)
 -   [Usage](#usage)
@@ -63,7 +63,7 @@ $ npm install -g @salesforce/commerce
 $ sfdx COMMAND
 running command...
 $ sfdx (-v|--version|version)
-@salesforce/commerce/234.0.14 linux-x64 node-v15.5.1
+@salesforce/commerce/234.0.14 darwin-x64 node-v14.3.0
 $ sfdx --help [COMMAND]
 USAGE
   $ sfdx COMMAND
@@ -165,8 +165,8 @@ OPTIONS
                                                                                     Directory to output the conversion
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store-
-                                                                                    scratch-def.json] config file
+                                                                                    ~/.commerce/config/store
+                                                                                    -scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
@@ -226,8 +226,8 @@ USAGE
 
 OPTIONS
   -c, --products-file-csv=products-file-csv
-      [default: ~/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass in
-      empty value to do product-less import
+      [default: ~/.commerce/examples/csv/Alpine-small.csv] The csv file containing products to import.  Pass
+      in empty value to do product-less import
 
   -f, --definitionfile=definitionfile
       [default: ~/.commerce/config/store-scratch-def.json] config file
@@ -272,8 +272,8 @@ OPTIONS
                                                                                     buyer's username
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store-
-                                                                                    scratch-def.json] config file
+                                                                                    ~/.commerce/config/store
+                                                                                    -scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
@@ -420,8 +420,8 @@ USAGE
 
 OPTIONS
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/store-
-                                                                                    scratch-def.json] config file
+                                                                                    ~/.commerce/config/store
+                                                                                    -scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
