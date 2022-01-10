@@ -96,7 +96,7 @@ export class StoreDisplay extends SfdxCommand {
             .instanceUrl;
         const url = new URL(instanceUrl);
         url.hostname = domain;
-        domain = url.toString() + `${urlpathprefix}/s`;
+        domain = url.toString() + `${urlpathprefix}`;
         await this.statusFileManager.setValue(fullStoreUrlKey, domain);
         return domain;
     }
