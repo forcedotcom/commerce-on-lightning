@@ -63,7 +63,7 @@ describe('commerce:store:display', () => {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        assert.equal(await storeViewInfo.getFullStoreURL(), 'https://hello:6101/test/s');
+        assert.equal(await storeViewInfo.getFullStoreURL(), 'https://hello:6101/test');
         [c, c1, c2, d].forEach((k) => k.restore());
     });
 });
