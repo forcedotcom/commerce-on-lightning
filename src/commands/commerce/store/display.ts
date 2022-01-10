@@ -81,7 +81,7 @@ export class StoreDisplay extends SfdxCommand {
             ? (this.flags.urlpathprefix as string)
             : (this.flags['store-name'] as string).replace(/[\\W_]+/g, '');
         const domainInfo = forceDataSoql(
-            `SELECT Domain.Domain FROM DomainSite WHERE PathPrefix='/${urlpathprefix}/s' limit 1`,
+            `SELECT Domain.Domain FROM DomainSite WHERE PathPrefix='/${urlpathprefix}' limit 1`,
             this.org.getUsername()
         );
         if (
@@ -96,7 +96,7 @@ export class StoreDisplay extends SfdxCommand {
             .instanceUrl;
         const url = new URL(instanceUrl);
         url.hostname = domain;
-        domain = url.toString() + `${urlpathprefix}/s`;
+        domain = url.toString() + `${urlpathprefix}`;
         await this.statusFileManager.setValue(fullStoreUrlKey, domain);
         return domain;
     }
