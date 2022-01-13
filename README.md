@@ -8,17 +8,15 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/1commerce/1commerce/badge.svg)](https://snyk.io/test/github/1commerce/1commerce)
 [![Downloads/week](https://img.shields.io/npm/dw/@salesforce/commerce.svg)](https://npmjs.org/package/@salesforce/commerce)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-brightgreen.svg)](https://raw.githubusercontent.com/forcedotcom/commerce-on-lightning/main/LICENSE.txt)
-==============
 
-
-Commerce commands for Salesforce CLI.
+### Commerce commands for Salesforce CLI.
 
 If you want a store, for test or any other purposes, then use this plugin to automate all steps required.
 It has built in automation to help if any steps fail. This plugin is designed to be as hands off as possible.
 
 This plugin is used to create and setup either a B2B or a B2C store with data with as little effort as possible.
 
-This plugin requires the [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli). For more information on the CLI, read the [getting started guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm).
+**This plugin requires the** [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli)**. For more information on the CLI, read the** [getting started guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm).
 
 We always recommend using the latest version of these commands, however, you can install a specific version or tag if needed.
 
@@ -31,8 +29,9 @@ We always recommend using the latest version of these commands, however, you can
 ==============
 
 
--   [Introduction](#introduction)
-=======
+## Introduction
+  
+
 -   [Usage](#usage)
 -   [Install](#install)
 -   [Post Install](#now-that-you-have-the-commerce-plugin-installed-please-see)
