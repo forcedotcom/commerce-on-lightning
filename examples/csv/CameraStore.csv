@@ -1,4 +1,4 @@
-"Name","Description","ProductCode","Family","ProductCategory","ProductImagePath1","SalesPrice","ListPrice"
+"Product Name","Product Description","ProductCode","Product Family","Category","Media Standard URL 1","Price (sales) USD","Price (original) USD"
 "K-1 Mark II","Pentax K-1 Mark II DX","RFN2UD","Pentax","Photography/Cameras/Digital","https://img4demo.herokuapp.com/imageo/cameras/k1/svg","1393.5","1679.00"
 "EOS 5D Mark IV","Canon EOS 5D Mark IV FX","Y5SA9L","Canon","","https://img4demo.herokuapp.com/imageo/cameras/eos5d/svg","1889.99","2499.00"
 "EOS Rebel T6i","Canon EOS Rebel T6i DX","HAM4G4","Canon","","https://img4demo.herokuapp.com/imageo/cameras/eosrebelt6i/svg","389.99","549.00"
