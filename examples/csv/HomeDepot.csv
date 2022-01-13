@@ -1,4 +1,4 @@
-"Name","Description","ProductCode","ProductCategory","ProductImagePath1","SalesPrice","ListPrice"
+"Product Name","Product Description","ProductCode","Category","Media Standard URL 1","Price (sales) USD","Price (original) USD"
 "1/2 in. Drill Driver","This 20-Volt MAX Compact Brushless Drill/Driver kit includes two 20-Volt MAX Lithium Ion Batteries, a charger, and a carrying bag.","PC001","Departments/Tools/Power Tools","https://img4demo.herokuapp.com/image/hd/ptdddriver/jpeg","99","159"
 "1/2 in. Compact Drill","Cordless Compact Drill/Driver offers 350 in./lbs. of torque","PC002","","https://img4demo.herokuapp.com/image/hd/ptrcdrill/jpeg","110","129"
 "1/2 in. Compact Drill","More compact at 6.5 in. length, lightweight at 3.4 lb. w/battery","PC003","","https://img4demo.herokuapp.com/image/hd/pdmcdrill/jpeg","89","110"

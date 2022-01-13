@@ -1,3 +1,3 @@
-"Name","Description","StockKeepingUnit","ProductImagePath1","ProductCategory","SalesPrice","ListPrice"
+"Product Name","Porduct Description","SKU","Maedia Standard URL 1","Category","Price (sales)","Price (original)"
 "Kitten One","Description of Kitten One","K001","https://placekitten.com/200/200","Kitten","300.00","250.00"
 "Kitten Two","Description of Kitten Two","K002","https://placekitten.com/245/245","Kitten","500.00","475.00"
