@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [234.0.15](https://github.com/forcedotcom/commerce-on-lightning/compare/v234.0.14...v234.0.15) (2022-01-13)
+
 ### [234.0.14](https://github.com/forcedotcom/commerce-on-lightning/compare/v232.1.0...v234.0.14) (2022-01-07)
 
 
