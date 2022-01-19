@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [234.0.17](https://github.com/forcedotcom/commerce-on-lightning/compare/v234.0.15...v234.0.17) (2022-01-19)
+
+
+### Bug Fixes
+
+* correct typo ([7485e55](https://github.com/forcedotcom/commerce-on-lightning/commit/7485e55f6012bc8926b0e1691bd3ba090f70a695))
+* removing /s from store url ([ccf364d](https://github.com/forcedotcom/commerce-on-lightning/commit/ccf364d237219b5bbfa6db547bf453cf5ff39087))
+* removing /s from store url ([40e1b92](https://github.com/forcedotcom/commerce-on-lightning/commit/40e1b925fa85db36a1ff1b1e708b6492cfd962c1))
+* update product import CSVs to expected v54 format ([8c17c13](https://github.com/forcedotcom/commerce-on-lightning/commit/8c17c13fd8bfe4068dca33bb6f146f1eb8312847))
+
 ### [234.0.15](https://github.com/forcedotcom/commerce-on-lightning/compare/v234.0.14...v234.0.15) (2022-01-13)
 
 ### [234.0.14](https://github.com/forcedotcom/commerce-on-lightning/compare/v232.1.0...v234.0.14) (2022-01-07)
