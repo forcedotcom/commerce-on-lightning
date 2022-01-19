@@ -1,11 +1,10 @@
-import {LightningElement, api, wire} from 'lwc';
-import {NavigationMixin} from 'lightning/navigation';
+import { LightningElement, api, wire } from 'lwc';
+import { NavigationMixin } from 'lightning/navigation';
 import basePath from '@salesforce/community/basePath';
-import {listContent} from 'lightning/cmsDeliveryApi';
+import { listContent } from 'lightning/cmsDeliveryApi';
 import communityId from '@salesforce/community/Id';
 
 export default class StoreLogo extends NavigationMixin(LightningElement) {
-
     @api
     height;
 
@@ -33,7 +32,7 @@ export default class StoreLogo extends NavigationMixin(LightningElement) {
 
     homeURL = basePath;
 
-    @wire(listContent, {communityId: communityId, contentKeys: '$contentKeys'})
+    @wire(listContent, { communityId: communityId, contentKeys: '$contentKeys' })
     onListContent(results) {
         const content = results.data;
         if (!this.imageUrl && content && content.items) {
@@ -56,8 +55,8 @@ export default class StoreLogo extends NavigationMixin(LightningElement) {
         this[NavigationMixin.Navigate]({
             type: 'comm__namedPage',
             attributes: {
-                name: 'Home'
-            }
+                name: 'Home',
+            },
         });
     }
 }

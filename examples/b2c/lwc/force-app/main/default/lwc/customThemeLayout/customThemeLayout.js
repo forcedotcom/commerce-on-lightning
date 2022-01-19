@@ -7,6 +7,4 @@ import { LightningElement } from 'lwc';
  * @slot
  */
 
-export default class CustomLayout extends LightningElement {
-
-}
+export default class CustomLayout extends LightningElement {}

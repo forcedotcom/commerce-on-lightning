@@ -1,46 +1,33 @@
 <template>
-    <ul
-            if:true={showNavigationList}
-            class={containerClass}
-            id="navigation-list"
-            role="menu"
-    >
+    <ul if:true="{showNavigationList}" class="{containerClass}" id="navigation-list" role="menu">
         <!-- Close button for mobile view -->
         <li
-                if:false={showCloseButton}
-                class="closeTrigger slds-m-around_small"
-                onclick={handleCloseTriggerClicked}
-                role="presentation"
+            if:false="{showCloseButton}"
+            class="closeTrigger slds-m-around_small"
+            onclick="{handleCloseTriggerClicked}"
+            role="presentation"
         >
             <button class="closeButton" aria-expanded="true" aria-label="close">
-                <lightning-button-icon
-                        icon-name="utility:close"
-                        variant="bare"
-                        alternative-text="Close"
-                >
+                <lightning-button-icon icon-name="utility:close" variant="bare" alternative-text="Close">
                 </lightning-button-icon>
             </button>
         </li>
 
         <!-- Show the parent name with the back icon -->
         <li
-                if:true={state.parent}
-                class="dropDownListItem dropDownListParent"
-                data-id={state.parent.id}
-                onclick={handleBackButton}
-                onkeydown={handleKeydownEvent}
-                role="presentation"
+            if:true="{state.parent}"
+            class="dropDownListItem dropDownListParent"
+            data-id="{state.parent.id}"
+            onclick="{handleBackButton}"
+            onkeydown="{handleKeydownEvent}"
+            role="presentation"
         >
-            <button
-                    aria-expanded="true"
-                    class="slds-p-vertical_small"
-                    role="menuitem"
-            >
+            <button aria-expanded="true" class="slds-p-vertical_small" role="menuitem">
                 <lightning-icon
-                        icon-name="utility:chevronleft"
-                        variant="bare"
-                        size="xx-small"
-                        class="slds-current-color slds-m-right_xx-small"
+                    icon-name="utility:chevronleft"
+                    variant="bare"
+                    size="xx-small"
+                    class="slds-current-color slds-m-right_xx-small"
                 >
                 </lightning-icon>
                 <span class="slds-m-right_xx-small">Back</span>
@@ -48,28 +35,28 @@
         </li>
 
         <!-- Add all the sub menu items in the drop down -->
-        <template for:each={state.items} for:item="item">
+        <template for:each="{state.items}" for:item="item">
             <li
-                    class="dropDownListItem dropDownListChild"
-                    key={item.label}
-                    data-id={item.id}
-                    onclick={handleNavigationClicked}
-                    onkeydown={handleKeydownEvent}
-                    role="presentation"
+                class="dropDownListItem dropDownListChild"
+                key="{item.label}"
+                data-id="{item.id}"
+                onclick="{handleNavigationClicked}"
+                onkeydown="{handleKeydownEvent}"
+                role="presentation"
             >
                 <a
-                        class="slds-grid slds-p-vertical_small slds-p-left_large slds-truncate"
-                        tabindex="0"
-                        href={item.href}
-                        role="menuitem"
+                    class="slds-grid slds-p-vertical_small slds-p-left_large slds-truncate"
+                    tabindex="0"
+                    href="{item.href}"
+                    role="menuitem"
                 >
                     <span class="slds-col_bump-right">{item.label}</span>
                     <lightning-icon
-                            if:true={item.subMenu.length}
-                            icon-name="utility:chevronright"
-                            variant="bare"
-                            size="xx-small"
-                            class="slds-current-color slds-m-horizontal_small"
+                        if:true="{item.subMenu.length}"
+                        icon-name="utility:chevronright"
+                        variant="bare"
+                        size="xx-small"
+                        class="slds-current-color slds-m-horizontal_small"
                     >
                     </lightning-icon>
                 </a>

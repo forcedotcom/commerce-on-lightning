@@ -27,8 +27,14 @@
             <property name="hideExpiryMonth" label="Hide Expiry Month" type="Boolean" description="" default="false" role="inputOnly"/>
             <property name="hideExpiryYear" label="Hide Expiry Year" type="Boolean" description="" default="false" role="inputOnly"/>
             <!-- Labels -->
-            <property name="previousButtonLabel" label="Previous Button Label" type="String" description="The text string to place on the Previous button" default="Previous" role="inputOnly"/>
-            <property name="nextButtonLabel" label="Next Button Label" type="String" description="The text string to place on the Next button" default="Next" role="inputOnly"/>
+            <property name="previousButtonLabel" label="Previous Button Label" type="String" description="The text string to place on the Previous button" default="Previous" translatable="true" role="inputOnly"/>
+            <property name="nextButtonLabel" label="Next Button Label" type="String" description="The text string to place on the Next button" default="Next" translatable="true" role="inputOnly"/>
+            <property name="billingAddressHeadingLabel" label="Billing Address Label" type="String" description="Specify custom text for the Billing Address label" default="Billing Address" translatable="true" role="inputOnly"/>
+            <property name="paymentMethodHeadingLabel" label="Payment Method Heading" type="String" description="Specify custom text for the heading of the Payment Method." default="Payment Method" translatable="true" role="inputOnly"/>
+            <property name="purchaseOrderEntryHeadingLabel" label="Purchase Order Text Box Label" type="String" description="Specify custom text for the label of the Purchase Order input text box" default="Enter Purchase Order" translatable="true" role="inputOnly"/>
+            <property name="purchaseOrderOptionLabel" label="Purchase Order Radio Option Label" type="String" description="Specify custom text for the label of the Purchase Order radio button." default="Purchase Order" translatable="true" role="inputOnly"/>
+            <property name="cardPaymentOptionLabel" label="Credit Card Radio Option Label" type="String" description="Specify custom text for the label of the Credit Card radio button." default="Credit Card" translatable="true" role="inputOnly"/>
+
             <!-- OUTPUT only fields-->
             <property name="selectedBillingAddress" label="Selected Billing Address ID" type="String" description="The address ID" role="outputOnly"/>
             <property name="purchaseOrderNumber" label="Purchase Order Number" type="String" description="The entered purchase order number" role="outputOnly" />

@@ -1,4 +1,4 @@
-import {LightningElement, track, api} from 'lwc';
+import { LightningElement, track, api } from 'lwc';
 
 const NAVIGATE_TO_PAGE_EVENT = 'navigatetopage';
 const RESIZE_EVENT = 'resize';
@@ -9,7 +9,6 @@ const ESC_KEY = 'Esc';
 const ARIA_CONTROLS = 'aria-controls';
 
 export default class HorizontalNavigation extends LightningElement {
-
     _overflowMenuItemWidth = 0;
     _isOverflowComputed = false;
     _menuItems;
@@ -236,7 +235,9 @@ export default class HorizontalNavigation extends LightningElement {
      * @returns {Number} width of the overflow menu item. Returns 0 if the overflow menu item is not present.
      */
     computeMoreMenuItemWidth() {
-        return this.template.querySelector('li.dummyMoreItem') ? this.template.querySelector('li.dummyMoreItem').clientWidth : 0;
+        return this.template.querySelector('li.dummyMoreItem')
+            ? this.template.querySelector('li.dummyMoreItem').clientWidth
+            : 0;
     }
 
     /**
@@ -255,7 +256,8 @@ export default class HorizontalNavigation extends LightningElement {
 
             sumOfMenuItemElementsWidth += menuItemElement.clientWidth;
             if (sumOfMenuItemElementsWidth + this._overflowMenuItemWidth >= maxWidth) {
-                const isMoreMenuItemNeeded = i === menuItemElements.length - 1 ? sumOfMenuItemElementsWidth >= maxWidth : true;
+                const isMoreMenuItemNeeded =
+                    i === menuItemElements.length - 1 ? sumOfMenuItemElementsWidth >= maxWidth : true;
 
                 // if the last menu item's width is less than the overflowMenuItemWidth then we collapse
                 // that menu item in overflow menu item as well.

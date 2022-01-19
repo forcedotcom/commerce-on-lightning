@@ -1,23 +1,23 @@
 <template>
     <div class="inputContainer slds-input-has-fixed-addon">
         <input
-                type="search"
-                id="text-input-id-1"
-                class="slds-input inputTextBox"
-                placeholder={placeHolderText}
-                oninput={handleInputChange}
-                maxlength="255"
-                autocomplete="off"
-                onkeydown={handleSearchButtonKeyDown}
+            type="search"
+            id="text-input-id-1"
+            class="slds-input inputTextBox"
+            placeholder="{placeHolderText}"
+            oninput="{handleInputChange}"
+            maxlength="255"
+            autocomplete="off"
+            onkeydown="{handleSearchButtonKeyDown}"
         />
         <button
-                class="slds-button slds-button_brand searchButton"
-                title="Search"
-                onkeydown={handleSearchButtonKeyDown}
-                onclick={handleSearchButtonClick}
+            class="slds-button slds-button_brand searchButton"
+            title="Search"
+            onkeydown="{handleSearchButtonKeyDown}"
+            onclick="{handleSearchButtonClick}"
         >
             <svg class="slds-icon slds-icon-text-default slds-icon_x-small searchIcon" aria-hidden="true">
-                <use xlink:href={searchIconPath}></use>
+                <use xlink:href="{searchIconPath}"></use>
             </svg>
             <span class="slds-assistive-text">Search</span>
         </button>

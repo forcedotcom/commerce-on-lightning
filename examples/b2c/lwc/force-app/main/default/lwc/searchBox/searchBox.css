@@ -7,13 +7,13 @@
     fill: var(--dxp-g-brand-contrast);
 }
 
-.inputTextBox{
+.inputTextBox {
     border: unset;
     border-top-right-radius: 0;
     border-bottom-right-radius: 0;
 }
 
-.inputContainer{
+.inputContainer {
     border: 1px solid var(--dxp-g-brand);
-    border-radius: 0 .4rem .4rem 0;
+    border-radius: 0 0.4rem 0.4rem 0;
 }
