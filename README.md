@@ -1,42 +1,61 @@
 # commerce-on-lightning
 
-[![Version](https://img.shields.io/npm/v/@salesforce/commerce.svg)](https://npmjs.org/package/@salesforce/commerce)
-[![CircleCI](https://circleci.com/gh/forcedotcom/commerce-on-lightning.svg?style=shield)](https://circleci.com/gh/forcedotcom/commerce-on-lightning)
+[![Version](https://img.shields.io/npm/v/1commerce.svg)](https://npmjs.org/package/1commerce)
+[![CircleCI](https://circleci.com/gh/1commerce/1commerce/tree/master.svg?style=shield)](https://circleci.com/gh/1commerce/1commerce/tree/master)
 [![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/1commerce/1commerce?branch=master&svg=true)](https://ci.appveyor.com/project/heroku/1commerce/branch/master)
 [![Codecov](https://codecov.io/gh/1commerce/1commerce/branch/master/graph/badge.svg)](https://codecov.io/gh/1commerce/1commerce)
 [![Greenkeeper](https://badges.greenkeeper.io/1commerce/1commerce.svg)](https://greenkeeper.io/)
 [![Known Vulnerabilities](https://snyk.io/test/github/1commerce/1commerce/badge.svg)](https://snyk.io/test/github/1commerce/1commerce)
-[![Downloads/week](https://img.shields.io/npm/dw/@salesforce/commerce.svg)](https://npmjs.org/package/@salesforce/commerce)
-[![License](https://img.shields.io/badge/License-BSD%203--Clause-brightgreen.svg)](https://raw.githubusercontent.com/forcedotcom/commerce-on-lightning/main/LICENSE.txt)
+[![Downloads/week](https://img.shields.io/npm/dw/1commerce.svg)](https://npmjs.org/package/1commerce)
+[![License](https://img.shields.io/badge/License-BSD%203--Clause-brightgreen.svg)](https://raw.githubusercontent.com/salesforcecli/plugin-auth/main/LICENSE.txt)
+==============
 
-### Commerce commands for Salesforce CLI.
+Commerce commands for Salesforce CLI.
 
 If you want a store, for test or any other purposes, then use this plugin to automate all steps required.
 It has built in automation to help if any steps fail. This plugin is designed to be as hands off as possible.
 
 This plugin is used to create and setup either a B2B or a B2C store with data with as little effort as possible.
 
-**This plugin requires the** [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli)**. For more information on the CLI, read the** [getting started guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm).
+This plugin requires the [Salesforce CLI](https://developer.salesforce.com/tools/sfdxcli). For more information on the CLI, read the [getting started guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm).
 
 We always recommend using the latest version of these commands, however, you can install a specific version or tag if needed.
 
-[commerce-on-lightning-orchestration](https://forcedotcom/commerce-on-lightning/commerce-on-lightning-orchestration) - commerce-orchestration
+[commerce-on-lightning-dev](https://git.soma.salesforce.com/communities/commerce-on-lightning-dev) - commerce-dev
+
+-   devhubs (local development)
+
+[commerce-on-lightning-orchestration](https://git.soma.salesforce.com/communities/commerce-on-lightning-orchestration) - commerce-orchestration
 
 -   scratchorgs
 
-[commerce-on-lightning](https://forcedotcom/commerce-on-lightning/commerce-on-lightning-orchestration) - @salesforce/commerce <---- THIS PLUGIN
+[commerce-on-lightning](https://git.soma.salesforce.com/communities/commerce-on-lightning) - @salesforce/commerce <---- THIS PLUGIN
 
 -   store
 
 ==============
 
-## Introduction
-
+-   [Introduction](#introduction)
 -   [Usage](#usage)
 -   [Install](#install)
 -   [Post Install](#now-that-you-have-the-commerce-plugin-installed-please-see)
 -   [Commands](#commands)
 -   [Debugging your plugin](#debugging-your-plugin)
+
+## Introduction
+
+This plugin is designed to setup a test store either B2B or B2C within a scratch org. It will add products and
+users, a guest user, admin user and buyer user.
+This plugin assumes your devhub and scratchorg are already setup.
+
+This repo also contains example components for your store you can load after the fact.
+
+For B2C examples components please see:
+[B2B2C Advanced Reference Components](https://git.soma.salesforce.com/communities/commerce-on-lightning/tree/master/examples/b2c/lwc)
+
+For B2B examples components please see:
+[B2B Advanced Reference Components](https://git.soma.salesforce.com/communities/commerce-on-lightning/tree/master/examples/b2c/lwc)
+
 <!-- usage -->
 
 ```sh-session
@@ -44,7 +63,7 @@ $ npm install -g @salesforce/commerce
 $ sfdx COMMAND
 running command...
 $ sfdx (-v|--version|version)
-@salesforce/commerce/236.0.1 darwin-x64 node-v14.16.0
+@salesforce/commerce/234.0.15 darwin-x64 node-v14.3.0
 $ sfdx --help [COMMAND]
 USAGE
   $ sfdx COMMAND
@@ -58,14 +77,14 @@ USAGE
 ## Install
 
 ```bash
-sfdx plugins:install @salesforce/commerce
+echo y | sfdx plugins:install ssh://git@git.soma.salesforce.com:communities/commerce-on-lightning.git
 ```
 
 <!-- installstop -->
 
 ## Issues
 
-Please report any issues at https://github.com/forcedotcom/commerce-on-lightning/issues
+Please report any issues at https://git.soma.salesforce.com/communities/commerce-on-lightning/issues
 
 ## Contributing
 
@@ -88,22 +107,25 @@ Agreement. You can do so by going to https://cla.salesforce.com/sign-cla.
 
 ### Build
 
+If you plan to help develop the plugin then these steps are for you.
+
 To build the plugin locally, make sure to have yarn installed and run the following commands:
 
 ```bash
 # Clone the repository
-git clone git@github.com:salesforcecli/plugin-auth
+git clone git@git.soma.salesforce.com:communities/commerce-on-lightning.git
 
 # Install the dependencies and compile
 yarn install
 yarn build
 ```
 
-To use your plugin, run using the local `./bin/run` or `./bin/run.cmd` file.
+To use your plugin, run using the local `./bin/run` or `./bin/run.cmd` file. This is helpful for mostly debugging
+purposes as you can add this command to an IDE.
 
 ```bash
 # Run using local run file.
-./bin/run auth
+./bin/run commerce:store:create
 ```
 
 There should be no differences when running via the Salesforce CLI or using the local run file. However, it can be useful to link the plugin to do some additional testing or run your commands from anywhere on your machine.
@@ -143,8 +165,8 @@ OPTIONS
                                                                                     Directory to output the conversion
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/stor
-                                                                                    e-scratch-def.json] config file
+                                                                                    ~/.commerce/config/store
+                                                                                    -scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
@@ -162,8 +184,6 @@ OPTIONS
 EXAMPLE
   sfdx commerce:examples:convert -f store-scratch-def.json
 ```
-
-_See code: [src/commands/commerce/examples/convert.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v236.0.1/src/commands/commerce/examples/convert.ts)_
 
 ## `sfdx commerce:payments:quickstart:setup -n <string> [-p <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -194,8 +214,6 @@ OPTIONS
 EXAMPLE
   sfdx commerce:payments:quickstart:setup -p Stripe
 ```
-
-_See code: [src/commands/commerce/payments/quickstart/setup.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v236.0.1/src/commands/commerce/payments/quickstart/setup.ts)_
 
 ## `sfdx commerce:products:import -n <string> [-c <string>] [-f <filepath>] [-o <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -239,8 +257,6 @@ EXAMPLE
   sfdx commerce:products:import --store-name test-store
 ```
 
-_See code: [src/commands/commerce/products/import.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v236.0.1/src/commands/commerce/products/import.ts)_
-
 ## `sfdx commerce:store:create [name=value...] -n <string> [-f <filepath>] [-o <string>] [-t <string>] [-b <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Comprehensive create and set up a store. This will create your community/store push store sources, create buyer user, import products, create search index.
@@ -256,8 +272,8 @@ OPTIONS
                                                                                     buyer's username
 
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/stor
-                                                                                    e-scratch-def.json] config file
+                                                                                    ~/.commerce/config/store
+                                                                                    -scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
@@ -285,8 +301,6 @@ OPTIONS
 EXAMPLE
   sfdx commerce:store:create --store-name test-store
 ```
-
-_See code: [src/commands/commerce/store/create.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v236.0.1/src/commands/commerce/store/create.ts)_
 
 ## `sfdx commerce:store:display -n <string> [-b <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -327,8 +341,6 @@ EXAMPLE
   sfdx commerce:store:display --store-name test-store
 ```
 
-_See code: [src/commands/commerce/store/display.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v236.0.1/src/commands/commerce/store/display.ts)_
-
 ## `sfdx commerce:store:open -n <string> [--all] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Open store(s)
@@ -366,8 +378,6 @@ EXAMPLES
   sfdx commerce:store:open --all
 ```
 
-_See code: [src/commands/commerce/store/open.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v236.0.1/src/commands/commerce/store/open.ts)_
-
 ## `sfdx commerce:store:quickstart:create [name=value...] -n <string> [-t <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Use this command to just create a community. It will use sfdx force:community:create until a community is created or failed.
@@ -399,8 +409,6 @@ EXAMPLE
   sfdx commerce:store:quickstart:create --templatename 'b2c-lite-storefront'
 ```
 
-_See code: [src/commands/commerce/store/quickstart/create.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v236.0.1/src/commands/commerce/store/quickstart/create.ts)_
-
 ## `sfdx commerce:store:quickstart:setup [name=value...] -n <string> [-f <filepath>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
 Set up a store
@@ -412,8 +420,8 @@ USAGE
 
 OPTIONS
   -f, --definitionfile=definitionfile                                               [default:
-                                                                                    ~/.commerce/config/stor
-                                                                                    e-scratch-def.json] config file
+                                                                                    ~/.commerce/config/store
+                                                                                    -scratch-def.json] config file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
@@ -435,8 +443,6 @@ OPTIONS
 EXAMPLE
   sfdx commerce:store:quickstart:setup --definitionfile store-scratch-def.json
 ```
-
-_See code: [src/commands/commerce/store/quickstart/setup.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v236.0.1/src/commands/commerce/store/quickstart/setup.ts)_
 
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
