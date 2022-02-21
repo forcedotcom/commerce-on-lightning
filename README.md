@@ -29,7 +29,7 @@ We always recommend using the latest version of these commands, however, you can
 
 -   scratchorgs
 
-[commerce-on-lightning](https://git.soma.salesforce.com/communities/commerce-on-lightning-orchestration) - @salesforce/commerce <---- THIS PLUGIN
+[commerce-on-lightning](https://git.soma.salesforce.com/communities/commerce-on-lightning) - @salesforce/commerce <---- THIS PLUGIN
 
 -   store
 
