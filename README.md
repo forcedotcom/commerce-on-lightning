@@ -38,7 +38,6 @@ We always recommend using the latest version of these commands, however, you can
 -   [Introduction](#introduction)
 -   [Usage](#usage)
 -   [Install](#install)
--   [Post Install](#now-that-you-have-the-commerce-plugin-installed-please-see)
 -   [Commands](#commands)
 -   [Debugging your plugin](#debugging-your-plugin)
 
@@ -51,10 +50,12 @@ This plugin assumes your devhub and scratchorg are already setup.
 This repo also contains example components for your store you can load after the fact.
 
 For B2C examples components please see:
-[B2B2C Advanced Reference Components](https://git.soma.salesforce.com/communities/commerce-on-lightning/tree/master/examples/b2c/lwc)
+[B2B2C Advanced Reference Components](https://github.com/forcedotcom/commerce-on-lightning/tree/main-2/examples/b2c/lwc)
 
 For B2B examples components please see:
-[B2B Advanced Reference Components](https://git.soma.salesforce.com/communities/commerce-on-lightning/tree/master/examples/b2c/lwc)
+[B2B Advanced Reference Components](https://github.com/forcedotcom/commerce-on-lightning/tree/main-2/examples/b2b/lwc)
+
+### Usage
 
 <!-- usage -->
 
@@ -88,22 +89,7 @@ Please report any issues at https://git.soma.salesforce.com/communities/commerce
 
 ## Contributing
 
-1. Please read our [Code of Conduct](CODE_OF_CONDUCT.md)
-2. Create a new issue before starting your project so that we can keep track of
-   what you are trying to add/fix. That way, we can also offer suggestions or
-   let you know if there is already an effort in progress.
-3. Fork this repository.
-4. [Build the plugin locally](#build)
-5. Create a _topic_ branch in your fork. Note, this step is recommended but technically not required if contributing using a fork.
-6. Edit the code in your fork.
-7. Write appropriate tests for your changes. Try to achieve at least 95% code coverage on any new code. No pull request will be accepted without unit tests.
-8. Sign CLA (see [CLA](#cla) below).
-9. Send us a pull request when you are done. We'll review your code, suggest any needed changes, and merge it in.
-
-### CLA
-
-External contributors will be required to sign a Contributor's License
-Agreement. You can do so by going to https://cla.salesforce.com/sign-cla.
+Please see our [CONTRIBUTING](CONTRIBUTING.md) guide.
 
 ### Build
 
@@ -472,5 +458,5 @@ $ NODE_OPTIONS=--inspect-brk bin/run commerce:store:create -u myOrg@example.com
 4. In the upper left hand corner of VS Code, verify that the "Attach to Remote" launch configuration has been chosen.
 5. Hit the green play button to the left of the "Attach to Remote" launch configuration window. The debugger should now be suspended on the first line of the program.
 6. Hit the green play button at the top middle of VS Code (this play button will be to the right of the play button that you clicked in step #5).
-   <br><img src=".images/vscodeScreenshot.png" width="480" height="278"><br>
-   Congrats, you are debugging!
+
+    Congrats, you are debugging!
