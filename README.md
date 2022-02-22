@@ -24,7 +24,7 @@ We always recommend using the latest version of these commands, however, you can
 
 -   scratchorgs
 
-[commerce-on-lightning](https://forcedotcom/commerce-on-lightning/commerce-on-lightning-orchestration) - @salesforce/commerce <---- THIS PLUGIN
+[commerce-on-lightning](https://github.com/forcedotcom/commerce-on-lightning) - @salesforce/commerce <---- THIS PLUGIN
 
 -   store
 
