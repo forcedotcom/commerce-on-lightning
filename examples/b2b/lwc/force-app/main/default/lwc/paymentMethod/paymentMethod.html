@@ -14,7 +14,7 @@
             for="po-number"
         >
             <span class="slds-form-element__label slds-text-title_bold"
-                >{_purchaseOrderOptionLabel}</span
+                >{labels.purchaseOrderOptionLabel}</span
             >
         </label>
 
@@ -41,7 +41,7 @@
                 data-po-number
                 type="text"
                 name="PONumberInput"
-                label={_purchaseOrderEntryHeadingLabel}
+                label={labels.purchaseOrderEntryHeader}
                 value={purchaseOrderNumber}
                 onblur={handleUpdate}
                 required={poRequired}
@@ -74,7 +74,7 @@
             for="card-payment"
         >
             <span class="slds-form-element__label slds-text-title_bold"
-                >{_cardPaymentOptionLabel}</span
+                >{labels.cardPaymentOptionLabel}</span
             >
         </label>
         <div class="slds-p-top_medium" if:true={isCardPaymentSelected}>
