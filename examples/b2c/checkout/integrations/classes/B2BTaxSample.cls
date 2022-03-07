@@ -11,7 +11,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             // We need to get the ID of the delivery group in order to get the DeliverTo info.
             Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId][0].CartDeliveryGroupId;
             CartDeliveryGroup deliveryGroup = [SELECT DeliverToState, DeliverToCountry FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId][0];
-            String taxType = [SELECT TaxType FROM WebCart WHERE Id = :cartId][0].TaxType;
+            String taxLocaleType = [SELECT TaxLocaleType FROM WebCart WHERE Id = :cartId][0].TaxLocaleType;
             
             // Get all SKUs, the cart item IDs, and the total prices from the cart items.
             Map<String, Id> cartItemIdsBySKU = new Map<String, Id>();
@@ -20,7 +20,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
                 String cartItemSKU = '';
                 if (cartItem.Type == 'Product') {
                     if (String.isBlank(cartItem.Sku)) {
-                        String errorMessage = System.Label.ERROR_SKU_NOT_DEFINED;
+                        String errorMessage = 'The SKUs for all products in your cart must be defined.';
                         return integrationStatusFailedWithCartValidationOutputError(
                             integStatus,
                             errorMessage,
@@ -54,7 +54,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             // Get the tax rates and tax amounts from an external service
             // Other parameters will be passed here, like ship_from, bill_to, more details about the ship_to, etc.
             Map<String, TaxDataFromExternalService> rateAndAmountFromExternalServicePerSku = getTaxRatesAndAmountsFromExternalService(
-                cartItemTotalPriceBySKU, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType
+                cartItemTotalPriceBySKU, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxLocaleType
             );
             
             // If there are taxes from a previously cancelled checkout, delete them.
@@ -70,7 +70,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
                 if (rateAndAmountFromExternalService == null){
                     return integrationStatusFailedWithCartValidationOutputError(
                         integStatus,
-                        String.format(System.Label.ERROR_SKU_NOT_FOUND_EXT, new List<String>{ sku }),
+                        'The product with sku ' + sku + ' could not be found in the external system',
                         jobInfo,
                         cartId
                     );
@@ -127,7 +127,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             // See the readme section about error handling for details about how to create that notification.
             return integrationStatusFailedWithCartValidationOutputError(
                 integStatus,
-                String.format(System.Label.ERROR_EXCEPTION_OCCURRED, new List<String>{ e.getTypeName(), e.getMessage() }),
+                'An exception of type ' + e.getTypeName() + ' has occurred: ' + e.getMessage(),
                 jobInfo,
                 cartId
             );
@@ -136,13 +136,13 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
     }
     
     private Map<String, TaxDataFromExternalService> getTaxRatesAndAmountsFromExternalService (
-        Map<String, DataToExternalService> cartItemTotalAmountBySKU, String state, String country, String taxType) {
+        Map<String, DataToExternalService> cartItemTotalAmountBySKU, String state, String country, String taxLocaleType) {
             Http http = new Http();
             HttpRequest request = new HttpRequest();
             Integer SuccessfulHttpRequest = 200;
             String encodedState = (state == null) ? '' : EncodingUtil.urlEncode(state, 'UTF-8').replace('+', '%20');
             String encodedCountry = (country == null) ? '' : EncodingUtil.urlEncode(country, 'UTF-8').replace('+', '%20');
-            String encodedTaxType = (taxType == null) ? '' : EncodingUtil.urlEncode(taxType, 'UTF-8').replace('+', '%20');
+            String encodedTaxLocaleType = (taxLocaleType == null) ? '' : EncodingUtil.urlEncode(taxLocaleType, 'UTF-8').replace('+', '%20');
             
             Map<String, DataToExternalService> encodedCartItemTotalAmountBySKU = new Map<String, DataToExternalService>();
             for(String sku: cartItemTotalAmountBySKU.keySet()) {
@@ -151,7 +151,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             
             // To access the service below, you may need to add endpoint = https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
             String requestURL = 'https://b2b-commerce-test.herokuapp.com/get-tax-rates-with-adjustments?state=' + encodedState
-                            + '&country=' + encodedCountry + '&taxType=' + encodedTaxType
+                            + '&country=' + encodedCountry + '&taxType=' + encodedTaxLocaleType
                             //+ '&country=' + encodedCountry + '&taxType=' + 'Gross'  
                             + '&amountsBySKU=' + JSON.serialize(encodedCartItemTotalAmountBySKU);
             request.setEndpoint(requestURL);
@@ -170,7 +170,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
                 return taxDataFromExternalServiceBySKU;
             }
             else {
-                throw new CalloutException (String.format(System.Label.ERROR_CALLOUT_EXCEPTION, new List<String>{ String.valueOf(response.getStatusCode()) }));
+                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
             }
     }
     
