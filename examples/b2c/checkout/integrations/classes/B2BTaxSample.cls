@@ -37,7 +37,6 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
                 }
 
                 String cartItemId = cartItem.Id;
-
                 cartItemIdsBySKU.put(cartItemSKU, cartItemId);
 
                 List<CIPA> cipaList = new List<CIPA>();
