@@ -16,7 +16,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             // Get all SKUs, the cart item IDs, and the total prices from the cart items.
             Map<String, Id> cartItemIdsBySKU = new Map<String, Id>();
             Map<String, DataToExternalService> cartItemTotalPriceBySKU = new Map<String, DataToExternalService>();
-            for (CartItem cartItem : [SELECT Id, Sku, Quantity, TotalLineAmount, AdjustmentAmount, ItemizedAdjustmentAmount, Type FROM CartItem WHERE CartId = :cartId]) {
+            for (CartItem cartItem : [SELECT Id, Sku, Quantity, TotalLineAmount, AdjustmentAmount, Type FROM CartItem WHERE CartId = :cartId]) {
                 String cartItemSKU = '';
                 if (cartItem.Type == 'Product') {
                     if (String.isBlank(cartItem.Sku)) {
@@ -78,11 +78,13 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
                 // Update CartItem with taxes
                 String cartItemIdToUpdate = rateAndAmountFromExternalService.getCartItemId();
                 CartItem cartItemToUpdate = [SELECT Id FROM CartItem WHERE Id = :cartItemIdToUpdate][0];
+                // Tax for tier adjustment
                 cartItemToUpdate.AdjustmentTaxAmount = rateAndAmountFromExternalService.getAdjustmentTaxAmount();
+                // Net Unit Price
                 cartItemToUpdate.NetUnitPrice = rateAndAmountFromExternalService.getNetUnitPrice();
+                // Gross Unit Price
                 cartItemToUpdate.GrossUnitPrice = rateAndAmountFromExternalService.getGrossUnitPrice();
                 update(cartItemToUpdate);
-                //System.debug(rateAndAmountFromExternalService);
                 // If the sku was found in the external system, add a new CartTax line for that sku
                 // The following fields from CartTax can be filled in:
                 // Amount (required): Calculated tax amount.
