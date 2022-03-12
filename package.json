@@ -1,6 +1,6 @@
 {
     "name": "@salesforce/commerce",
-    "version": "238.0.2",
+    "version": "238.0.1",
     "author": "Jonathan Arndt",
     "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
     "dependencies": {
@@ -109,7 +109,7 @@
             "@salesforce/plugin-command-reference"
         ],
         "hooks": {
-            "init": "./lib/hooks/init/download"
+            "files": "./lib/hooks/files/download"
         }
     },
     "repository": "https://github.com/forcedotcom/commerce-on-lightning",

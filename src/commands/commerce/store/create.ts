@@ -162,6 +162,8 @@ export class StoreCreate extends SfdxCommand {
         }
     }
     public async run(): Promise<AnyJson> {
+        // Copy all example files
+        await this.config.runHook('files', {});
         this.devhubUsername = (await this.org.getDevHubOrg()).getUsername();
         const passedArgs = getPassedArgs(this.argv, this.flags);
         if (!this.flags.type || (this.flags.type !== 'b2c' && this.flags.type !== 'b2b')) this.flags.type = 'b2c';

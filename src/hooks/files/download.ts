@@ -7,18 +7,17 @@
 import { Hook } from '@oclif/config';
 import { fs } from '@salesforce/core';
 import { B_DIR, BASE_DIR } from '../../lib/utils/constants/properties';
-import { copyFolderRecursiveSync, mkdirSync, remove } from '../../lib/utils/fsUtils';
+import { copyFolderRecursiveWithConfirm, mkdirSync } from '../../lib/utils/fsUtils';
 
 // eslint-disable-next-line @typescript-eslint/require-await
-export const hook: Hook<'init'> = async () => {
+export const hook: Hook<'files'> = async () => {
     // TODO takes a second to run, might be overkill to run everytime maybe put a last synced metadata or something to know when to copy files over
     mkdirSync(BASE_DIR);
     const dirs = ['examples', 'json', 'quickstart-config', 'config'];
     const files = ['sfdx-project.json']; // fs.linkSync
-    dirs.forEach((d) => {
-        remove(BASE_DIR + '/' + d);
-        copyFolderRecursiveSync(B_DIR + '/' + d, BASE_DIR);
-    }); // .filter(f=>!fs.existsSync(BASE_DIR+"/"+d))
+    for (const d of dirs) {
+        await copyFolderRecursiveWithConfirm(B_DIR + '/' + d, BASE_DIR);
+    } // .filter(f=>!fs.existsSync(BASE_DIR+"/"+d))
     files
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         .filter((f) => !fs.existsSync(BASE_DIR + '/' + f))
