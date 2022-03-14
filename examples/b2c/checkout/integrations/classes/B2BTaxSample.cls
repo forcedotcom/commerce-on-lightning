@@ -11,7 +11,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             // We need to get the ID of the delivery group in order to get the DeliverTo info.
             Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId][0].CartDeliveryGroupId;
             CartDeliveryGroup deliveryGroup = [SELECT DeliverToState, DeliverToCountry FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId][0];
-            String taxLocaleType = [SELECT TaxLocaleType FROM WebCart WHERE Id = :cartId][0].TaxLocaleType;
+            String taxType = [SELECT TaxType FROM WebCart WHERE Id = :cartId][0].TaxType;
             
             // Get all SKUs, the cart item IDs, and the total prices from the cart items.
             Map<String, Id> cartItemIdsBySKU = new Map<String, Id>();
@@ -54,7 +54,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             // Get the tax rates and tax amounts from an external service
             // Other parameters will be passed here, like ship_from, bill_to, more details about the ship_to, etc.
             Map<String, TaxDataFromExternalService> rateAndAmountFromExternalServicePerSku = getTaxRatesAndAmountsFromExternalService(
-                cartItemTotalPriceBySKU, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxLocaleType
+                cartItemTotalPriceBySKU, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType
             );
             
             // If there are taxes from a previously cancelled checkout, delete them.
@@ -136,13 +136,13 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
     }
     
     private Map<String, TaxDataFromExternalService> getTaxRatesAndAmountsFromExternalService (
-        Map<String, DataToExternalService> cartItemTotalAmountBySKU, String state, String country, String taxLocaleType) {
+        Map<String, DataToExternalService> cartItemTotalAmountBySKU, String state, String country, String taxType) {
             Http http = new Http();
             HttpRequest request = new HttpRequest();
             Integer SuccessfulHttpRequest = 200;
             String encodedState = (state == null) ? '' : EncodingUtil.urlEncode(state, 'UTF-8').replace('+', '%20');
             String encodedCountry = (country == null) ? '' : EncodingUtil.urlEncode(country, 'UTF-8').replace('+', '%20');
-            String encodedTaxLocaleType = (taxLocaleType == null) ? '' : EncodingUtil.urlEncode(taxLocaleType, 'UTF-8').replace('+', '%20');
+            String encodedTaxType = (taxType == null) ? '' : EncodingUtil.urlEncode(taxType, 'UTF-8').replace('+', '%20');
             
             Map<String, DataToExternalService> encodedCartItemTotalAmountBySKU = new Map<String, DataToExternalService>();
             for(String sku: cartItemTotalAmountBySKU.keySet()) {
@@ -151,7 +151,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             
             // To access the service below, you may need to add endpoint = https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
             String requestURL = 'https://b2b-commerce-test.herokuapp.com/get-tax-rates-with-adjustments?state=' + encodedState
-                            + '&country=' + encodedCountry + '&taxType=' + encodedTaxLocaleType
+                            + '&country=' + encodedCountry + '&taxType=' + encodedTaxType
                             //+ '&country=' + encodedCountry + '&taxType=' + 'Gross'  
                             + '&amountsBySKU=' + JSON.serialize(encodedCartItemTotalAmountBySKU);
             request.setEndpoint(requestURL);
