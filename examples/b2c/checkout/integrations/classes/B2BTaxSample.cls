@@ -20,7 +20,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
                 String cartItemSKU = '';
                 if (cartItem.Type == 'Product') {
                     if (String.isBlank(cartItem.Sku)) {
-                        String errorMessage = 'The SKUs for all products in your cart must be defined.';
+                        String errorMessage = System.Label.ERROR_SKU_NOT_DEFINED;
                         return integrationStatusFailedWithCartValidationOutputError(
                             integStatus,
                             errorMessage,
@@ -70,7 +70,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
                 if (rateAndAmountFromExternalService == null){
                     return integrationStatusFailedWithCartValidationOutputError(
                         integStatus,
-                        'The product with sku ' + sku + ' could not be found in the external system',
+                        String.format(System.Label.ERROR_SKU_NOT_FOUND_EXT, new List<String>{ sku }),
                         jobInfo,
                         cartId
                     );
@@ -127,7 +127,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             // See the readme section about error handling for details about how to create that notification.
             return integrationStatusFailedWithCartValidationOutputError(
                 integStatus,
-                'An exception of type ' + e.getTypeName() + ' has occurred: ' + e.getMessage(),
+                String.format(System.Label.ERROR_EXCEPTION_OCCURRED, new List<String>{ e.getTypeName(), e.getMessage() }),
                 jobInfo,
                 cartId
             );
@@ -170,7 +170,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
                 return taxDataFromExternalServiceBySKU;
             }
             else {
-                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+                throw new CalloutException (String.format(System.Label.ERROR_CALLOUT_EXCEPTION, new List<String>{ String.valueOf(response.getStatusCode()) }));
             }
     }
     

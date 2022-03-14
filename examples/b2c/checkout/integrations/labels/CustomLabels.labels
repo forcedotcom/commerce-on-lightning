@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+  <labels>
+    <categories>Error</categories>
+    <fullName>ERROR_SKU_NOT_DEFINED</fullName>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>skuNotDefined</shortDescription>
+    <value>The SKUs for all products in your cart must be defined.</value>
+  </labels>
+  <labels>
+    <categories>Error</categories>
+    <fullName>ERROR_SKU_NOT_FOUND_EXT</fullName>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>skuNotFoundInExternalSystem</shortDescription>
+    <value>The product with SKU {0} could not be found in the external system</value>
+  </labels>
+  <labels>
+    <categories>Error</categories>
+    <fullName>ERROR_EXCEPTION_OCCURRED</fullName>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>exceptionOccurred</shortDescription>
+    <value>An exception of type {0} has occurred: {1}</value>
+  </labels>
+  <labels>
+    <categories>Error</categories>
+    <fullName>ERROR_CALLOUT_EXCEPTION</fullName>
+    <language>en_US</language>
+    <protected>false</protected>
+    <shortDescription>calloutException</shortDescription>
+    <value>There was a problem with the request. Error: {0}</value>
+  </labels>
+</CustomLabels>
