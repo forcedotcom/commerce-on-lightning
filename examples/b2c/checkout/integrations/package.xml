@@ -4,7 +4,7 @@
       <members>*</members>
       <name>CustomLabels</name>
     </types>
-     <types>
+    <types>
       <members>*</members>
       <name>Translations</name>
     </types>
@@ -15,6 +15,8 @@
         <members>B2BPricingSampleTest</members>
         <members>B2BDeliverySample</members>
         <members>B2BDeliverySampleTest</members>
+        <members>B2CDeliverySample</members>
+        <members>B2CDeliverySampleTest</members>
         <members>B2BTaxSample</members>
         <members>B2BTaxSampleTest</members>
         <name>ApexClass</name>

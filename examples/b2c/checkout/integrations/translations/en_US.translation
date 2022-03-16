@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Translations xmlns="http://soap.sforce.com/2006/04/metadata">
+  <customLabels>
+    <label>The SKUs for all products in your cart must be defined.</label>
+    <name>ERROR_SKU_NOT_DEFINED</name>
+  </customLabels>
+  <customLabels>
+    <label>The product with SKU {0} could not be found in the external system</label>
+    <name>ERROR_SKU_NOT_FOUND_EXT</name>
+  </customLabels>
+  <customLabels>
+    <label>An exception of type {0} has occurred: {1}</label>
+    <name>ERROR_EXCEPTION_OCCURRED</name>
+  </customLabels>
+  <customLabels>
+    <label>There was a problem with the request. Error: {0}</label>
+    <name>ERROR_CALLOUT_EXCEPTION</name>
+  </customLabels>
+</Translations>
