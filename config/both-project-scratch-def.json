@@ -29,6 +29,9 @@
         },
         "commerceSettings": {
             "commerceEnabled": true
+        },
+        "languageSettings": {
+            "enableTranslationWorkbench": true
         }
     }
 }
