@@ -1,6 +1,13 @@
 {
     "nameFlagDescription": "name to print",
     "errorNoOrgResults": "No results found for the org '%s'.",
+    "files": {
+        "fileDifference": "Local file %s does not match plugin file %s.",
+        "copyPluginVersionYN": "Would you like replace %s with %s? Y/N",
+        "backingUpExistingFile": "Backing up existing local file as: %s\n",
+        "overwritingFile": "Overwriting file %s with %s\n",
+        "skippingFile": "Skipping replacing existing file: %s\n"
+    },
     "setup": {
         "cmdDescription": "Setup a devhub and scratch org from start to finish with one command",
         "resetAllDescription": "Reset org clearing all devhub and scratch orgs and sdb",
