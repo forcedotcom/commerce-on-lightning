@@ -43,7 +43,7 @@ export function mkdirSync(name: string): string {
     }
     return name;
 }
-export async function copyFileWithConfirm(source: string, target: string): Promise<void> {
+export async function copyFileWithConfirm(source: string, target: string, prompt?: boolean): Promise<void> {
     let targetFile = target;
     // If target is a directory, a new file with the same name will be created
     if (fs.existsSync(target))
@@ -51,11 +51,15 @@ export async function copyFileWithConfirm(source: string, target: string): Promi
 
     if (fs.existsSync(targetFile)) {
         if (!fs.areFilesEqualSync(targetFile, source)) {
+            let promptAnswer;
             ux.log(chalk.red(msgs.getMessage('files.fileDifference', [targetFile, source])));
-
-            const promptAnswer = await ux.confirm(
-                chalk.green(msgs.getMessage('files.copyPluginVersionYN', [targetFile, source]))
-            );
+            if (prompt === true) {
+                promptAnswer = await ux.confirm(
+                    chalk.green(msgs.getMessage('files.copyPluginVersionYN', [targetFile, source]))
+                );
+            } else {
+                promptAnswer = true;
+            }
             if (promptAnswer === true) {
                 const targetFileBackupName = path.join(target, `${path.basename(source)}.bak`);
                 ux.log(chalk.green(msgs.getMessage('files.backingUpExistingFile', [targetFileBackupName])));
@@ -65,8 +69,6 @@ export async function copyFileWithConfirm(source: string, target: string): Promi
             } else if (promptAnswer === false) {
                 ux.log(chalk.green(msgs.getMessage('files.skippingFile', [targetFile])));
                 return;
-            } else {
-                ux.log(chalk.red(`Invalid response. ${msgs.getMessage('files.skippingFile', [targetFile])}`));
             }
         }
     } else {
@@ -74,7 +76,7 @@ export async function copyFileWithConfirm(source: string, target: string): Promi
     }
 }
 
-export async function copyFolderRecursiveWithConfirm(source: string, target: string): Promise<void> {
+export async function copyFolderRecursiveWithConfirm(source: string, target: string, prompt?: boolean): Promise<void> {
     let files = [];
     // Check if folder needs to be created or integrated
     const targetFolder = path.join(target, path.basename(source));
@@ -84,8 +86,9 @@ export async function copyFolderRecursiveWithConfirm(source: string, target: str
         files = fs.readdirSync(source);
         for (const file1 of files.filter((file: string) => !fs.existsSync(`${BASE_DIR}/${file}`))) {
             const curSource = path.join(source, file1);
-            if (fs.lstatSync(curSource).isDirectory()) await copyFolderRecursiveWithConfirm(curSource, targetFolder);
-            else await copyFileWithConfirm(curSource, targetFolder);
+            if (fs.lstatSync(curSource).isDirectory())
+                await copyFolderRecursiveWithConfirm(curSource, targetFolder, prompt);
+            else await copyFileWithConfirm(curSource, targetFolder, prompt);
         }
     }
 }
