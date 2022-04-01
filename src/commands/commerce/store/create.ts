@@ -17,6 +17,7 @@ import {
     CONFIG_DIR,
     SCRATCH_ORG_DIR,
     STORE_DIR,
+    FILE_COPY_ARGS,
 } from '../../../lib/utils/constants/properties';
 import { BuyerUserDef, parseStoreScratchDef, replaceErrors, UserInfo } from '../../../lib/utils/jsonUtils';
 import { Requires } from '../../../lib/utils/requires';
@@ -25,6 +26,7 @@ import { shell, shellJsonSfdx } from '../../../lib/utils/shell';
 import { sleep } from '../../../lib/utils/sleep';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { mkdirSync } from '../../../lib/utils/fsUtils';
+import { FilesCopy } from '../files/copy';
 import { StoreQuickstartCreate } from './quickstart/create';
 import { StoreQuickstartSetup } from './quickstart/setup';
 import { StoreOpen } from './open';
@@ -55,14 +57,15 @@ export class StoreCreate extends SfdxCommand {
     public static get vargsAllowList(): string[] {
         return ['buyerEmail', 'existingBuyerAuthentication', 'buyerAlias'].concat(
             StoreQuickstartSetup.vargsAllowList,
-            StoreQuickstartCreate.vargsAllowList
+            StoreQuickstartCreate.vargsAllowList,
+            FilesCopy.vargsAllowList
         );
     }
 
     public static description = msgs.getMessage('create.cmdDescription');
     public static examples = [`sfdx ${CMD} --store-name test-store`];
     protected static flagsConfig = filterFlags(
-        ['store-name', 'templatename', 'definitionfile', 'type', 'buyer-username'],
+        ['store-name', 'templatename', 'definitionfile', 'type', 'buyer-username', 'prompt'],
         allFlags
     );
     public org: Org;
@@ -162,9 +165,10 @@ export class StoreCreate extends SfdxCommand {
         }
     }
     public async run(): Promise<AnyJson> {
-        // Copy all example files
-        await this.config.runHook('files', {});
         this.devhubUsername = (await this.org.getDevHubOrg()).getUsername();
+        // Copy all example files
+        FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
+        await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
         const passedArgs = getPassedArgs(this.argv, this.flags);
         if (!this.flags.type || (this.flags.type !== 'b2c' && this.flags.type !== 'b2b')) this.flags.type = 'b2c';
         if (!Object.keys(passedArgs).includes('definitionfile') && Object.keys(passedArgs).includes('type'))

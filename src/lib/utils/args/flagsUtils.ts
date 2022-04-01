@@ -40,11 +40,19 @@ export function getPassedArgs(
     argv.forEach((arg) => {
         if (arg.startsWith('-')) {
             if (arg in m) {
-                // for case -v something or --hello something
+                // handle single element boolean arg
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                n[m[arg]] = undefined;
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                last = m[arg];
+                if (flagConfig[m[arg]]['kind'] === 'boolean') {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    n[m[arg]] = true;
+                    last = undefined;
+                } else {
+                    // for case -v something or --hello something
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    n[m[arg]] = undefined;
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+                    last = m[arg];
+                }
             }
             // for case -vsomething excluding --hellosomething
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
