@@ -64,7 +64,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             // For each cart item, insert a new tax line in the CartTax entity.
             // The total tax is automatically rolled up to TotalLineTaxAmount in the corresponding CartItem line.
             CartTax[] cartTaxestoInsert = new CartTax[]{};
-            CartTax[] cartAdjTaxestoInsert = new CartTax[]{};
+            //CartTax[] cartAdjTaxestoInsert = new CartTax[]{};
             for (String sku : cartItemIdsBySKU.keySet()) {
                 TaxDataFromExternalService rateAndAmountFromExternalService = rateAndAmountFromExternalServicePerSku.get(sku);
                 if (rateAndAmountFromExternalService == null){
