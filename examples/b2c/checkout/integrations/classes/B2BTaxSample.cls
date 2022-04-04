@@ -114,11 +114,13 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
                         TaxType = 'Actual',
                         CartItemPriceAdjustmentId = cipaTax.getId()
                     );
-                    cartAdjTaxestoInsert.add(promoTax);
+                    
+                    cartTaxestoInsert.add(promoTax);
+                    //cartAdjTaxestoInsert.add(promoTax);
                 }
             }
             insert(cartTaxestoInsert);
-            insert(cartAdjTaxestoInsert);
+            //insert(cartAdjTaxestoInsert);
             integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
         } catch(Exception e) {
             // For testing purposes, this example treats exceptions as user errors, which means they are displayed to the buyer user.
