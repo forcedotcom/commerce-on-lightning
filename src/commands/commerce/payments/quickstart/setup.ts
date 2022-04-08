@@ -9,11 +9,12 @@ import { Messages, Org, SfdxError } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { paymentsFlags } from '../../../../lib/flags/commerce/payments.flags';
 import { storeFlags } from '../../../../lib/flags/commerce/store.flags';
-import { filterFlags } from '../../../../lib/utils/args/flagsUtils';
-import { EXAMPLE_DIR } from '../../../../lib/utils/constants/properties';
+import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../../lib/utils/args/flagsUtils';
+import { EXAMPLE_DIR, FILE_COPY_ARGS } from '../../../../lib/utils/constants/properties';
 import { forceDataRecordCreate, forceDataRecordDelete, forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
 import { shell, shellJsonSfdx } from '../../../../lib/utils/shell';
 import { StoreQuickstartSetup } from '../../store/quickstart/setup';
+import { FilesCopy } from '../../files/copy';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -28,12 +29,15 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
     public static examples = [`sfdx ${CMD} -p Stripe`]; // TODO documentation including examples and descriptions
     protected static flagsConfig = {
         ...paymentsFlags,
-        ...filterFlags(['store-name'], storeFlags),
+        ...filterFlags(['store-name', 'prompt'], storeFlags),
     };
     public org: Org;
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<AnyJson> {
+        // Copy all example files
+        FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
+        await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
         const selection = this.flags['payment-adapter'] as string;
         const namedCredentialMasterLabel = selection;
         const paymentGatewayAdapterName = `${selection}Adapter`;

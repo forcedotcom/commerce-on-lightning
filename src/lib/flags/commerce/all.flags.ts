@@ -5,12 +5,14 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { exampleFlags } from './convert.flags';
+import { filesFlags } from './files.flags';
 import { paymentsFlags } from './payments.flags';
 import { productsFlags } from './products.flags';
 import { storeFlags } from './store.flags';
 
 export const allFlags = {
     ...exampleFlags,
+    ...filesFlags,
     ...paymentsFlags,
     ...productsFlags,
     ...storeFlags,
