@@ -61,9 +61,6 @@ export async function copyFileWithConfirm(source: string, target: string, prompt
                 promptAnswer = true;
             }
             if (promptAnswer === true) {
-                const targetFileBackupName = path.join(target, `${path.basename(source)}.bak`);
-                ux.log(chalk.green(msgs.getMessage('files.backingUpExistingFile', [targetFileBackupName])));
-                fs.writeFileSync(targetFileBackupName, fs.readFileSync(targetFile));
                 ux.log(chalk.green(msgs.getMessage('files.overwritingFile', [targetFile, source])));
                 fs.writeFileSync(targetFile, fs.readFileSync(source));
             } else if (promptAnswer === false) {
