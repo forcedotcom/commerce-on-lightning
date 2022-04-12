@@ -5,7 +5,6 @@
         "cmdDescription": "Copy files from source to destination folder",
         "fileDifference": "Local file %s does not match source file %s.",
         "copyPluginVersionYN": "Would you like replace %s with %s? Y/N",
-        "backingUpExistingFile": "Backing up existing local file as: %s",
         "overwritingFile": "Overwriting file %s with %s",
         "skippingFile": "Skipping replacing existing file: %s"
     },
