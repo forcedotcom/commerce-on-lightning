@@ -16,13 +16,13 @@ export const B_DIR = `${__dirname}/../../../..`;
 export const BASE_DIR = homedir + '/.commerce';
 export const DEVHUB_DIR = (dir = BASE_DIR, hubOrgAdminUsername?: string): string =>
     `${mkdirSync(dir)}/devhubs${hubOrgAdminUsername ? '/' + cleanName(hubOrgAdminUsername) : ''}`;
-export const SCRATCH_ORG_DIR = (hubOrgAdminUsername: string, scratchOrgAdminUsername: string, dir = BASE_DIR): string =>
+export const SCRATCH_ORG_DIR = (dir = BASE_DIR, hubOrgAdminUsername: string, scratchOrgAdminUsername: string): string =>
     `${DEVHUB_DIR(dir, hubOrgAdminUsername)}${scratchOrgAdminUsername ? '/' + cleanName(scratchOrgAdminUsername) : ''}`;
 export const STORE_DIR = (
+    dir = BASE_DIR,
     hubOrgAdminUsername: string,
     scratchOrgAdminUsername: string,
-    storeName: string,
-    dir = BASE_DIR
+    storeName: string
 ): string =>
     `${SCRATCH_ORG_DIR(dir, hubOrgAdminUsername, scratchOrgAdminUsername)}${
         storeName ? '/' + cleanName(storeName) : ''
