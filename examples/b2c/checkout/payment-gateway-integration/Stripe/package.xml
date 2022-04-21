@@ -5,9 +5,9 @@
         <members>StripeValidationException</members>
         <name>ApexClass</name>
     </types>
-    <types>
+    <types> 
         <members>*</members>
         <name>NamedCredential</name>
     </types>
-    <version>49.0</version>
+    <version>55.0</version>
 </Package>
