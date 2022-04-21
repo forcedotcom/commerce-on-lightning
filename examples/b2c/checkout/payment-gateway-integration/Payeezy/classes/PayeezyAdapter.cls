@@ -58,7 +58,7 @@ global virtual class PayeezyAdapter implements commercepayments.PaymentGatewayAd
                     return error;
             }
 
-        } catch(PayeezeValidationException e) {
+        } catch(PayeezyValidationException e) {
             commercepayments.GatewayErrorResponse error = new commercepayments.GatewayErrorResponse('400', e.getMessage());
             return error;
         }
@@ -186,7 +186,7 @@ global virtual class PayeezyAdapter implements commercepayments.PaymentGatewayAd
         jsonGeneratorInstance.writeStringField('transaction_type', 'capture');
         
         if(String.isBlank(authObject.GatewayRefNumber))
-            throw new PayeezeValidationException('Invalid value for : GatewayRefNumber');
+            throw new PayeezyValidationException('Invalid value for : GatewayRefNumber');
         
         jsonGeneratorInstance.writeStringField('transaction_tag', authObject.GatewayRefNumber);
         if (captureRequest.amount != null)
@@ -229,7 +229,7 @@ global virtual class PayeezyAdapter implements commercepayments.PaymentGatewayAd
         jsonGeneratorInstance.writeStringField('transaction_type', 'void');
         
         if(String.isBlank(authObject.GatewayRefNumber))
-            throw new PayeezeValidationException('Invalid value for : GatewayRefNumber');
+            throw new PayeezyValidationException('Invalid value for : GatewayRefNumber');
         
         jsonGeneratorInstance.writeStringField('transaction_tag', authObject.GatewayRefNumber);
         if (authorizationReversalRequest.amount != null)
@@ -322,19 +322,19 @@ global virtual class PayeezyAdapter implements commercepayments.PaymentGatewayAd
                                }
                           }
                          else{
-                              throw new PayeezeValidationException('Required Field Missing : CardCategory');
+                              throw new PayeezyValidationException('Required Field Missing : CardCategory');
                          }
                     } else{
                         //Add new payment Method here
-                        throw new PayeezeValidationException('Required Field Missing : CardPaymentMethod');
+                        throw new PayeezyValidationException('Required Field Missing : CardPaymentMethod');
                     }
                 }
                 else {
                     //Add new payment Method here
-                    throw new PayeezeValidationException('Required Field Missing : CardPaymentMethod');
+                    throw new PayeezyValidationException('Required Field Missing : CardPaymentMethod');
                 }
             } else {
-                throw new PayeezeValidationException('Required Field Missing : PaymentMethod');
+                throw new PayeezyValidationException('Required Field Missing : PaymentMethod');
             }
         jsonGeneratorInstance.writeEndObject();
         return jsonGeneratorInstance.getAsString();
@@ -369,7 +369,7 @@ global virtual class PayeezyAdapter implements commercepayments.PaymentGatewayAd
         jsonGeneratorInstance.writeStringField('transaction_type', 'refund');
         
         if(String.isBlank(paymentObject.GatewayRefNumber))
-            throw new PayeezeValidationException('Invalid value for : GatewayRefNumber');
+            throw new PayeezyValidationException('Invalid value for : GatewayRefNumber');
             
         jsonGeneratorInstance.writeStringField('transaction_tag', paymentObject.GatewayRefNumber);
         if (refundRequest.amount != null)
@@ -464,19 +464,19 @@ global virtual class PayeezyAdapter implements commercepayments.PaymentGatewayAd
                                }
                           }
                          else{
-                              throw new PayeezeValidationException('Required Field Missing : CardCategory');
+                              throw new PayeezyValidationException('Required Field Missing : CardCategory');
                          }
                     } else{
                         //Add new payment Method here
-                        throw new PayeezeValidationException('Required Field Missing : CardPaymentMethod');
+                        throw new PayeezyValidationException('Required Field Missing : CardPaymentMethod');
                     }
                 }
                 else {
                     //Add new payment Method here
-                    throw new PayeezeValidationException('Required Field Missing : CardPaymentMethod');
+                    throw new PayeezyValidationException('Required Field Missing : CardPaymentMethod');
                 }
             } else {
-                throw new PayeezeValidationException('Required Field Missing : PaymentMethod');
+                throw new PayeezyValidationException('Required Field Missing : PaymentMethod');
             }
             jsonGeneratorInstance.writeEndObject();
             return jsonGeneratorInstance.getAsString();
@@ -855,19 +855,19 @@ global virtual class PayeezyAdapter implements commercepayments.PaymentGatewayAd
     
     private void checkForRequiredFields(commercepayments.CardPaymentMethodRequest cardPaymentMethod){
         if(cardPaymentMethod == null){
-            throw new PayeezeValidationException('Invalid Request parameters: Missing Card Details');
+            throw new PayeezyValidationException('Invalid Request parameters: Missing Card Details');
         }
         if(cardPaymentMethod.cardnumber == null){
-            throw new PayeezeValidationException('Invalid Request parameters: Missing Card Number');
+            throw new PayeezyValidationException('Invalid Request parameters: Missing Card Number');
         }
         if(cardPaymentMethod.cvv == null){
-            throw new PayeezeValidationException('Invalid Request parameters: Missing Card CVV');
+            throw new PayeezyValidationException('Invalid Request parameters: Missing Card CVV');
         }
         if(cardPaymentMethod.expiryYear == null || cardPaymentMethod.expiryMonth == null){
-            throw new PayeezeValidationException('Invalid Request parameters: Missing Card Expiry date');
+            throw new PayeezyValidationException('Invalid Request parameters: Missing Card Expiry date');
         }
         if( cardPaymentMethod.cardholdername == null){
-            throw new PayeezeValidationException('Invalid Request parameters: Missing Card Holder Name');
+            throw new PayeezyValidationException('Invalid Request parameters: Missing Card Holder Name');
         }
     }
 }
