@@ -10,7 +10,7 @@ workflows:
             - release-management/validate-pr:
                   filters:
                       branches:
-                          ignore: main-2
+                          ignore: main
             - release-management/test-package:
                   name: node-latest
                   node_version: latest
@@ -23,7 +23,7 @@ workflows:
                       - node-latest
                   filters:
                       branches:
-                          only: main-2
+                          only: main
                   context:
                       - CLI_CTC
                       - AWS
@@ -34,6 +34,6 @@ workflows:
                   filters:
                       branches:
                           only:
-                              - main-2
+                              - main
         jobs:
             - release-management/test-ts-update
