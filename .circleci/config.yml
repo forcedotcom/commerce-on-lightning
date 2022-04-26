@@ -25,7 +25,7 @@ workflows:
                       branches:
                           only: main
                   context:
-                      - release
+                      - salesforce-cli
                       - CLI_CTC
                       - AWS
     test-ts-update:
