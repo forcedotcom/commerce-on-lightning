@@ -2,8 +2,8 @@
 
 [![Version](https://img.shields.io/npm/v/@salesforce/commerce.svg)](https://npmjs.org/package/@salesforce/commerce)
 [![CircleCI](https://circleci.com/gh/forcedotcom/commerce-on-lightning.svg?style=shield)](https://circleci.com/gh/forcedotcom/commerce-on-lightning)
-[![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/commerce/1commerce?branch=master&svg=true)](https://ci.appveyor.com/project/heroku/1commerce/branch/master)
-[![Codecov](https://codecov.io/gh/1commerce/1commerce/branch/master/graph/badge.svg)](https://codecov.io/gh/1commerce/1commerce)
+[![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/forcedotcom/commerce-on-lightning?branch=master&svg=true)](https://ci.appveyor.com/project/heroku/commerce-on-lightning/branch/master)
+[![Codecov](https://codecov.io/gh/forcedotcom/commerce-on-lightning/branch/master/graph/badge.svg)](https://codecov.io/gh/forcedotcom/commerce-on-lightning)
 [![Known Vulnerabilities](https://snyk.io/test/github/forcedotcom/commerce-on-lightning/badge.svg)](https://snyk.io/test/github/forcedotcom/commerce-on-lightning)
 [![Downloads/week](https://img.shields.io/npm/dw/@salesforce/commerce.svg)](https://npmjs.org/package/@salesforce/commerce)
 [![License](https://img.shields.io/badge/License-BSD%203--Clause-brightgreen.svg)](https://raw.githubusercontent.com/forcedotcom/commerce-on-lightning/main/LICENSE.txt)
