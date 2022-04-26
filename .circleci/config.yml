@@ -24,7 +24,9 @@ workflows:
                   filters:
                       branches:
                           only: main-2
-                  context: CLI_CTC
+                  context:
+                      - CLI_CTC
+                      - AWS
     test-ts-update:
         triggers:
             - schedule:
