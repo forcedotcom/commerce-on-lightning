@@ -25,6 +25,7 @@ workflows:
                       branches:
                           only: main
                   context:
+                      - release
                       - CLI_CTC
                       - AWS
     test-ts-update:
