@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [236.0.3](https://github.com/forcedotcom/commerce-on-lightning/compare/v234.0.17...v236.0.3) (2022-04-26)
+
+
+### Bug Fixes
+
+* add release context to config.yml ([10646cc](https://github.com/forcedotcom/commerce-on-lightning/commit/10646cc5e0c210e26b7a69fc4b04998c85bdd16b))
+* alter release to salesforce-cli context in config.yml ([b6b6c16](https://github.com/forcedotcom/commerce-on-lightning/commit/b6b6c16357c674d064713d961fc320e242198ca3))
+* change main-2 to master and fix config.yml ([f3e1cf4](https://github.com/forcedotcom/commerce-on-lightning/commit/f3e1cf4fe32c9a301cbe94c0eb00b3d5e07b4c77))
+* update README.md ([bcd79aa](https://github.com/forcedotcom/commerce-on-lightning/commit/bcd79aad70daa15b8cba575eaf8c2397e2b90fb2))
+
 ### [234.0.17](https://github.com/forcedotcom/commerce-on-lightning/compare/v234.0.15...v234.0.17) (2022-01-19)
 
 
