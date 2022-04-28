@@ -9,7 +9,7 @@
         "@oclif/config": "^1",
         "@oclif/errors": "^1",
         "@salesforce/command": "^3.1.0",
-        "@salesforce/core": "^2.20.5",
+        "@salesforce/core": "^2.36.0",
         "fast-xml-parser": "^3.19.0",
         "puppeteer": "^7.1.0",
         "string-argv": "^0.3.1",
