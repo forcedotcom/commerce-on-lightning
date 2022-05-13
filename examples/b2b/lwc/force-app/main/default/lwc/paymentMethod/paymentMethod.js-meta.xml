@@ -29,7 +29,7 @@
             <!-- Labels -->
             <property name="previousButtonLabel" label="Previous Button Label" type="String" description="The text string to place on the Previous button" default="Previous" translatable="true" role="inputOnly"/>
             <property name="nextButtonLabel" label="Next Button Label" type="String" description="The text string to place on the Next button" default="Next" translatable="true" role="inputOnly"/>
-            <property name="billingAddressHeadingLabel" label="Billing Address Label" type="String" description="Specify custom text for the Billing Address label" default="Billing Address" translatable="true" role="inputOnly"/>
+            <!--<property name="billingAddressHeadingLabel" label="Billing Address Label" type="String" description="Specify custom text for the Billing Address label" default="Billing Address" translatable="true" role="inputOnly"/> -->
             <property name="paymentMethodHeadingLabel" label="Payment Method Heading" type="String" description="Specify custom text for the heading of the Payment Method." default="Payment Method" translatable="true" role="inputOnly"/>
             <property name="purchaseOrderEntryHeadingLabel" label="Purchase Order Text Box Label" type="String" description="Specify custom text for the label of the Purchase Order input text box" default="Enter Purchase Order" translatable="true" role="inputOnly"/>
             <property name="purchaseOrderOptionLabel" label="Purchase Order Radio Option Label" type="String" description="Specify custom text for the label of the Purchase Order radio button." default="Purchase Order" translatable="true" role="inputOnly"/>
