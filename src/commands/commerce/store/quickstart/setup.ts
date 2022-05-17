@@ -173,7 +173,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         // turn sharing rule metadata off by default
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
             /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-            const res = XML.parse(packageRetrieve);
+            const res = XML.parse(packageRetrieve, { parseNodeValue: false });
             res['Package']['types'] = res['Package']['types'].filter((t) => t['members'] !== 'ProductCatalog');
             /* eslint-disable */
             packageRetrieve = XML.stringify(res);
