@@ -457,7 +457,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         shellJsonSfdx(
             `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${this.storeDir}/experience-bundle-package/${
                 this.varargs['communityExperienceBundleName'] as string
-            }ToDeploy.zip" --wait -1 --verbose --singlepackage`
+            }ToDeploy.zip" --wait 60 --verbose --singlepackage`
         );
     }
 
@@ -798,7 +798,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
                     this.storeDir
                 }/experience-bundle-package/${
                     this.varargs['communityExperienceBundleName'] as string
-                }ToDeploy.zip" --wait -1 --verbose --singlepackage`
+                }ToDeploy.zip" --wait 60 --verbose --singlepackage`
             );
         } catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -811,7 +811,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
                         this.storeDir
                     }/experience-bundle-package/${
                         this.varargs['communityExperienceBundleName'] as string
-                    }ToDeploy.zip" --wait -1 --verbose --singlepackage`
+                    }ToDeploy.zip" --wait 60 --verbose --singlepackage`
                 );
             } else if (JSON.stringify(e.message).indexOf('Error parsing file') >= 0 && cnt === 0) {
                 await this.statusFileManager.setValue('retrievedPackages', false);
