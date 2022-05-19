@@ -11,11 +11,12 @@ import { fs, Messages, SfdxError, Org as SfdxOrg } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
 import { allFlags } from '../../../../lib/flags/commerce/all.flags';
-import { addAllowedArgs, filterFlags } from '../../../../lib/utils/args/flagsUtils';
+import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../../lib/utils/args/flagsUtils';
 import {
     BASE_DIR,
     BUYER_USER_DEF,
     EXAMPLE_DIR,
+    FILE_COPY_ARGS,
     PACKAGE_RETRIEVE,
     PACKAGE_RETRIEVE_TEMPLATE,
     QUICKSTART_CONFIG,
@@ -31,6 +32,7 @@ import { shell, shellJsonSfdx } from '../../../../lib/utils/shell';
 import { StatusFileManager } from '../../../../lib/utils/statusFileManager';
 import { ProductsImport } from '../../products/import';
 import { StoreCreate } from '../create';
+import { FilesCopy } from '../../files/copy';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -67,7 +69,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
     public static examples = [`sfdx ${CMD} --definitionfile store-scratch-def.json`];
 
     protected static flagsConfig = {
-        ...filterFlags(['store-name', 'definitionfile'], allFlags),
+        ...filterFlags(['store-name', 'definitionfile', 'prompt'], allFlags),
     };
 
     private static storeType: string;
@@ -99,6 +101,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
     }
 
     public async run(): Promise<AnyJson> {
+        // Copy all example files
+        FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
+        await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
         this.devHubUsername = (await this.org.getDevHubOrg()).getUsername();
         this.statusFileManager = new StatusFileManager(
             this.devHubUsername,
@@ -168,7 +173,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         // turn sharing rule metadata off by default
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
             /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
-            const res = XML.parse(packageRetrieve);
+            const res = XML.parse(packageRetrieve, { parseNodeValue: false });
             res['Package']['types'] = res['Package']['types'].filter((t) => t['members'] !== 'ProductCatalog');
             /* eslint-disable */
             packageRetrieve = XML.stringify(res);
@@ -452,7 +457,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         shellJsonSfdx(
             `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${this.storeDir}/experience-bundle-package/${
                 this.varargs['communityExperienceBundleName'] as string
-            }ToDeploy.zip" --wait -1 --verbose --singlepackage`
+            }ToDeploy.zip" --wait 60 --verbose --singlepackage`
         );
     }
 
@@ -793,7 +798,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
                     this.storeDir
                 }/experience-bundle-package/${
                     this.varargs['communityExperienceBundleName'] as string
-                }ToDeploy.zip" --wait -1 --verbose --singlepackage`
+                }ToDeploy.zip" --wait 60 --verbose --singlepackage`
             );
         } catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -806,7 +811,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
                         this.storeDir
                     }/experience-bundle-package/${
                         this.varargs['communityExperienceBundleName'] as string
-                    }ToDeploy.zip" --wait -1 --verbose --singlepackage`
+                    }ToDeploy.zip" --wait 60 --verbose --singlepackage`
                 );
             } else if (JSON.stringify(e.message).indexOf('Error parsing file') >= 0 && cnt === 0) {
                 await this.statusFileManager.setValue('retrievedPackages', false);

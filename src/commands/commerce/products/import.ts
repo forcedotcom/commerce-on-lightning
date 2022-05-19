@@ -10,14 +10,16 @@ import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
 import { productsFlags } from '../../../lib/flags/commerce/products.flags';
 import { storeFlags } from '../../../lib/flags/commerce/store.flags';
-import { filterFlags } from '../../../lib/utils/args/flagsUtils';
-import { BASE_DIR, CONFIG_DIR, JSON_DIR, STORE_DIR } from '../../../lib/utils/constants/properties';
+import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
+import { BASE_DIR, CONFIG_DIR, FILE_COPY_ARGS, JSON_DIR, STORE_DIR } from '../../../lib/utils/constants/properties';
 import { ImportResult, parseStoreScratchDef, replaceErrors } from '../../../lib/utils/jsonUtils';
 import { forceDataRecordCreate, forceDataSoql } from '../../../lib/utils/sfdx/forceDataSoql';
 import { shellJsonSfdx } from '../../../lib/utils/shell';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { StoreCreate } from '../store/create';
 import { exampleFlags } from '../../../lib/flags/commerce/convert.flags';
+import { FilesCopy } from '../files/copy';
+import { filesFlags } from '../../../lib/flags/commerce/files.flags';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -35,6 +37,7 @@ export class ProductsImport extends SfdxCommand {
         ...productsFlags,
         ...filterFlags(['definitionfile', 'type'], exampleFlags),
         ...filterFlags(['store-name'], storeFlags),
+        ...filterFlags(['prompt'], filesFlags),
     };
 
     public org: Org;
@@ -44,6 +47,9 @@ export class ProductsImport extends SfdxCommand {
 
     // tslint:disable-next-line:no-any
     public async run(): Promise<AnyJson> {
+        // Copy all example files
+        FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
+        await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
         this.devHubUsername = (await this.org.getDevHubOrg()).getUsername();
         this.statusFileManager = new StatusFileManager(
             this.devHubUsername,

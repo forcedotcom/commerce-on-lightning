@@ -37,3 +37,10 @@ export const PACKAGE_RETRIEVE_TEMPLATE = (type?: string, dir = BASE_DIR): string
     `${mkdirSync(QUICKSTART_CONFIG(dir))}/${type ? type.toLowerCase() + '-' : ''}package-retrieve-template.xml`;
 export const PACKAGE_RETRIEVE = (dir = BASE_DIR): string => `${mkdirSync(QUICKSTART_CONFIG(dir))}/package-retrieve.xml`;
 export const SFDX_DIR = (dir = homedir): string => `${mkdirSync(dir + '/.sfdx')}`;
+export const FILES_TO_COPY = 'sfdx-project.json';
+export const DIRS_TO_COPY = 'examples,json,quickstart-config,config';
+export const FILE_COPY_ARGS = [
+    { args: ['--copysourcepath'], value: B_DIR },
+    { args: ['--dirstocopy'], value: DIRS_TO_COPY },
+    { args: ['--filestocopy'], value: FILES_TO_COPY },
+];
