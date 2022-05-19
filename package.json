@@ -1,6 +1,6 @@
 {
     "name": "@salesforce/commerce",
-    "version": "236.0.3",
+    "version": "238.0.14",
     "author": "Jonathan Arndt",
     "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
     "dependencies": {
@@ -90,6 +90,7 @@
                 "subtopics": {
                     "devhub": {},
                     "examples": {},
+                    "files": {},
                     "open": {},
                     "payments": {},
                     "products": {},
@@ -107,10 +108,7 @@
             "@oclif/plugin-help",
             "@oclif/plugin-command-snapshot",
             "@salesforce/plugin-command-reference"
-        ],
-        "hooks": {
-            "init": "./lib/hooks/init/download"
-        }
+        ]
     },
     "repository": "https://github.com/forcedotcom/commerce-on-lightning",
     "scripts": {
@@ -142,7 +140,7 @@
     },
     "husky": {
         "hooks": {
-            "pre-commit": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix; git --no-pager diff HEAD package.json | egrep '\"version\": \"[0-9]+\\.' || npm --no-git-tag-version version patch; git add package.json; sf-husky-pre-commit",
+            "pre-commit": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix; if git --no-pager diff HEAD package.json | egrep '\"version\": \"[0-9]+\\.'; then npm run version; else (npm --no-git-tag-version version patch; git add package.json; sf-husky-pre-commit); fi;",
             "commit-msg": "sf-husky-commit-msg",
             "pre-push": "sf-husky-pre-push"
         }
