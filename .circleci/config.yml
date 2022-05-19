@@ -34,6 +34,6 @@ workflows:
                   filters:
                       branches:
                           only:
-                              - main
+                              - develop
         jobs:
             - release-management/test-ts-update
