@@ -78,6 +78,8 @@
             "errorNoBuyerGroupNameProductImportFailed": "No Buyer Group Name - Product Import must have failed",
             "mappingAdminUserToRole": "Mapping Admin User to Role.",
             "thisDeveloperNameAlreadyExists": "This Developer Name already exists or has been previously used.",
+            "userRoleAlreadyExists": "User role '%s' already exists",
+            "createdUserRole": "Created user role '%s'",
             "creatingBuyerUserWithContactAndAccount": "Creating Buyer User with associated Contact and Account.",
             "makingAccountBuyerAccount": "Making Account a Buyer Account",
             "assigningBuyerAccountToBuyerGroup": "Assigning Buyer Account to Buyer Group.",
