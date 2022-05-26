@@ -510,11 +510,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const role = 'CEO';
         let queryResult = forceDataSoql(`SELECT Id FROM UserRole WHERE Name = '${role}'`, this.org.getUsername())
             .result;
-        let roleId;
         if (queryResult?.records && queryResult.records.length > 0) {
-            roleId = queryResult.records[0].Id;
             this.ux.log(msgs.getMessage('quickstart.setup.userRoleAlreadyExists', [role]));
-            return roleId;
+            return queryResult.records[0].Id;
         }
         //Create the user role if it does not exist
         forceDataRecordCreate(
@@ -523,9 +521,8 @@ export class StoreQuickstartSetup extends SfdxCommand {
             this.org.getUsername()
         );
         this.ux.log(msgs.getMessage('quickstart.setup.createdUserRole', [role]));
-        roleId = forceDataSoql(`SELECT Id FROM UserRole WHERE Name = '${role}'`, this.org.getUsername()).result
-            .records[0].Id;
-        return roleId;
+        return forceDataSoql(`SELECT Id FROM UserRole WHERE Name = '${role}'`, this.org.getUsername()).result.records[0]
+            .Id;
     }
 
     private async createBuyerUserWithContactAndAccount(): Promise<void> {
