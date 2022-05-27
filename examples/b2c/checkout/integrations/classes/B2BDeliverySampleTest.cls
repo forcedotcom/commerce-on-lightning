@@ -3,7 +3,7 @@ private class B2BDeliverySampleTest {
     @testSetup static void setup() {
         Account testAccount = new Account(Name='TestAccount');
         insert testAccount;
-        WebStore testWebStore = new WebStore(Name='TestWebStore', DefaultLanguage='en_US');
+        WebStore testWebStore = new WebStore(Name='TestWebStore', SupportedLanguages='en_US', DefaultLanguage='en_US');
         insert testWebStore;
         
         Account account = [SELECT Id FROM Account WHERE Name='TestAccount' LIMIT 1];
