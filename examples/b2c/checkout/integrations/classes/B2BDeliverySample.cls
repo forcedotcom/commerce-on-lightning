@@ -10,7 +10,9 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
 
             // Get the shipping options from an external service.
             // We're getting information like rates and carriers from this external service. 
-            ShippingOptionsAndRatesFromExternalService[] shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService();
+            String siteLanguage = jobInfo.siteLanguage; 
+
+            ShippingOptionsAndRatesFromExternalService[] shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService(siteLanguage);
 
             // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
             delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId];
@@ -60,13 +62,13 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
         return integStatus;
     }
 
-    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService () {
+    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (String siteLanguage) {
         ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
         Http http = new Http();
         HttpRequest request = new HttpRequest();
         Integer SuccessfulHttpRequest = 200;
         // To access the service below, you may need to add endpoint = https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
-        request.setEndpoint('https://b2b-commerce-test.herokuapp.com/calculate-shipping-rates-winter-21');
+        request.setEndpoint('https://b2b-commerce-test.herokuapp.com/calculate-shipping-rates-winter-21-with-lang?lang=' + siteLanguage);
         request.setMethod('GET');
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
