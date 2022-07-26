@@ -4,18 +4,11 @@
         "plugin": "@salesforce/commerce",
         "flags": ["definitionfile", "json", "loglevel", "outputdir", "prompt", "sourcepath", "store-name", "type"]
     },
-
     {
         "command": "commerce:extension:register",
         "plugin": "@salesforce/commerce",
         "flags": ["registered-extensionname", "extensionpointname", "apex-classname", "apex-classname", "loglevel"]
     },
-    {
-        "command": "commerce:extension:map",
-        "plugin": "@salesforce/commerce",
-        "flags": ["registered-extensionname", "store-name", "store-id", "loglevel"]
-    },
-
     {
         "command": "commerce:files:copy",
         "plugin": "@salesforce/commerce",
