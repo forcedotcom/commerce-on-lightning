@@ -2,40 +2,22 @@
     {
         "command": "commerce:examples:convert",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "definitionfile",
-            "json",
-            "loglevel",
-            "outputdir",
-            "prompt",
-            "sourcepath",
-            "store-name",
-            "type"
-        ]
+        "flags": ["definitionfile", "json", "loglevel", "outputdir", "prompt", "sourcepath", "store-name", "type"]
+    },
+    {
+        "command": "commerce:extension:register",
+        "plugin": "@salesforce/commerce",
+        "flags": ["registered-extensionname", "extensionpointname", "apex-classname", "apex-classname", "loglevel"]
     },
     {
         "command": "commerce:files:copy",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "copysourcepath",
-            "dirstocopy",
-            "filestocopy",
-            "json",
-            "loglevel",
-            "prompt"
-        ]
+        "flags": ["copysourcepath", "dirstocopy", "filestocopy", "json", "loglevel", "prompt"]
     },
     {
         "command": "commerce:payments:quickstart:setup",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "apiversion",
-            "json",
-            "loglevel",
-            "payment-adapter",
-            "store-name",
-            "targetusername"
-        ]
+        "flags": ["apiversion", "json", "loglevel", "payment-adapter", "store-name", "targetusername"]
     },
     {
         "command": "commerce:products:import",
@@ -87,27 +69,12 @@
     {
         "command": "commerce:store:open",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "all",
-            "apiversion",
-            "json",
-            "loglevel",
-            "store-name",
-            "targetdevhubusername",
-            "targetusername"
-        ]
+        "flags": ["all", "apiversion", "json", "loglevel", "store-name", "targetdevhubusername", "targetusername"]
     },
     {
         "command": "commerce:store:quickstart:create",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "apiversion",
-            "json",
-            "loglevel",
-            "store-name",
-            "targetusername",
-            "templatename"
-        ]
+        "flags": ["apiversion", "json", "loglevel", "store-name", "targetusername", "templatename"]
     },
     {
         "command": "commerce:store:quickstart:setup",
