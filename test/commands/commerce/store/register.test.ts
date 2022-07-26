@@ -93,16 +93,16 @@ describe('Test for Invalid EPN', () => {
             expect(ctx.stderr).to.contain('Invalid EPN');
         });
 });
-describe('Test successful register', () => {
-    test.stdout()
-        .stderr()
-        .withOrg({ username: 'demo_u4@1commerce.com' }, true)
-        .timeout(600000)
-        .command(['commerce:extension:register', '-a', 'TestApex', '-e', 'CommerceDx_Inventory', '-r', 'test100'])
-        .it('runs commerce:extension:register', (ctx) => {
-            expect(ctx.stdout).to.contain('Sucessfully registered Apex Class');
-        });
-});
+// describe('Test successful register', () => {
+//     test.stdout()
+//         .stderr()
+//         .withOrg({ username: 'demo_u4@1commerce.com' }, true)
+//         .timeout(600000)
+//         .command(['commerce:extension:register', '-a', 'TestApex', '-e', 'CommerceDx_Inventory', '-r', 'test102'])
+//         .it('runs commerce:extension:register', (ctx) => {
+//             expect(ctx.stdout).to.contain('Sucessfully registered Apex Class');
+//         });
+// });
 describe('Test existing RegisterExtensionName', () => {
     test.stdout()
         .stderr()
