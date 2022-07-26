@@ -118,6 +118,33 @@
             "done": "Done"
         }
     },
+    "extension": {
+        "register": {
+            "cmdDescription": "Register an extension with one command",
+            "apexClassNameFlagDescription": "Name of the Apex class that needs to be extended",
+            "errApexClass": " Invalid class. Apex class doesn't exist in webstore",
+            "nameAlreadyExists": "Registered-Extension name already exists",
+            "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
+            "regExtensionNameFlagDescription": "Unique name for extension",
+            "errEPN": "Invalid EPN. Run [commerce:extension:epn] for all valid EPN values",
+            "savingConfigIntoConfig": "Sucessfully registered Apex Class. Use command [commerce:extension:map] to link the extension to a store.",
+            "apexNameSpaceFlagDescription": "Optional namespace for apex class"
+        },
+        "map": {
+            "cmdDescription": "Maps an extension to a specific webstore",
+            "StoreNameFlagDescription": "The name of the web store to map the extension",
+            "errStoreName": "Web-storename is not valid",
+            "errStoreId": "Store Id is not valid",
+            "nameAlreadyExists": "Registered-Extension name already exists",
+            "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
+            "regExtensionNameFlagDescription": "Unique name for extension",
+            "savingConfigIntoConfig": "Sucessfully mapped apex class to store.",
+            "storeId": "Either name or id should be provided"
+        },
+        "getEPN": {
+            "cmdDescription": "Lists all EPN values"
+        }
+    },
     "view": {
         "cmdDescription": "Open store(s)",
         "errorStoreId": "Could not resolve store to a store id.",
