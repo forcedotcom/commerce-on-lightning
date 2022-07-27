@@ -89,7 +89,6 @@ export class RegisterExtension extends SfdxCommand {
         }
 
         // Inserts 5 fields into registeredExternalService table
-
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
             'RegisteredExternalService',
@@ -101,13 +100,12 @@ export class RegisterExtension extends SfdxCommand {
         if (results instanceof SfdxError && results.message.indexOf('DUPLICATE_VALUE') > 0) {
             throw new SfdxError(msgs.getMessage('extension.register.nameAlreadyExists', [storeRegisteredName]));
         }
-
         // JSON response of inserted record
         return this.getInsertedRecord(storeRegisteredName, storeApexClass);
     }
 
     // returns entire record from RegisteredExternalService in JSON format
-    private getInsertedRecord(storeRegisteredName: string, storeApexClass: string): string {
+    public getInsertedRecord(storeRegisteredName: string, storeApexClass: string): string {
         const RegisteredTable = forceDataSoql(
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
             `SELECT ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${storeRegisteredName}'`
@@ -128,7 +126,7 @@ export class RegisterExtension extends SfdxCommand {
     }
 
     // Queries for apexclassId from existing apexClass table
-    private getApexClass(storeApexClass: string, storeUserName: string): string {
+    public getApexClass(storeApexClass: string, storeUserName: string): string {
         let apexClassId: string;
         try {
             apexClassId = forceDataSoql(
