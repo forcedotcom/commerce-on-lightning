@@ -126,7 +126,7 @@
             "nameAlreadyExists": "Registered-Extension name already exists",
             "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
             "regExtensionNameFlagDescription": "Unique name for extension",
-            "errEPN": "Invalid EPN. Run [commerce:extension:epn] for all valid EPN values",
+            "errEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
             "savingConfigIntoConfig": "Sucessfully registered Apex Class. Use command [commerce:extension:map] to link the extension to a store.",
             "apexNameSpaceFlagDescription": "Optional namespace for apex class"
         },
