@@ -24,11 +24,10 @@ describe('Test extension register function', () => {
     const apexClassId = 'testId';
     const orgUserName = 'testUserName';
     const service = 'RegisteredExternalService';
-    // const QUERY_RECORDID = `SELECT Id FROM RegisteredExternalService WHERE DeveloperName='${registeredExtensionName}'`;
     const QUERY_GET_APEX_CLASS = `SELECT Id FROM ApexClass WHERE Name='${apexClass}' LIMIT 1`;
     const QUERY_GET_EPN_LIST = `SELECT Value FROM PicklistValueInfo WHERE Value='${epn}' AND EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName' LIMIT 1`;
     const QUERY_GET_INSERTED_RECORD = `DeveloperName=${registeredExtensionName} MasterLabel=${registeredExtensionName} ExtensionPointName=${epn} ExternalServiceProviderId=${apexClassId} ExternalServiceProviderType='Extension'`;
-    // const QUERY_REGISTER_TABLE = `SELECT ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${registeredExtensionName}'`;
+    const QUERY_REGISTER_TABLE = `SELECT Id,ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${registeredExtensionName}'`;
     const registerExtension = new RegisterExtension([], config);
     const sfdxError = new SfdxError('error');
 
@@ -116,12 +115,7 @@ describe('Test extension register function', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub
-            .withArgs(
-                `SELECT Id,ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${registeredExtensionName}'`,
-                'testUserName'
-            )
-            .returns(jsonqr);
+        forceDataSoqlStub.withArgs(QUERY_REGISTER_TABLE, 'testUserName').returns(jsonqr);
         assert.throws(
             () => registerExtension.registerApex(registeredExtensionName, epn, apexClass, orgUserName),
             TypeError
