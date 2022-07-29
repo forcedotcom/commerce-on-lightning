@@ -5,20 +5,6 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-// import { strict as assert } from 'assert';
-// import sinon, { stub } from 'sinon';
-// import { StubbedType } from '@salesforce/ts-sinon';
-// import { UX } from '@salesforce/command';
-// import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
-// import { expect, test } from '@salesforce/command/lib/test';
-// import { Org, OrgListResult, Result } from '../../../../src/lib/utils/jsonUtils';
-// import { StatusFileManager } from '../../../../src/lib/utils/statusFileManager';
-// // import { RegisterExtension } from '../../../../src/commands/commerce/extension/register';
-// import * as shellExports from '../../../../src/lib/utils/shell';
-// import { StoreCreate } from '../../../../src/commands/commerce/store/create';
-// import { getHubOrgByUsername } from '../../../../src/lib/utils/sfdx/forceOrgList';
-// import * as forceOrgListExports from '../../../../src/lib/utils/sfdx/forceOrgList';
-
 import { strict as assert } from 'assert';
 import { stubInterface } from '@salesforce/ts-sinon';
 import { IConfig } from '@oclif/config';
@@ -32,33 +18,37 @@ import { Result } from '../../../../src/lib/utils/jsonUtils';
 
 describe('Test extension register function', () => {
     const config = stubInterface<IConfig>($$.SANDBOX, {});
-    const registeredExtensionName = 'test';
+    const registeredExtensionName = 'testRegExtension';
     const epn = 'testEPN';
-    const apexClass = 'testApex';
-    const orgUserName = 'testUser';
+    const apexClass = 'testApexClass';
+    const apexClassId = 'testId';
+    const orgUserName = 'testUserName';
+    const service = 'RegisteredExternalService';
+    // const QUERY_RECORDID = `SELECT Id FROM RegisteredExternalService WHERE DeveloperName='${registeredExtensionName}'`;
     const QUERY_GET_APEX_CLASS = `SELECT Id FROM ApexClass WHERE Name='${apexClass}' LIMIT 1`;
     const QUERY_GET_EPN_LIST = `SELECT Value FROM PicklistValueInfo WHERE Value='${epn}' AND EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName' LIMIT 1`;
-
-    const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
+    const QUERY_GET_INSERTED_RECORD = `DeveloperName=${registeredExtensionName} MasterLabel=${registeredExtensionName} ExtensionPointName=${epn} ExternalServiceProviderId=${apexClassId} ExternalServiceProviderType='Extension'`;
+    // const QUERY_REGISTER_TABLE = `SELECT ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${registeredExtensionName}'`;
     const registerExtension = new RegisterExtension([], config);
-
-    beforeEach(() => {
-        forceDataSoqlStub.reset();
-    });
+    const sfdxError = new SfdxError('error');
 
     after(() => {
         sinon.restore();
     });
 
     it('Throws error with a invalid Apex class', async () => {
+        const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
         forceDataSoqlStub.withArgs(QUERY_GET_APEX_CLASS, orgUserName).throws(new SfdxError('Invalid Apex'));
         assert.throws(
             () => registerExtension.registerApex(registeredExtensionName, epn, apexClass, orgUserName),
             SfdxError
         );
         assert(forceDataSoqlStub.calledWith(QUERY_GET_APEX_CLASS, orgUserName));
+        forceDataSoqlStub.restore();
     });
+
     it('Throws error with a invalid EPN', async () => {
+        const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
         const qr = new Result<QueryResult>();
         qr.result = new (class implements QueryResult {
             public done: boolean;
@@ -67,7 +57,7 @@ describe('Test extension register function', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_APEX_CLASS, 'testUser').returns(qr);
+        forceDataSoqlStub.withArgs(QUERY_GET_APEX_CLASS, 'testUserName').returns(qr);
         // stub EPN query call
         const epnQr = new Result<QueryResult>();
         epnQr.result = new (class implements QueryResult {
@@ -84,87 +74,60 @@ describe('Test extension register function', () => {
         );
         assert(forceDataSoqlStub.calledWith(QUERY_GET_APEX_CLASS, orgUserName));
         assert(forceDataSoqlStub.calledWith(QUERY_GET_EPN_LIST));
+        forceDataSoqlStub.restore();
+    });
+    it('Successful extension registration', async () => {
+        const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
+        const qr = new Result<QueryResult>();
+        qr.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [{ Id: 'hi' }];
+            public totalSize = 1;
+        })();
+        forceDataSoqlStub.withArgs(QUERY_GET_APEX_CLASS, 'testUserName').returns(qr);
+        // stub EPN query call
+        const epnQr = new Result<QueryResult>();
+        epnQr.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [{ Value: 'bye' }];
+            public totalSize = 1;
+        })();
+        forceDataSoqlStub.withArgs(QUERY_GET_EPN_LIST, 'testUserName').returns(epnQr);
+        // // stub insert record call
+        const recordQr = new Result<QueryResult>();
+        recordQr.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [];
+            public totalSize = 1;
+        })();
+        const forceDataRecordStub = sinon.stub(forceOrgSoqlExports, 'forceDataRecordCreate');
+        forceDataRecordStub.withArgs(service, QUERY_GET_INSERTED_RECORD, 'testUserName').returns(sfdxError);
+        const jsonqr = new Result<QueryResult>();
+        jsonqr.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [{ Id: 'hi' }];
+            public totalSize = 1;
+        })();
+        forceDataSoqlStub
+            .withArgs(
+                `SELECT Id,ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${registeredExtensionName}'`,
+                'testUserName'
+            )
+            .returns(jsonqr);
+        assert.throws(
+            () => registerExtension.registerApex(registeredExtensionName, epn, apexClass, orgUserName),
+            TypeError
+        );
+        assert(forceDataSoqlStub.calledWith(QUERY_GET_APEX_CLASS, orgUserName));
+        assert(forceDataSoqlStub.calledWith(QUERY_GET_EPN_LIST));
+        forceDataSoqlStub.restore();
     });
 });
-
-//     // get storeid using create command's method
-//     it('should get the storeid using getStoreId()', async () => {
-//         const sfm = new StatusFileManager('a', 'b', 'c');
-//         const s = stub(sfm, 'setValue').resolves();
-//         const c = stub(sfm, 'getValue').resolves(undefined);
-//         const qr = new Result<QueryResult>();
-//         qr.result = new (class implements QueryResult {
-//             public done: boolean;
-//             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-//             // @ts-ignore
-//             public records: Record[] = [{ Id: 'hi' }];
-//             public totalSize: number;
-//         })();
-//         const c1 = stub(forceOrgSoqlExports, 'forceDataSoql').returns(qr);
-//         assert.equal(await StoreCreate.getStoreId(sfm, uxStub), 'hi');
-//         [c, c1, s].forEach((a) => a.restore());
-//     });
-//     // // get userinfo using create command's method "getUserInfo())"
-//     it('should get the users info using getUserInfo()', async () => {
-//         const sfm = new StatusFileManager('a', 'b', 'c');
-//         const s = stub(sfm, 'setValue').resolves();
-//         const c = stub(sfm, 'getValue').resolves(undefined);
-//         const res = new Result();
-//         res.result = { id: 'testId', username: 'testUser' };
-//         const c1 = stub(shellExports, 'shellJsonSfdx').returns(res);
-//         assert.equal((await StoreCreate.getUserInfo(sfm, 'test')).username, 'testUser');
-//         [c, c1, s].forEach((a) => a.restore());
-//     });
-// });
-
-// describe('Test for invalid apex class', () => {
-//     test.stdout()
-//         .stderr()
-//         // .stub(forceOrgSoqlExports, 'forceDataSoql', async () => {
-//         //     throw new Error('hello');
-//         // })
-//         .withOrg({ username: 'demo_u4@1commerce.com' }, true)
-//         .timeout(600000)
-//         .command(['commerce:extension:register', '-a', 'TestApex1', '-e', 'CommerceDx_Inventory', '-r', 'test25'])
-//         .it('runs commerce:extension:register', (ctx) => {
-//             expect(ctx.stderr).to.contain('Invalid class.');
-//         });
-// });
-// describe('Test for Invalid EPN', () => {
-//     test.stdout()
-//         .stderr()
-//         .withOrg({ username: 'demo_u4@1commerce.com' }, true)
-//         .timeout(600000)
-//         .command([
-//             'commerce:extension:register',
-//             '-a',
-//             'TestApex',
-//             '-e',
-//             'CommerceDx_Inventory_TestFailed',
-//             '-r',
-//             'test25',
-//         ])
-//         .it('runs commerce:extension:register', (ctx) => {
-//             expect(ctx.stderr).to.contain('Invalid EPN');
-//         });
-// });
-// describe('Test successful register', () => {
-//     test.stdout()
-//         .stderr()
-//         .withOrg({ username: 'demo_u4@1commerce.com' }, true)
-//         .timeout(600000)
-//         .command(['commerce:extension:register', '-a', 'TestApex', '-e', 'CommerceDx_Inventory', '-r', 'test102'])
-//         .it('runs commerce:extension:register', (ctx) => {
-//             expect(ctx.stdout).to.contain('Sucessfully registered Apex Class');
-//         });
-// });
-// describe('Test existing RegisterExtensionName', () => {
-//     test.stdout()
-//         .stderr()
-//         .withOrg({ username: 'demo_u4@1commerce.com' }, true)
-//         .timeout(600000)
-//         .command(['commerce:extension:register', '-a', 'TestApex', '-e', 'CommerceDx_Inventory', '-r', 'test25'])
-//         .it('runs commerce:extension:register', (ctx) => {
-//             expect(ctx.stderr).to.contain('Registered-Extension name already');
-//         });
-// });

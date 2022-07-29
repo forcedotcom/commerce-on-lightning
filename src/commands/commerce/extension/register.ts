@@ -55,7 +55,7 @@ export class RegisterExtension extends SfdxCommand {
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<unknown> {
         this.ux.log(
-            `Retrieving Apex Class ${
+            `Retrieving and registering Apex Class ${
                 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 this.flags['apex-classname']
             }' using username: ${this.org.getUsername()} \n..........`
@@ -82,7 +82,8 @@ export class RegisterExtension extends SfdxCommand {
 
         // checks if user passed valid EPN
         const epnVal = forceDataSoql(
-            `SELECT Value FROM PicklistValueInfo WHERE Value='${storeEPN}' AND EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName' LIMIT 1`
+            `SELECT Value FROM PicklistValueInfo WHERE Value='${storeEPN}' AND EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName' LIMIT 1`,
+            storeUserName
         );
         if (epnVal.result.totalSize === 0) {
             throw new SfdxError(msgs.getMessage('extension.register.errEPN'));
@@ -101,22 +102,30 @@ export class RegisterExtension extends SfdxCommand {
             throw new SfdxError(msgs.getMessage('extension.register.nameAlreadyExists', [storeRegisteredName]));
         }
         // JSON response of inserted record
-        return this.getInsertedRecord(storeRegisteredName, storeApexClass);
+        return this.getInsertedRecord(storeRegisteredName, storeApexClass, storeUserName);
     }
 
+    // Queries for apexclassId from existing apexClass table
+    private getApexClass(storeApexClass: string, storeUserName: string): string {
+        const QUERY_GET_APEX_CLASS = `SELECT Id FROM ApexClass WHERE Name='${storeApexClass}' LIMIT 1`;
+        let apexClassId: string;
+        try {
+            apexClassId = forceDataSoql(QUERY_GET_APEX_CLASS, storeUserName).result.records[0].Id;
+        } catch (e) {
+            throw new SfdxError(msgs.getMessage('extension.register.errApexClass', [storeApexClass]));
+        }
+        return apexClassId;
+    }
     // returns entire record from RegisteredExternalService in JSON format
-    public getInsertedRecord(storeRegisteredName: string, storeApexClass: string): string {
-        const registeredExternalServiceId = forceDataSoql(
-            `SELECT Id FROM RegisteredExternalService WHERE DeveloperName='${storeRegisteredName}'`,
-            this.org.getUsername()
-        ).result.records[0].Id;
-
+    private getInsertedRecord(storeRegisteredName: string, storeApexClass: string, storeUserName: string): string {
         const RegisteredTable = forceDataSoql(
-            `SELECT ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${storeRegisteredName}'`
+            `SELECT Id,ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${storeRegisteredName}'`,
+            storeUserName
         );
+
         for (const element of RegisteredTable.result.records) {
             const finalTable = {
-                TableId: registeredExternalServiceId,
+                UniqueExtensionId: element['Id'],
                 RegisteredExtensionName: element['DeveloperName'] as string,
                 ApexClassName: storeApexClass,
                 ExtensionPointName: element['ExtensionPointName'] as string,
@@ -127,19 +136,5 @@ export class RegisterExtension extends SfdxCommand {
             this.ux.log(msgs.getMessage('extension.register.savingConfigIntoConfig'));
             return returnResult;
         }
-    }
-
-    // Queries for apexclassId from existing apexClass table
-    public getApexClass(storeApexClass: string, storeUserName: string): string {
-        let apexClassId: string;
-        try {
-            apexClassId = forceDataSoql(
-                `SELECT Id FROM ApexClass WHERE Name='${storeApexClass}' LIMIT 1`,
-                storeUserName
-            ).result.records[0].Id;
-        } catch (e) {
-            throw new SfdxError(msgs.getMessage('extension.register.errApexClass', [storeApexClass]));
-        }
-        return apexClassId;
     }
 }
