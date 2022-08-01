@@ -86,7 +86,7 @@ describe('Test extension register function', () => {
             public totalSize = 1;
         })();
         forceDataSoqlStub.withArgs(QUERY_GET_APEX_CLASS, 'testUserName').returns(qr);
-        // stub EPN query call
+        // stub EPN query call with size 1 to let it flow through the code
         const epnQr = new Result<QueryResult>();
         epnQr.result = new (class implements QueryResult {
             public done: boolean;

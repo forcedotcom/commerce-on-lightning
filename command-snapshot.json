@@ -7,7 +7,16 @@
     {
         "command": "commerce:extension:register",
         "plugin": "@salesforce/commerce",
-        "flags": ["registered-extensionname", "extensionpointname", "apex-classname", "apex-classname", "loglevel"]
+        "flags": [
+            "registered-extensionname",
+            "extensionpointname",
+            "apex-classname",
+            "loglevel",
+            "json",
+            "targetusername",
+            "apiversion",
+            "apex-namespace"
+        ]
     },
     {
         "command": "commerce:files:copy",
