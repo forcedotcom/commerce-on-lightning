@@ -12,6 +12,8 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
             // We're getting information like rates and carriers from this external service. 
             String siteLanguage = jobInfo.siteLanguage; 
 
+            // Following line of code calls the live HTTP Heroku Service to retrieve Shipping Methods
+            // If you need to bypass the live call, use getShippingOptionsAndRatesFromMockedService instead
             ShippingOptionsAndRatesFromExternalService[] shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService(siteLanguage);
 
             // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
@@ -54,7 +56,7 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
         } catch(Exception e) {
             return integrationStatusFailedWithCartValidationOutputError(
                 integStatus,
-                'An exception of type ' + e.getTypeName() + ' has occurred: ' + e.getMessage(),
+                'An exception occurred during Shipping Integration.',
                 jobInfo,
                 cartId
             );
@@ -93,6 +95,45 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
         else {
             throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
+    }
+
+    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (String siteLanguage) {
+        ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
+        String responseBody = getShippingOptionsResponse(siteLanguage);
+        List<Object> results = (List<Object>) JSON.deserializeUntyped(responseBody);
+        for (Object result: results) {
+            Map<String, Object> subresult = (Map<String, Object>) result;
+            Map<String, Object> providerAndRate = (Map<String, Object>) subresult.get('rate');
+            shippingOptions.add( new ShippingOptionsAndRatesFromExternalService(
+                (String) providerAndRate.get('name'),
+                (String) providerAndRate.get('serviceCode'),
+                (Decimal) providerAndRate.get('shipmentCost'),
+                (Decimal) providerAndRate.get('otherCost'),
+                (String) providerAndRate.get('serviceName')
+            ));
+        }
+        return shippingOptions;
+    }
+
+    private String getShippingOptionsResponse(String siteLanguage) {
+        String name1, name2, serviceName1, serviceName2;
+        if(siteLanguage == 'de') {
+            name1 = 'Liefermethode 1';
+            name2 = 'Liefermethode 2';
+            serviceName1 = 'Testträger 1';
+            serviceName2 = 'Testträger 2';
+        } else if(siteLanguage == 'ja') {
+            name1 = '配送方法1';
+            name2 = '配送方法2';
+            serviceName1 = 'テストキャリア1';
+            serviceName2 = 'テストキャリア2';
+        } else {
+            name1 = 'Delivery Method 1';
+            name2 = 'Delivery Method 2';
+            serviceName1 = 'Test Carrier 1';
+            serviceName2 = 'Test Carrier 2';
+        }
+        return '[{"status":"calculated","rate":{"name":"'+name1+'","serviceName":"'+serviceName1+'","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},{"status":"calculated","rate":{"name":"'+name2+'","serviceName":"'+serviceName2+'","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99}}]';
     }
 
     // Structure to store the shipping options retrieved from external service.
