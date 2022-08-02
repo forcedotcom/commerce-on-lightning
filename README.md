@@ -197,7 +197,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:extension:getEPN
+  sfdx commerce:extension:points:list
 ```
 
 _See code: [src/commands/commerce/extension/points/list.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.21/src/commands/commerce/extension/points/list.ts)_
