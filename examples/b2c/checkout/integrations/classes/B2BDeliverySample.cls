@@ -14,7 +14,7 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
 
             // Following line of code calls the live HTTP Heroku Service to retrieve Shipping Methods.
             // If you need to bypass the live call, use getShippingOptionsAndRatesFromMockedService instead.
-            // Please 
+            // These implementations are just a sample with hardcoded Shipping options and MUST not be used in production systems.
             ShippingOptionsAndRatesFromExternalService[] shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService(siteLanguage);
 
             // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
