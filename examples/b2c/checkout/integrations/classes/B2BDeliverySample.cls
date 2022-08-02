@@ -12,9 +12,9 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
             // We're getting information like rates and carriers from this external service. 
             String siteLanguage = jobInfo.siteLanguage; 
 
-            // Following line of code calls the live HTTP Heroku Service to retrieve Shipping Methods.
+            // Following line of code calls the live HTTP Heroku Service to retrieve mocked sample shipping methods.
             // If you need to bypass the live call, use getShippingOptionsAndRatesFromMockedService instead.
-            // These implementations are just a sample with hardcoded Shipping options and MUST not be used in production systems.
+            // Both implementations are just samples returning hardcoded Shipping options and MUST not be used in production systems.
             ShippingOptionsAndRatesFromExternalService[] shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService(siteLanguage);
 
             // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
