@@ -56,7 +56,7 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
         } catch(Exception e) {
             return integrationStatusFailedWithCartValidationOutputError(
                 integStatus,
-                'An exception occurred during Shipping Integration.',
+                'An exception occurred during Shipping Calculation.',
                 jobInfo,
                 cartId
             );
