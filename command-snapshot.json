@@ -24,6 +24,11 @@
         "flags": ["copysourcepath", "dirstocopy", "filestocopy", "json", "loglevel", "prompt"]
     },
     {
+        "command": "commerce:extension:points:list",
+        "plugin": "@salesforce/commerce",
+        "flags": []
+    },
+    {
         "command": "commerce:payments:quickstart:setup",
         "plugin": "@salesforce/commerce",
         "flags": ["apiversion", "json", "loglevel", "payment-adapter", "store-name", "targetusername"]

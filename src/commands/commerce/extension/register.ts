@@ -89,8 +89,6 @@ export class RegisterExtension extends SfdxCommand {
             throw new SfdxError(msgs.getMessage('extension.register.errEPN'));
         }
 
-        // Inserts 5 fields into registeredExternalService table
-
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
             'RegisteredExternalService',
@@ -98,7 +96,7 @@ export class RegisterExtension extends SfdxCommand {
             storeUserName
         );
         // Validates/checks for already existing unique name?
-        if (results instanceof SfdxError && results.message.indexOf('DUPLICATE_VALUE') > 0) {
+        if (results instanceof SfdxError) {
             throw new SfdxError(msgs.getMessage('extension.register.nameAlreadyExists', [storeRegisteredName]));
         }
         // JSON response of inserted record
@@ -107,10 +105,12 @@ export class RegisterExtension extends SfdxCommand {
 
     // Queries for apexclassId from existing apexClass table
     private getApexClass(storeApexClass: string, storeUserName: string): string {
-        const QUERY_GET_APEX_CLASS = `SELECT Id FROM ApexClass WHERE Name='${storeApexClass}' LIMIT 1`;
         let apexClassId: string;
         try {
-            apexClassId = forceDataSoql(QUERY_GET_APEX_CLASS, storeUserName).result.records[0].Id;
+            apexClassId = forceDataSoql(
+                `SELECT Id FROM ApexClass WHERE Name='${storeApexClass}' LIMIT 1`,
+                storeUserName
+            ).result.records[0].Id;
         } catch (e) {
             throw new SfdxError(msgs.getMessage('extension.register.errApexClass', [storeApexClass]));
         }
@@ -126,8 +126,8 @@ export class RegisterExtension extends SfdxCommand {
         for (const element of RegisteredTable.result.records) {
             const finalTable = {
                 UniqueExtensionId: element['Id'],
+                ApexClassId: element['ExternalServiceProviderId'] as string,
                 RegisteredExtensionName: element['DeveloperName'] as string,
-                ApexClassName: storeApexClass,
                 ExtensionPointName: element['ExtensionPointName'] as string,
                 ExternalServiceProviderType: element['ExternalServiceProviderType'] as string,
             };
