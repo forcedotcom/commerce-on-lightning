@@ -12,8 +12,9 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
             // We're getting information like rates and carriers from this external service. 
             String siteLanguage = jobInfo.siteLanguage; 
 
-            // Following line of code calls the live HTTP Heroku Service to retrieve Shipping Methods
-            // If you need to bypass the live call, use getShippingOptionsAndRatesFromMockedService instead
+            // Following line of code calls the live HTTP Heroku Service to retrieve Shipping Methods.
+            // If you need to bypass the live call, use getShippingOptionsAndRatesFromMockedService instead.
+            // Please 
             ShippingOptionsAndRatesFromExternalService[] shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService(siteLanguage);
 
             // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
@@ -64,6 +65,11 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
         return integStatus;
     }
 
+    /**
+        This method provides a sample of how to call an external service to retrieve Shipping Options.
+        The heroku servie called in this method is just a reference implementation that responds back with 
+        a sample response and MUST not be used in production systems.
+     */
     private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (String siteLanguage) {
         ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
         Http http = new Http();
@@ -97,6 +103,11 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
         }
     }
 
+
+    /**
+        This method provides an alternative to retrieve Shipping Options if http call needs to be bypassed.
+        This method uses a hardcoded sample response and MUST not be used in production systems.
+     */
     private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (String siteLanguage) {
         ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
         String responseBody = getShippingOptionsResponse(siteLanguage);

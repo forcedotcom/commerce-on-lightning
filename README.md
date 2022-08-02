@@ -58,7 +58,7 @@ $ npm install -g @salesforce/commerce
 $ sfdx COMMAND
 running command...
 $ sfdx (-v|--version|version)
-@salesforce/commerce/240.0.7 linux-x64 node-v16.16.0
+@salesforce/commerce/240.0.8 linux-x64 node-v16.16.0
 $ sfdx --help [COMMAND]
 USAGE
   $ sfdx COMMAND
@@ -172,7 +172,7 @@ EXAMPLE
   sfdx commerce:examples:convert -f store-scratch-def.json
 ```
 
-_See code: [src/commands/commerce/examples/convert.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.7/src/commands/commerce/examples/convert.ts)_
+_See code: [src/commands/commerce/examples/convert.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.8/src/commands/commerce/examples/convert.ts)_
 
 ## `sfdx commerce:files:copy [name=value...] --filestocopy <array> --dirstocopy <array> --copysourcepath <string> [-y] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -213,7 +213,7 @@ EXAMPLES
   "dir1,dir2,dir3"
 ```
 
-_See code: [src/commands/commerce/files/copy.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.7/src/commands/commerce/files/copy.ts)_
+_See code: [src/commands/commerce/files/copy.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.8/src/commands/commerce/files/copy.ts)_
 
 ## `sfdx commerce:payments:quickstart:setup -n <string> [-p <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -245,7 +245,7 @@ EXAMPLE
   sfdx commerce:payments:quickstart:setup -p Stripe
 ```
 
-_See code: [src/commands/commerce/payments/quickstart/setup.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.7/src/commands/commerce/payments/quickstart/setup.ts)_
+_See code: [src/commands/commerce/payments/quickstart/setup.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.8/src/commands/commerce/payments/quickstart/setup.ts)_
 
 ## `sfdx commerce:products:import -n <string> [-c <string>] [-f <filepath>] [-o <string>] [-y] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -293,7 +293,7 @@ EXAMPLE
   sfdx commerce:products:import --store-name test-store
 ```
 
-_See code: [src/commands/commerce/products/import.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.7/src/commands/commerce/products/import.ts)_
+_See code: [src/commands/commerce/products/import.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.8/src/commands/commerce/products/import.ts)_
 
 ## `sfdx commerce:store:create [name=value...] -n <string> [-f <filepath>] [-o <string>] [-y] [-t <string>] [-b <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -345,7 +345,7 @@ EXAMPLE
   sfdx commerce:store:create --store-name test-store
 ```
 
-_See code: [src/commands/commerce/store/create.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.7/src/commands/commerce/store/create.ts)_
+_See code: [src/commands/commerce/store/create.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.8/src/commands/commerce/store/create.ts)_
 
 ## `sfdx commerce:store:display -n <string> [-b <string>] [-p <string>] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -386,7 +386,7 @@ EXAMPLE
   sfdx commerce:store:display --store-name test-store
 ```
 
-_See code: [src/commands/commerce/store/display.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.7/src/commands/commerce/store/display.ts)_
+_See code: [src/commands/commerce/store/display.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.8/src/commands/commerce/store/display.ts)_
 
 ## `sfdx commerce:store:open -n <string> [--all] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -425,7 +425,7 @@ EXAMPLES
   sfdx commerce:store:open --all
 ```
 
-_See code: [src/commands/commerce/store/open.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.7/src/commands/commerce/store/open.ts)_
+_See code: [src/commands/commerce/store/open.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.8/src/commands/commerce/store/open.ts)_
 
 ## `sfdx commerce:store:quickstart:create [name=value...] -n <string> [-t <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -458,7 +458,7 @@ EXAMPLE
   sfdx commerce:store:quickstart:create --templatename 'b2c-lite-storefront'
 ```
 
-_See code: [src/commands/commerce/store/quickstart/create.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.7/src/commands/commerce/store/quickstart/create.ts)_
+_See code: [src/commands/commerce/store/quickstart/create.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.8/src/commands/commerce/store/quickstart/create.ts)_
 
 ## `sfdx commerce:store:quickstart:setup [name=value...] -n <string> [-f <filepath>] [-y] [-v <string>] [-u <string>] [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
@@ -500,7 +500,7 @@ EXAMPLE
   sfdx commerce:store:quickstart:setup --definitionfile store-scratch-def.json
 ```
 
-_See code: [src/commands/commerce/store/quickstart/setup.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.7/src/commands/commerce/store/quickstart/setup.ts)_
+_See code: [src/commands/commerce/store/quickstart/setup.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.8/src/commands/commerce/store/quickstart/setup.ts)_
 
 <!-- commandsstop -->
 <!-- debugging-your-plugin -->
