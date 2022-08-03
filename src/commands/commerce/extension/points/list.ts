@@ -23,6 +23,10 @@ export class getEPN extends SfdxCommand {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<void> {
+        this.printEPN();
+    }
+
+    public printEPN(): void {
         this.ux.log('Getting all ExtensionPointName values \n..........');
         const domainInfo = forceDataSoql(
             "SELECT Value, IsDefaultValue, IsActive FROM PicklistValueInfo WHERE EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName'"
@@ -30,9 +34,17 @@ export class getEPN extends SfdxCommand {
         // iterates through picklist to show availabe EPN vals
         this.ux.log('PICKLIST Value Table:', '\n');
         for (const element of domainInfo.result.records) {
-            this.ux.log('Value:', element['Value']);
-            this.ux.log('IsActive:', element['IsActive']);
-            this.ux.log('IsDefaultValue:', element['IsDefaultValue'], '\n');
+            this.ux.log(
+                'Value:',
+                element['Value'],
+                '\n',
+                'IsActive:',
+                element['IsActive'],
+                '\n',
+                'IsDefaultValue:',
+                element['IsDefaultValue'],
+                '\n'
+            );
         }
     }
 }
