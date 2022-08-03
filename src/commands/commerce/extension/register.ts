@@ -111,8 +111,10 @@ export class RegisterExtension extends SfdxCommand {
                 `SELECT Id FROM ApexClass WHERE Name='${storeApexClass}' LIMIT 1`,
                 storeUserName
             ).result.records[0].Id;
-        } catch (e) {
-            throw new SfdxError(msgs.getMessage('extension.register.errApexClass', [storeApexClass]));
+        } catch (error) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            const errorMsg = msgs.getMessage('extension.register.errApexClass').concat(error);
+            throw new SfdxError(errorMsg);
         }
         return apexClassId;
     }
