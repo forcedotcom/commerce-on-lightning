@@ -129,14 +129,14 @@
             "errEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
             "savingConfigIntoConfig": "Sucessfully registered Apex Class. Use command [commerce:extension:map] to link the extension to a store.",
             "apexNameSpaceFlagDescription": "Optional namespace for apex class",
-            "undefinedName": "Undefined Registered-Extension name. Enter '-r <name>'"
+            "undefinedName": "Undefined registered extension name. Enter '-r <name>'"
         },
         "map": {
             "cmdDescription": "Maps an extension to a specific webstore",
             "StoreNameFlagDescription": "The name of the web store to map the extension",
             "errStoreName": "Web-storename is not valid",
             "errStoreId": "Store Id is not valid",
-            "nameAlreadyExists": "Registered-Extension name already exists",
+            "nameAlreadyExists": "Registered extension name already exists: ",
             "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
             "regExtensionNameFlagDescription": "Unique name for extension",
             "savingConfigIntoConfig": "Sucessfully mapped apex class to store.",
