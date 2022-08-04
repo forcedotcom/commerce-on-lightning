@@ -8,9 +8,9 @@
         "command": "commerce:extension:register",
         "plugin": "@salesforce/commerce",
         "flags": [
-            "registered-extensionname",
-            "extensionpointname",
-            "apex-classname",
+            "registered-extension-name",
+            "extension-point-name",
+            "apex-class-name",
             "loglevel",
             "json",
             "targetusername",
