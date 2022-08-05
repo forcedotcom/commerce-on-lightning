@@ -11,9 +11,9 @@ import { IConfig } from '@oclif/config';
 import { $$ } from '@salesforce/command/lib/test';
 import sinon from 'sinon';
 import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
-import { getEPN } from '../../../../src/commands/commerce/extension/points/list';
-import * as forceOrgSoqlExports from '../../../../src/lib/utils/sfdx/forceDataSoql';
-import { Result } from '../../../../src/lib/utils/jsonUtils';
+import { getEPN } from '../../../../../src/commands/commerce/extension/points/list';
+import * as forceOrgSoqlExports from '../../../../../src/lib/utils/sfdx/forceDataSoql';
+import { Result } from '../../../../../src/lib/utils/jsonUtils';
 
 describe('Test EPN list command', () => {
     const config = stubInterface<IConfig>($$.SANDBOX, {});

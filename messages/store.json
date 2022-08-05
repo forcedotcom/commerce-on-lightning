@@ -122,8 +122,8 @@
         "register": {
             "cmdDescription": "Register an extension with one command",
             "apexClassNameFlagDescription": "Name of the Apex class that needs to be extended",
-            "errApexClass": "Apex class doesn't exist in webstore.",
-            "nameAlreadyExists": "Registered-Extension name already exists",
+            "errApexClass": "Error while retrieving the Apex Class:",
+            "error": "Error while registering with the given registered extension name:",
             "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
             "regExtensionNameFlagDescription": "Unique name for extension",
             "errEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
