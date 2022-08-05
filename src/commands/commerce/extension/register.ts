@@ -55,7 +55,7 @@ export class RegisterExtension extends SfdxCommand {
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<unknown> {
         this.ux.log(
-            `Retrieving and registering Apex Class ${
+            `Retrieving Apex Class '${
                 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                 this.flags['apex-class-name']
             }' using username: ${this.org.getUsername()} \n..........`
@@ -136,7 +136,7 @@ export class RegisterExtension extends SfdxCommand {
                 ExternalServiceProviderType: element['ExternalServiceProviderType'] as string,
             };
             const returnResult = `${JSON.stringify(finalTable, null, 4)};\n`;
-            this.ux.log(`Registered External Service Table = ${returnResult}`);
+            this.ux.log(`${returnResult}`);
             this.ux.log(msgs.getMessage('extension.register.savingConfigIntoConfig'));
             return returnResult;
         }
