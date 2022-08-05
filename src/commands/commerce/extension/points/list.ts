@@ -32,7 +32,6 @@ export class getEPN extends SfdxCommand {
             "SELECT Value, IsDefaultValue, IsActive FROM PicklistValueInfo WHERE EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName'"
         );
         // iterates through picklist to show availabe EPN vals
-        this.ux.log('PICKLIST Value Table:');
         for (const element of domainInfo.result.records) {
             this.ux.log(element['Value']);
         }
