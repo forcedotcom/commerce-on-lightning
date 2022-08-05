@@ -135,7 +135,7 @@ export class RegisterExtension extends SfdxCommand {
                 ExtensionPointName: element['ExtensionPointName'] as string,
                 ExternalServiceProviderType: element['ExternalServiceProviderType'] as string,
             };
-            const returnResult = `${JSON.stringify(finalTable, null, 4)};\n`;
+            const returnResult = `${JSON.stringify(finalTable, null, 4)}\n`;
             this.ux.log(`${returnResult}`);
             this.ux.log(msgs.getMessage('extension.register.savingConfigIntoConfig'));
             return returnResult;
