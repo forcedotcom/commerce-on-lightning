@@ -134,14 +134,16 @@
         "map": {
             "cmdDescription": "Maps an extension to a specific webstore",
             "StoreNameFlagDescription": "The name of the web store to map the extension",
-            "errStoreName": "Web-storename is not valid",
-            "errStoreId": "Store Id is not valid",
-            "nameAlreadyExists": "Registered extension name already exists: ",
+            "errStoreName": "Cannot find wesbtore with the name: ",
+            "errStoreId": "Cannot find store id: ",
+            "error": "Error while registering with the given registered extension name:",
             "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
             "regExtensionNameFlagDescription": "Unique name for extension",
-            "savingConfigIntoConfig": "Sucessfully mapped apex class to store.",
-            "storeId": "Either name or id should be provided"
+            "savingConfigIntoConfig": "Sucessfully mapped the extension to store: .",
+            "storeId": "Either name or id should be provided",
+            "nonexistant": "Registered extension name does not exist in sObject table RegisteredExternalService."
         },
+
         "getEPN": {
             "cmdDescription": "Lists all EPN values"
         }
