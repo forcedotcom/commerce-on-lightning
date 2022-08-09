@@ -54,6 +54,9 @@ export class MapExtension extends SfdxCommand {
         const storeid = this.getStoreId(storeName, storeId, userName);
         const registeredExternalServiceId = this.getExtensionName(extensionName, userName);
 
+        if (storeName === undefined && storeId === undefined) {
+            throw new SfdxError(msgs.getMessage('extension.map.undefinedName'));
+        }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
             'StoreIntegratedService',
@@ -62,7 +65,7 @@ export class MapExtension extends SfdxCommand {
         );
 
         if (results instanceof SfdxError) {
-            throw new SfdxError(msgs.getMessage('extension.map.error', [extensionName, results.message]));
+            throw new SfdxError(msgs.getMessage('extension.map.error', [extensionName, '\n', results.message]));
         }
         // JSON response of inserted record
         return this.getInsertedRecord(storeid, registeredExternalServiceId);
@@ -77,7 +80,7 @@ export class MapExtension extends SfdxCommand {
             ).result.records[0].Id;
         } catch (error) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            const errorMsg = msgs.getMessage('extension.map.nonexistant', [error.message]);
+            const errorMsg = msgs.getMessage('extension.map.nonexistent', ['\n', error.message]);
             throw new SfdxError(errorMsg);
         }
         return registeredExternalServiceId;
@@ -91,7 +94,7 @@ export class MapExtension extends SfdxCommand {
             } catch (e) {
                 throw new SfdxError(
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    msgs.getMessage('extension.map.errStoreName', [storeName, e.message])
+                    msgs.getMessage('extension.map.errStoreName', [storeName, '\n', e.message])
                 );
             }
         } else {
@@ -101,7 +104,7 @@ export class MapExtension extends SfdxCommand {
             } catch (e) {
                 throw new SfdxError(
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    msgs.getMessage('extension.map.errStoreId', [storeId, e.message])
+                    msgs.getMessage('extension.map.errStoreId', [storeId, '\n', e.message])
                 );
             }
         }
@@ -114,13 +117,15 @@ export class MapExtension extends SfdxCommand {
         );
         for (const element of StoreIntegratedTable.result.records) {
             const finalTable = {
-                UniqueMappedId: element['Id'],
+                Id: element['Id'],
                 Integration: element['Integration'] as string,
                 StoreId: element['StoreId'] as string,
             };
             const returnResult = `${JSON.stringify(finalTable, null, 4)}\n`;
             this.ux.log(returnResult);
-            this.ux.log(msgs.getMessage('extension.map.savingConfigIntoConfig'));
+            this.ux.log(
+                msgs.getMessage('extension.map.savingConfigIntoConfig', [this.flags['registered-extension-name']])
+            );
             return returnResult;
         }
     }

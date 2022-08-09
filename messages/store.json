@@ -134,14 +134,15 @@
         "map": {
             "cmdDescription": "Maps an extension to a specific webstore",
             "StoreNameFlagDescription": "The name of the webstore to map the extension",
-            "errStoreName": "Can't find wesbtore with the name: ",
-            "errStoreId": "Can't find store ID: ",
-            "error": "Error while registering with the given registered extension name:",
+            "errStoreName": "Can't find webstore with the name:",
+            "errStoreId": "Can't find store ID:",
+            "error": "Error while mapping the given registered extension name:",
             "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
             "regExtensionNameFlagDescription": "Unique name for extension",
-            "savingConfigIntoConfig": "Successfully mapped the extension to webstore: .",
-            "storeId": "Enter either a name or the store ID",
-            "nonexistant": "Registered extension name doesn't exist in sObject table RegisteredExternalService."
+            "savingConfigIntoConfig": "Successfully mapped the extension to webstore:",
+            "storeId": "Optional store ID flag",
+            "nonexistent": "Registered extension name doesn't exist in sObject table RegisteredExternalService.",
+            "undefinedName": "Undefined store ID and webstore name. Enter either '-i <storeId>' or '-n <storeName>'."
         },
 
         "getEPN": {
