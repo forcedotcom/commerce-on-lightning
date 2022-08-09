@@ -127,21 +127,21 @@
             "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
             "regExtensionNameFlagDescription": "Unique name for extension",
             "errEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
-            "savingConfigIntoConfig": "Sucessfully registered the extension. Use command [commerce:extension:map] to link the extension to a store.",
+            "savingConfigIntoConfig": "Successfully registered the extension. Use command [commerce:extension:map] to link the extension to a store.",
             "apexNameSpaceFlagDescription": "Optional namespace for apex class",
             "undefinedName": "Undefined registered extension name. Enter '-r <name>'"
         },
         "map": {
             "cmdDescription": "Maps an extension to a specific webstore",
-            "StoreNameFlagDescription": "The name of the web store to map the extension",
-            "errStoreName": "Cannot find wesbtore with the name: ",
-            "errStoreId": "Cannot find store id: ",
+            "StoreNameFlagDescription": "The name of the webstore to map the extension",
+            "errStoreName": "Can't find wesbtore with the name: ",
+            "errStoreId": "Can't find store ID: ",
             "error": "Error while registering with the given registered extension name:",
             "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
             "regExtensionNameFlagDescription": "Unique name for extension",
-            "savingConfigIntoConfig": "Sucessfully mapped the extension to store: .",
-            "storeId": "Either name or id should be provided",
-            "nonexistant": "Registered extension name does not exist in sObject table RegisteredExternalService."
+            "savingConfigIntoConfig": "Successfully mapped the extension to webstore: .",
+            "storeId": "Enter either a name or the store ID",
+            "nonexistant": "Registered extension name doesn't exist in sObject table RegisteredExternalService."
         },
 
         "getEPN": {
