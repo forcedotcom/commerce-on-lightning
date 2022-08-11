@@ -139,7 +139,7 @@
             "error": "Error while mapping the given registered extension name:",
             "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
             "regExtensionNameFlagDescription": "Unique name for extension",
-            "savingConfigIntoConfig": "Successfully mapped the extension:",
+            "savingConfigIntoConfig": "Successfully mapped the extension",
             "storeId": "Optional webstore ID flag",
             "nonexistent": "Can't find extension with registered extension name:",
             "undefinedName": "Undefined webstore ID and webstore name. Enter either '-i <webstoreId>' or '-n <webstoreName>'.",

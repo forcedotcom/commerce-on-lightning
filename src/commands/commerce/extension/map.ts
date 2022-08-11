@@ -72,7 +72,7 @@ export class MapExtension extends SfdxCommand {
             throw new SfdxError(msgs.getMessage('extension.map.error', [extensionName, '\n', results.message]));
         }
         // JSON response of inserted record
-        return this.getInsertedRecord(storeid, registeredExternalServiceId);
+        return this.getInsertedRecord(storeid, registeredExternalServiceId, extensionName);
     }
 
     private getRegisteredExtensionId(extensionName: string, userName: string): string {
@@ -124,10 +124,11 @@ export class MapExtension extends SfdxCommand {
         return storeId;
     }
 
-    private getInsertedRecord(storeid: string, registeredExternalServiceId: string): string {
+    private getInsertedRecord(storeid: string, registeredExternalServiceId: string, extensionName: string): string {
         const StoreIntegratedTable = forceDataSoql(
             `SELECT Id,Integration,ServiceProviderType,StoreId from StoreIntegratedService WHERE StoreId= '${storeid}' and Integration='${registeredExternalServiceId}' limit 1`
         );
+        const getName = forceDataSoql(`SELECT Name FROM WebStore WHERE Id='${storeid}'`);
         for (const element of StoreIntegratedTable.result.records) {
             const finalTable = {
                 Id: element['Id'],
@@ -137,10 +138,7 @@ export class MapExtension extends SfdxCommand {
             const returnResult = `${JSON.stringify(finalTable, null, 4)}\n`;
             this.ux.log(returnResult);
             this.ux.log(
-                msgs.getMessage('extension.map.savingConfigIntoConfig', [
-                    this.flags['registered-extension-name'],
-                    'to your webstore',
-                ])
+                msgs.getMessage('extension.map.savingConfigIntoConfig', [`'${extensionName}'`, 'to your webstore'])
             );
             return returnResult;
         }
