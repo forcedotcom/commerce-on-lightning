@@ -27,7 +27,7 @@ describe('Test extension map command', () => {
     const QUERY_GET_WEBSTORE = `SELECT Id FROM WebStore WHERE Name='${storeName}' LIMIT 1`;
     const QUERY_GET_WEBSTORE_ID = `SELECT Id FROM WebStore WHERE Id='${storeId}' LIMIT 1`;
     const QUERY_GET_INSERTED_RECORD = `SELECT Id,Integration,ServiceProviderType,StoreId from StoreIntegratedService WHERE StoreId= '${storeId}' and Integration='${registeredExternalServiceId}' limit 1`;
-    // const QUERY_GET_REGISTRATION = `SELECT Id FROM RegisteredExternalService WHERE DeveloperName='${registeredExtensionName}'`;
+    const QUERY_GET_REGISTRATION = `SELECT Id FROM RegisteredExternalService WHERE DeveloperName='${registeredExtensionName}'`;
     const INSERT_RECORD = `Integration=${service} StoreId=${storeId} ServiceProviderType='Extension'`;
     const mapCommand = new MapExtension([], config);
     const sfdxError = new SfdxError('error');
@@ -53,7 +53,7 @@ describe('Test extension map command', () => {
         );
         forceDataSoqlStub.restore();
     });
-    it('Successful extension mapping', async () => {
+    it('Throws error with duplicate store name', async () => {
         const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
         const qr = new Result<QueryResult>();
         qr.result = new (class implements QueryResult {
@@ -63,14 +63,41 @@ describe('Test extension map command', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE, 'testUserName').returns(qr);
-        // stub EPN query call with size 1 to let it flow through the code
-        const idQr = new Result<QueryResult>();
-        idQr.result = new (class implements QueryResult {
+        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName').returns(qr);
+        assert.throws(
+            () => mapCommand.processMapExtension(registeredExtensionName, storeName, storeId, orgUserName),
+            SfdxError
+        );
+        forceDataSoqlStub.restore();
+    });
+    it('Throws error with invalid registered extension name', async () => {
+        const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
+        const qr = new Result<QueryResult>();
+        qr.result = new (class implements QueryResult {
             public done: boolean;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            public records: Record[] = [{ Value: 'hey' }];
+            public records: Record[] = [{ Id: 'hi' }];
+            public totalSize = 1;
+        })();
+        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName').returns(qr);
+        // stub EPN query call with size 1 to let it flow through the code
+        const epnQr = new Result<QueryResult>();
+        epnQr.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [{ Value: 'bye' }];
+            public totalSize = 1;
+        })();
+        forceDataSoqlStub.withArgs(QUERY_GET_REGISTRATION, 'testUserName').returns(epnQr);
+        // // stub insert record call
+        const recordQr = new Result<QueryResult>();
+        recordQr.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [];
             public totalSize = 1;
         })();
         const forceDataRecordStub = sinon.stub(forceOrgSoqlExports, 'forceDataRecordCreate');
@@ -85,10 +112,11 @@ describe('Test extension map command', () => {
         })();
         forceDataSoqlStub.withArgs(QUERY_GET_INSERTED_RECORD, 'testUserName').returns(jsonqr);
         assert.throws(
-            () => mapCommand.processMapExtension(registeredExtensionName, storeName, undefined, orgUserName),
-            SfdxError
+            () => mapCommand.processMapExtension(registeredExtensionName, storeName, storeId, orgUserName),
+            TypeError
         );
-
+        assert(forceDataSoqlStub.calledWith(QUERY_GET_WEBSTORE_ID, orgUserName));
+        assert(forceDataSoqlStub.calledWith(QUERY_GET_REGISTRATION));
         forceDataSoqlStub.restore();
     });
 });

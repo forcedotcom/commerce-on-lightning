@@ -56,8 +56,8 @@ export class MapExtension extends SfdxCommand {
         if (storeName === undefined && storeId === undefined) {
             throw new SfdxError(msgs.getMessage('extension.map.undefinedName'));
         }
-        const storeid = this.getStoreId(storeName, storeId, userName);
-        const registeredExternalServiceId = this.getExtensionName(extensionName, userName);
+        const storeid = this.validateStoreId(storeName, storeId, userName);
+        const registeredExternalServiceId = this.getRegisteredExtensionId(extensionName, userName);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
@@ -73,7 +73,7 @@ export class MapExtension extends SfdxCommand {
         return this.getInsertedRecord(storeid, registeredExternalServiceId);
     }
 
-    private getExtensionName(extensionName: string, userName: string): string {
+    private getRegisteredExtensionId(extensionName: string, userName: string): string {
         let registeredExternalServiceId: string;
         try {
             registeredExternalServiceId = forceDataSoql(
@@ -88,7 +88,7 @@ export class MapExtension extends SfdxCommand {
         return registeredExternalServiceId;
     }
 
-    private getStoreId(storeName: string, storeId: string, userName: string): string {
+    private validateStoreId(storeName: string, storeId: string, userName: string): string {
         let fResult: Result<QueryResult>;
         let duplicate: boolean;
         if (storeId === undefined) {
@@ -104,6 +104,7 @@ export class MapExtension extends SfdxCommand {
                     msgs.getMessage('extension.map.errStoreName', [storeName, '\n', e.message])
                 );
             }
+            // check to see if multiple stores with the same name
             if (duplicate === true) {
                 throw new SfdxError(
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
