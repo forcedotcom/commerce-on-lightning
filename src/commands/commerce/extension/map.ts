@@ -128,7 +128,7 @@ export class MapExtension extends SfdxCommand {
         const StoreIntegratedTable = forceDataSoql(
             `SELECT Id,Integration,ServiceProviderType,StoreId from StoreIntegratedService WHERE StoreId= '${storeid}' and Integration='${registeredExternalServiceId}' limit 1`
         );
-        const getName = forceDataSoql(`SELECT Name FROM WebStore WHERE Id='${storeid}'`);
+        const name = forceDataSoql(`SELECT Name FROM WebStore WHERE Id='${storeid}' LIMIT 1`).result.records[0].Name;
         for (const element of StoreIntegratedTable.result.records) {
             const finalTable = {
                 Id: element['Id'],
@@ -138,7 +138,11 @@ export class MapExtension extends SfdxCommand {
             const returnResult = `${JSON.stringify(finalTable, null, 4)}\n`;
             this.ux.log(returnResult);
             this.ux.log(
-                msgs.getMessage('extension.map.savingConfigIntoConfig', [`'${extensionName}'`, 'to your webstore'])
+                msgs.getMessage('extension.map.savingConfigIntoConfig', [
+                    `'${extensionName}'`,
+                    'to your webstore',
+                    `'${name}'`,
+                ])
             );
             return returnResult;
         }
