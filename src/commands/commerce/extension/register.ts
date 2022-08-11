@@ -100,7 +100,9 @@ export class RegisterExtension extends SfdxCommand {
         );
         // Validates/checks for already existing unique name?
         if (results instanceof SfdxError) {
-            throw new SfdxError(msgs.getMessage('extension.register.error', [storeRegisteredName, results.message]));
+            throw new SfdxError(
+                msgs.getMessage('extension.register.error', [storeRegisteredName, '\n', results.message])
+            );
         }
         // JSON response of inserted record
         return this.getInsertedRecord(storeRegisteredName, storeApexClass, storeUserName);
@@ -116,7 +118,7 @@ export class RegisterExtension extends SfdxCommand {
             ).result.records[0].Id;
         } catch (error) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            const errorMsg = msgs.getMessage('extension.register.errApexClass', [storeApexClass, error.message]);
+            const errorMsg = msgs.getMessage('extension.register.errApexClass', [storeApexClass, '\n', error.message]);
             throw new SfdxError(errorMsg);
         }
         return apexClassId;
