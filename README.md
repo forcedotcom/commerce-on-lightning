@@ -205,7 +205,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:extension:map --registered-extension-name --store-id --store-name
+  sfdx commerce:extension:map --registered-extension-name=UNIQUE_EXTENSION_NAME --store-id=0x033439532 --store-name=EXAMPLE_STORE_NAME
 ```
 
 _See code: [src/commands/commerce/extension/map.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.23/src/commands/commerce/extension/map.ts)_
