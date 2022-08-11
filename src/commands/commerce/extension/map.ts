@@ -7,8 +7,10 @@
 
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages, Org, SfdxError } from '@salesforce/core';
+import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
 import { forceDataSoql, forceDataRecordCreate } from '../../../lib/utils/sfdx/forceDataSoql';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
+import { Result } from '../../../lib/utils/jsonUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -51,12 +53,12 @@ export class MapExtension extends SfdxCommand {
     }
 
     public processMapExtension(extensionName: string, storeName: string, storeId: string, userName: string): string {
-        const storeid = this.getStoreId(storeName, storeId, userName);
-        const registeredExternalServiceId = this.getExtensionName(extensionName, userName);
-
         if (storeName === undefined && storeId === undefined) {
             throw new SfdxError(msgs.getMessage('extension.map.undefinedName'));
         }
+        const storeid = this.getStoreId(storeName, storeId, userName);
+        const registeredExternalServiceId = this.getExtensionName(extensionName, userName);
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
             'StoreIntegratedService',
@@ -80,22 +82,36 @@ export class MapExtension extends SfdxCommand {
             ).result.records[0].Id;
         } catch (error) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            const errorMsg = msgs.getMessage('extension.map.nonexistent', ['\n', error.message]);
+            const errorMsg = msgs.getMessage('extension.map.nonexistent', [extensionName, '\n', error.message]);
             throw new SfdxError(errorMsg);
         }
         return registeredExternalServiceId;
     }
 
     private getStoreId(storeName: string, storeId: string, userName: string): string {
+        let fResult: Result<QueryResult>;
+        let duplicate: boolean;
         if (storeId === undefined) {
             try {
-                storeId = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}' LIMIT 1`, userName).result
-                    .records[0].Id;
+                fResult = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}'`, userName);
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                if (fResult.result.totalSize > 1) {
+                    duplicate = true;
+                }
             } catch (e) {
                 throw new SfdxError(
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     msgs.getMessage('extension.map.errStoreName', [storeName, '\n', e.message])
                 );
+            }
+            if (duplicate === true) {
+                throw new SfdxError(
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    msgs.getMessage('extension.map.multiple', [storeName])
+                );
+            } else {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                storeId = fResult.result.records[0].Id;
             }
         } else {
             try {
@@ -124,7 +140,10 @@ export class MapExtension extends SfdxCommand {
             const returnResult = `${JSON.stringify(finalTable, null, 4)}\n`;
             this.ux.log(returnResult);
             this.ux.log(
-                msgs.getMessage('extension.map.savingConfigIntoConfig', [this.flags['registered-extension-name']])
+                msgs.getMessage('extension.map.savingConfigIntoConfig', [
+                    this.flags['registered-extension-name'],
+                    'to your webstore',
+                ])
             );
             return returnResult;
         }
