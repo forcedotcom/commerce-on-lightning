@@ -27,8 +27,9 @@ export class RegisterExtension extends SfdxCommand {
     public static readonly requiresUsername = true;
     // Setting specific flags
     public static description = msgs.getMessage('extension.register.cmdDescription');
-    public static example = [`sfdx ${CMD} --registered-extension-name --extension-point-name --apex-class-name`];
-
+    public static example = [
+        `sfdx ${CMD} --registered-extension-name test-extension-name --extension-point-name test-epn --apex-class-name test-apex-class`,
+    ];
     public static flagsConfig = {
         'registered-extension-name': flags.string({
             char: 'r',
