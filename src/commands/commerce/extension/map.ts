@@ -92,29 +92,23 @@ export class MapExtension extends SfdxCommand {
 
     private validateStoreId(storeName: string, storeId: string, userName: string): string {
         let fResult: Result<QueryResult>;
-        let duplicate: boolean;
         if (storeId === undefined) {
-            try {
-                fResult = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}'`, userName);
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+            fResult = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}'`, userName);
+            if (fResult !== undefined && fResult.result !== undefined) {
                 if (fResult.result.totalSize > 1) {
-                    duplicate = true;
+                    throw new SfdxError(
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                        msgs.getMessage('extension.map.multiple', [storeName])
+                    );
+                } else if (fResult.result.totalSize === 0) {
+                    throw new SfdxError(
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                        msgs.getMessage('extension.map.errStoreName', [storeName])
+                    );
+                } else {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+                    storeId = fResult.result.records[0].Id;
                 }
-            } catch (e) {
-                throw new SfdxError(
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    msgs.getMessage('extension.map.errStoreName', [storeName, '\n', e.message])
-                );
-            }
-            // check to see if multiple stores with the same name
-            if (duplicate === true) {
-                throw new SfdxError(
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    msgs.getMessage('extension.map.multiple', [storeName])
-                );
-            } else {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-                storeId = fResult.result.records[0].Id;
             }
         } else {
             try {
