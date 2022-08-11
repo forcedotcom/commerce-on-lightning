@@ -205,7 +205,8 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:extension:map --registered-extension-name=UNIQUE_EXTENSION_NAME --store-id=0x033439532 --store-name=EXAMPLE_STORE_NAME
+  sfdx commerce:extension:map --registered-extension-name UNIQUE_EXTENSION_NAME --store-name EXAMPLE_STORE_NAME
+  sfdx commerce:extension:map --registered-extension-name UNIQUE_EXTENSION_NAME --store-id 0x033439532 
 ```
 
 _See code: [src/commands/commerce/extension/map.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.23/src/commands/commerce/extension/map.ts)_
@@ -232,7 +233,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:extension:getEPN
+  sfdx commerce:extension:points:list
 ```
 
 _See code: [src/commands/commerce/extension/points/list.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.23/src/commands/commerce/extension/points/list.ts)_
@@ -273,7 +274,7 @@ OPTIONS
       [default: warn] logging level for this command invocation
 
 EXAMPLE
-  sfdx commerce:extension:register --registered-extension-name --extension-point-name --apex-class-name
+  sfdx commerce:extension:register --registered-extension-name UNIQUE_EXTENSION_NAME --extension-point-name EXTENSION_POINT_NAME --apex-class-name EXAMPLE_APEX
 ```
 
 _See code: [src/commands/commerce/extension/register.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v240.0.23/src/commands/commerce/extension/register.ts)_
