@@ -156,7 +156,7 @@ export class MapExtension extends SfdxCommand {
             ).result.records[0]['ExtensionPointName'];
             const existingIds = forceDataSoql(
                 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                `SELECT DeveloperName,ExternalServiceProviderType FROM RegisteredExternalService WHERE ExtensionPointName='${EPNQuery}'`,
+                `SELECT DeveloperName,ExternalServiceProviderType FROM RegisteredExternalService WHERE ExtensionPointName='${EPNQuery}' AND ExternalServiceProviderType='Extension'`,
                 userName
             );
             for (const element of existingIds.result.records) {
