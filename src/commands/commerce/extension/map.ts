@@ -177,7 +177,3 @@ export class MapExtension extends SfdxCommand {
         } catch (e) {}
     }
 }
-
-// exists in register table
-// DNE in store integrated
-// how to query
