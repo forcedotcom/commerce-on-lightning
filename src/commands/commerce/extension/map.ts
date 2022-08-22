@@ -8,7 +8,7 @@
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages, Org, SfdxError } from '@salesforce/core';
 import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
-import { forceDataSoql, forceDataRecordCreate } from '../../../lib/utils/sfdx/forceDataSoql';
+import { forceDataSoql, forceDataRecordCreate, forceDataRecordDelete } from '../../../lib/utils/sfdx/forceDataSoql';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { Result } from '../../../lib/utils/jsonUtils';
 
@@ -60,7 +60,7 @@ export class MapExtension extends SfdxCommand {
         }
         const storeid = this.validateStoreId(storeName, storeId, userName);
         const registeredExternalServiceId = this.getRegisteredExtensionId(extensionName, userName);
-
+        this.deleteduplicateMaps(extensionName, userName);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
             'StoreIntegratedService',
@@ -147,4 +147,37 @@ export class MapExtension extends SfdxCommand {
             return returnResult;
         }
     }
+    private deleteduplicateMaps(extensionName: string, userName: string): void {
+        try {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const EPNQuery = forceDataSoql(
+                `SELECT ExtensionPointName FROM RegisteredExternalService WHERE DeveloperName='${extensionName}'`,
+                userName
+            ).result.records[0]['ExtensionPointName'];
+            const existingIds = forceDataSoql(
+                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                `SELECT DeveloperName,ExternalServiceProviderType FROM RegisteredExternalService WHERE ExtensionPointName='${EPNQuery}'`,
+                userName
+            );
+            for (const element of existingIds.result.records) {
+                const id = (element['ExternalServiceProviderType'] as string)
+                    .concat('__' as string)
+                    .concat(element['DeveloperName'] as string);
+                try {
+                    const deleteId = forceDataSoql(
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}'`,
+                        userName
+                    ).result.records[0].Id;
+                    forceDataRecordDelete('StoreIntegratedService', deleteId, this.org.getUsername());
+                    // eslint-disable-next-line no-empty
+                } catch (e) {}
+            }
+            // eslint-disable-next-line no-empty
+        } catch (e) {}
+    }
 }
+
+// exists in register table
+// DNE in store integrated
+// how to query
