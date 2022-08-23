@@ -154,10 +154,10 @@
             "StoreNameFlagDescription": "The name of the webstore to map the extension",
             "errStoreName": "Can't find webstore with the name:",
             "errStoreId": "Can't find webstore ID:",
-            "error": "Error while deleting with the given registered extension name:",
+            "error": "Error while unmapping with the given registered extension name:",
             "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
             "regExtensionNameFlagDescription": "Unique name for extension",
-            "savingConfigIntoConfig": "Successfully deleted the extension",
+            "savingConfigIntoConfig": "Successfully unmapped the extension",
             "storeId": "Optional webstore ID flag",
             "undefinedName": "Undefined webstore ID and webstore name. Enter either '-i <webstoreId>' or '-n <webstoreName>'."
         }
