@@ -140,6 +140,7 @@ export class MapExtension extends SfdxCommand {
     }
     private deleteDuplicateMaps(extensionName: string, userName: string, storeid: string): void {
         let epnVal: string;
+        let deletedId: string;
         const EPNQuery = forceDataSoql(
             `SELECT ExtensionPointName FROM RegisteredExternalService WHERE DeveloperName='${extensionName}'`,
             userName
@@ -159,23 +160,21 @@ export class MapExtension extends SfdxCommand {
             const id = (element['ExternalServiceProviderType'] as string)
                 .concat('__' as string)
                 .concat(element['DeveloperName'] as string);
-            try {
-                const deleteId = forceDataSoql(
-                    `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}' AND StoreId='${storeid}'`,
-                    userName
-                ).result.records[0].Id;
-                if (deleteId !== undefined) {
-                    this.ux.log(
-                        msgs.getMessage('extension.map.previousEPN', [
-                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                            `'${element['DeveloperName']}'`,
-                            'because it was for the same EPN in this webstore',
-                        ])
-                    );
-                    forceDataRecordDelete('StoreIntegratedService', deleteId, this.org.getUsername(), 'ignore');
-                }
-                // eslint-disable-next-line no-empty
-            } catch (e) {}
+            const deleteId = forceDataSoql(
+                `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}' AND StoreId='${storeid}'`,
+                userName
+            ).result.records[0];
+            if (deleteId !== undefined) {
+                deletedId = deleteId.Id;
+                this.ux.log(
+                    msgs.getMessage('extension.map.previousEPN', [
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        `'${element['DeveloperName']}'`,
+                        'because it was for the same EPN in this webstore',
+                    ])
+                );
+                forceDataRecordDelete('StoreIntegratedService', deletedId, this.org.getUsername(), 'pipe');
+            }
         }
     }
 }
