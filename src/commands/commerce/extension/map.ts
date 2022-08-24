@@ -96,7 +96,7 @@ export class MapExtension extends SfdxCommand {
             fResult = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}'`, userName);
             if (fResult !== undefined && fResult.result !== undefined) {
                 if (fResult.result.totalSize > 1) {
-                    throw new SfdxError(msgs.getMessage('extension.map.multiple', [storeName]));
+                    throw new SfdxError(msgs.getMessage('extension.map.errMultipleStoreWithSameName', [storeName]));
                 } else if (fResult.result.totalSize === 0) {
                     throw new SfdxError(msgs.getMessage('extension.map.errStoreName', [storeName]));
                 } else {
@@ -164,8 +164,10 @@ export class MapExtension extends SfdxCommand {
                     `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}' AND StoreId='${storeid}'`,
                     userName
                 ).result.records[0].Id;
-                this.ux.log(msgs.getMessage('extension.map.previousEPN', [`'${extensionName}'`, 'with this EPN']));
-                forceDataRecordDelete('StoreIntegratedService', deleteId, this.org.getUsername(), 'ignore');
+                if (deleteId !== undefined) {
+                    this.ux.log(msgs.getMessage('extension.map.previousEPN', [`'${id}'`, 'due to duplicate EPN']));
+                    forceDataRecordDelete('StoreIntegratedService', deleteId, this.org.getUsername(), 'ignore');
+                }
                 // eslint-disable-next-line no-empty
             } catch (e) {}
         }
