@@ -60,7 +60,7 @@ export class MapExtension extends SfdxCommand {
         }
         const storeid = this.validateStoreId(storeName, storeId, userName);
         const registeredExternalServiceId = this.getRegisteredExtensionId(extensionName, userName);
-        this.deleteduplicateMaps(extensionName, userName);
+        this.deleteDuplicateMaps(extensionName, userName, storeid);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
             'StoreIntegratedService',
@@ -96,17 +96,10 @@ export class MapExtension extends SfdxCommand {
             fResult = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}'`, userName);
             if (fResult !== undefined && fResult.result !== undefined) {
                 if (fResult.result.totalSize > 1) {
-                    throw new SfdxError(
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                        msgs.getMessage('extension.map.multiple', [storeName])
-                    );
+                    throw new SfdxError(msgs.getMessage('extension.map.multiple', [storeName]));
                 } else if (fResult.result.totalSize === 0) {
-                    throw new SfdxError(
-                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                        msgs.getMessage('extension.map.errStoreName', [storeName])
-                    );
+                    throw new SfdxError(msgs.getMessage('extension.map.errStoreName', [storeName]));
                 } else {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
                     storeId = fResult.result.records[0].Id;
                 }
             }
@@ -115,10 +108,8 @@ export class MapExtension extends SfdxCommand {
                 storeId = forceDataSoql(`SELECT Id FROM WebStore WHERE Id='${storeId}' LIMIT 1`, userName).result
                     .records[0].Id;
             } catch (e) {
-                throw new SfdxError(
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    msgs.getMessage('extension.map.errStoreId', [storeId, '\n', e.message])
-                );
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                throw new SfdxError(msgs.getMessage('extension.map.errStoreId', [storeId, '\n', e.message]));
             }
         }
         return storeId;
@@ -147,33 +138,36 @@ export class MapExtension extends SfdxCommand {
             return returnResult;
         }
     }
-    private deleteduplicateMaps(extensionName: string, userName: string): void {
-        try {
+    private deleteDuplicateMaps(extensionName: string, userName: string, storeid: string): void {
+        let epnVal: string;
+        const EPNQuery = forceDataSoql(
+            `SELECT ExtensionPointName FROM RegisteredExternalService WHERE DeveloperName='${extensionName}'`,
+            userName
+        );
+        if (EPNQuery !== undefined && EPNQuery.result !== undefined && EPNQuery.result.totalSize > 0) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            const EPNQuery = forceDataSoql(
-                `SELECT ExtensionPointName FROM RegisteredExternalService WHERE DeveloperName='${extensionName}'`,
-                userName
-            ).result.records[0]['ExtensionPointName'];
-            const existingIds = forceDataSoql(
-                // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                `SELECT DeveloperName,ExternalServiceProviderType FROM RegisteredExternalService WHERE ExtensionPointName='${EPNQuery}' AND ExternalServiceProviderType='Extension'`,
-                userName
-            );
-            for (const element of existingIds.result.records) {
-                const id = (element['ExternalServiceProviderType'] as string)
-                    .concat('__' as string)
-                    .concat(element['DeveloperName'] as string);
-                try {
-                    const deleteId = forceDataSoql(
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}'`,
-                        userName
-                    ).result.records[0].Id;
-                    forceDataRecordDelete('StoreIntegratedService', deleteId, this.org.getUsername());
-                    // eslint-disable-next-line no-empty
-                } catch (e) {}
-            }
-            // eslint-disable-next-line no-empty
-        } catch (e) {}
+            epnVal = EPNQuery.result.records[0]['ExtensionPointName'];
+        } else {
+            throw new SfdxError(msgs.getMessage('extension.map.errorEPN'));
+        }
+
+        const existingIds = forceDataSoql(
+            `SELECT DeveloperName,ExternalServiceProviderType FROM RegisteredExternalService WHERE ExtensionPointName='${epnVal}' AND ExternalServiceProviderType='Extension'`,
+            userName
+        );
+        for (const element of existingIds.result.records) {
+            const id = (element['ExternalServiceProviderType'] as string)
+                .concat('__' as string)
+                .concat(element['DeveloperName'] as string);
+            try {
+                const deleteId = forceDataSoql(
+                    `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}' AND StoreId='${storeid}'`,
+                    userName
+                ).result.records[0].Id;
+                this.ux.log(msgs.getMessage('extension.map.previousEPN', [`'${extensionName}'`, 'with this EPN']));
+                forceDataRecordDelete('StoreIntegratedService', deleteId, this.org.getUsername(), 'ignore');
+                // eslint-disable-next-line no-empty
+            } catch (e) {}
+        }
     }
 }
