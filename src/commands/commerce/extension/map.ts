@@ -165,7 +165,13 @@ export class MapExtension extends SfdxCommand {
                     userName
                 ).result.records[0].Id;
                 if (deleteId !== undefined) {
-                    this.ux.log(msgs.getMessage('extension.map.previousEPN', [`'${id}'`, 'due to duplicate EPN']));
+                    this.ux.log(
+                        msgs.getMessage('extension.map.previousEPN', [
+                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                            `'${element['DeveloperName']}'`,
+                            'because it was for the same EPN in this webstore',
+                        ])
+                    );
                     forceDataRecordDelete('StoreIntegratedService', deleteId, this.org.getUsername(), 'ignore');
                 }
                 // eslint-disable-next-line no-empty

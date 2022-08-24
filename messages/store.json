@@ -143,7 +143,7 @@
             "storeId": "Optional webstore ID flag",
             "errorEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
             "nonexistent": "Can't find extension with registered extension name:",
-            "previousEPN":"Unmapped previous mapped extension with Integration:",
+            "previousEPN": "Unmapped the extension:",
             "undefinedName": "Undefined webstore ID and webstore name. Enter either '-i <webstoreId>' or '-n <webstoreName>'.",
             "errMultipleStoreWithSameName": "More than one webstore found with the given name. To see all the webstores with the given name, run [sfdx force:data:soql:query -q SELECT ID, NAME FROM WEBSTORE WHERE NAME = '<webstoreName>' --json] and use '-i <storeId>' to specify a specific webstore."
         },
@@ -163,8 +163,8 @@
             "storeId": "Optional webstore ID flag",
             "errorEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
             "undefinedName": "Undefined webstore ID and webstore name. Enter either '-i <webstoreId>' or '-n <webstoreName>'.",
-            "unmappingEPN":"Unmapped the previous mapped extension:"
-    }
+            "unmappingEPN": "Unmapped the previous mapped extension:"
+        }
     },
     "view": {
         "cmdDescription": "Open store(s)",
