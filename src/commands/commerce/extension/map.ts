@@ -54,6 +54,16 @@ export class MapExtension extends SfdxCommand {
         );
     }
 
+    /**
+     * processMapExtension - Main method that calls helper functions to get webstore id and map an extension to that webstore. Any errors with undefined store id/store name or mismatched values will throw error and break command
+     *
+     * @param extensionName - registered-extension-name that user passes
+     * @param storeName - user can pass EITHER storeName or storeId. name of webstore
+     * @param storeId - a valid storeId of the webstore being mapped to.
+     * @param userName - a valid username(email) that is used to login to the webstore.
+     * @returns JSON response of confirmed inserted record into StoreIntegratedService table
+     */
+
     public processMapExtension(extensionName: string, storeName: string, storeId: string, userName: string): string {
         if (storeName === undefined && storeId === undefined) {
             throw new SfdxError(msgs.getMessage('extension.map.undefinedName'));
@@ -120,11 +130,11 @@ export class MapExtension extends SfdxCommand {
             `SELECT Id,Integration,ServiceProviderType,StoreId from StoreIntegratedService WHERE StoreId= '${storeid}' and Integration='${registeredExternalServiceId}' limit 1`
         );
         const name = forceDataSoql(`SELECT Name FROM WebStore WHERE Id='${storeid}' LIMIT 1`).result.records[0].Name;
-        for (const element of StoreIntegratedTable.result.records) {
+        for (const record of StoreIntegratedTable.result.records) {
             const finalTable = {
-                Id: element['Id'],
-                Integration: element['Integration'] as string,
-                StoreId: element['StoreId'] as string,
+                Id: record['Id'],
+                Integration: record['Integration'] as string,
+                StoreId: record['StoreId'] as string,
             };
             const returnResult = `${JSON.stringify(finalTable, null, 4)}\n`;
             this.ux.log(returnResult);
@@ -156,10 +166,10 @@ export class MapExtension extends SfdxCommand {
             `SELECT DeveloperName,ExternalServiceProviderType FROM RegisteredExternalService WHERE ExtensionPointName='${epnVal}' AND ExternalServiceProviderType='Extension'`,
             userName
         );
-        for (const element of existingIds.result.records) {
-            const id = (element['ExternalServiceProviderType'] as string)
+        for (const record of existingIds.result.records) {
+            const id = (record['ExternalServiceProviderType'] as string)
                 .concat('__' as string)
-                .concat(element['DeveloperName'] as string);
+                .concat(record['DeveloperName'] as string);
             const deleteId = forceDataSoql(
                 `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}' AND StoreId='${storeid}'`,
                 userName
@@ -169,7 +179,7 @@ export class MapExtension extends SfdxCommand {
                 this.ux.log(
                     msgs.getMessage('extension.map.previousEPN', [
                         // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                        `'${element['DeveloperName']}'`,
+                        `'${record['DeveloperName']}'`,
                         'because it was for the same EPN in this webstore',
                     ])
                 );
