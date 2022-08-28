@@ -58,24 +58,35 @@ export class UnMapExtension extends SfdxCommand {
         }
         const storeid = this.validateStoreId(storeName, storeId, userName);
         const name = forceDataSoql(`SELECT Name FROM WebStore WHERE Id='${storeid}' LIMIT 1`).result.records[0].Name;
-        const integration = 'Extension'.concat('__' as string).concat(extensionName);
         try {
-            const deleteId = forceDataSoql(
-                `SELECT Id FROM StoreIntegratedService WHERE Integration='${integration}' AND storeid='${storeid}'`,
+            let deletedId: string;
+            const existingIds = forceDataSoql(
+                `SELECT DeveloperName,ExternalServiceProviderType FROM RegisteredExternalService WHERE DeveloperName='${extensionName}' AND ExternalServiceProviderType='Extension'`,
                 userName
-            ).result.records[0].Id;
-            forceDataRecordDelete('StoreIntegratedService', deleteId, this.org.getUsername());
+            );
+            for (const record of existingIds.result.records) {
+                const id = (record['ExternalServiceProviderType'] as string)
+                    .concat('__' as string)
+                    .concat(record['DeveloperName'] as string);
+                const deleteId = forceDataSoql(
+                    `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}' AND StoreId='${storeid}'`,
+                    userName
+                ).result.records[0];
+                deletedId = deleteId.Id;
+                forceDataRecordDelete('StoreIntegratedService', deletedId, this.org.getUsername(), 'pipe');
+                this.ux.log(
+                    msgs.getMessage('extension.unmap.savingConfigIntoConfig', [
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        `'${record['DeveloperName']}'`,
+                        'from your webstore',
+                        `'${name}'`,
+                    ])
+                );
+            }
         } catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             throw new SfdxError(msgs.getMessage('extension.unmap.error', [extensionName, '\n', e.message]));
         }
-        this.ux.log(
-            msgs.getMessage('extension.unmap.savingConfigIntoConfig', [
-                `'${extensionName}'`,
-                'from your webstore',
-                `'${name}'`,
-            ])
-        );
     }
 
     private validateStoreId(storeName: string, storeId: string, userName: string): string {
