@@ -14,6 +14,7 @@ import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
 import * as forceOrgSoqlExports from '../../../../src/lib/utils/sfdx/forceDataSoql';
 import { UnMapExtension } from '../../../../src/commands/commerce/extension/unmap';
 import { Result } from '../../../../src/lib/utils/jsonUtils';
+
 describe('Test extension unmap command', () => {
     const config = stubInterface<IConfig>($$.SANDBOX, {});
     const registeredExtensionName = 'testRegExtension';
@@ -87,6 +88,38 @@ describe('Test extension unmap command', () => {
             TypeError
         );
         assert(forceDataSoqlStub.calledWith(QUERY_GET_WEBSTORE_ID, orgUserName));
+        forceDataSoqlStub.restore();
+    });
+    it('Successful Unmapping', async () => {
+        const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
+        const qr = new Result<QueryResult>();
+        qr.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [{ Id: 'hi' }];
+            public totalSize = 1;
+        })();
+        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName').returns(qr);
+        // stub EPN query call with size 1 to let it flow through the code
+        const epnQr = new Result<QueryResult>();
+        epnQr.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [{ Value: 'bye' }];
+            public totalSize = 1;
+        })();
+        forceDataSoqlStub.withArgs(QUERY_GET_STORENAME, 'testUserName').returns(epnQr);
+        // // stub insert record call
+        const recordQr = new Result<QueryResult>();
+        recordQr.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [];
+            public totalSize = 0;
+        })();
         forceDataSoqlStub.restore();
     });
 });

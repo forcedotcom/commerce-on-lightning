@@ -16,7 +16,7 @@ Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'extension';
 const CMD = `commerce:${TOPIC}:unmap`;
-const msgs = Messages.loadMessages('@salesforce/commerce', 'store');
+const msgs = Messages.loadMessages('@salesforce/commerce', 'extension');
 
 export class UnMapExtension extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -56,7 +56,8 @@ export class UnMapExtension extends SfdxCommand {
         if (storeName === undefined && storeId === undefined) {
             throw new SfdxError(msgs.getMessage('extension.unmap.undefinedName'));
         }
-        const storeid = this.validateStoreId(storeName, storeId, userName);
+        const validateId = new UtilStoreValidate();
+        const storeid = validateId.validateStoreId(storeName, storeId, userName);
         const name = forceDataSoql(`SELECT Name FROM WebStore WHERE Id='${storeid}' LIMIT 1`).result.records[0].Name;
         try {
             let deletedId: string;
@@ -88,8 +89,10 @@ export class UnMapExtension extends SfdxCommand {
             throw new SfdxError(msgs.getMessage('extension.unmap.error', [extensionName, '\n', e.message]));
         }
     }
+}
 
-    private validateStoreId(storeName: string, storeId: string, userName: string): string {
+export class UtilStoreValidate {
+    public validateStoreId(storeName: string, storeId: string, userName: string): string {
         let fResult: Result<QueryResult>;
         if (storeId === undefined) {
             fResult = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}'`, userName);

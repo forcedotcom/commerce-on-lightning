@@ -7,16 +7,15 @@
 
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages, Org, SfdxError } from '@salesforce/core';
-import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
 import { forceDataSoql, forceDataRecordCreate, forceDataRecordDelete } from '../../../lib/utils/sfdx/forceDataSoql';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
-import { Result } from '../../../lib/utils/jsonUtils';
+import { UtilStoreValidate } from './unmap';
 
 Messages.importMessagesDirectory(__dirname);
 
 const TOPIC = 'extension';
 const CMD = `commerce:${TOPIC}:map`;
-const msgs = Messages.loadMessages('@salesforce/commerce', 'store');
+const msgs = Messages.loadMessages('@salesforce/commerce', 'extension');
 
 export class MapExtension extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -68,7 +67,8 @@ export class MapExtension extends SfdxCommand {
         if (storeName === undefined && storeId === undefined) {
             throw new SfdxError(msgs.getMessage('extension.map.undefinedName'));
         }
-        const storeid = this.validateStoreId(storeName, storeId, userName);
+        const validateId = new UtilStoreValidate();
+        const storeid = validateId.validateStoreId(storeName, storeId, userName);
         const registeredExternalServiceId = this.getRegisteredExtensionId(extensionName, userName);
         this.deleteDuplicateMaps(extensionName, userName, storeid);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -98,31 +98,6 @@ export class MapExtension extends SfdxCommand {
             throw new SfdxError(errorMsg);
         }
         return registeredExternalServiceId;
-    }
-
-    private validateStoreId(storeName: string, storeId: string, userName: string): string {
-        let fResult: Result<QueryResult>;
-        if (storeId === undefined) {
-            fResult = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}'`, userName);
-            if (fResult !== undefined && fResult.result !== undefined) {
-                if (fResult.result.totalSize > 1) {
-                    throw new SfdxError(msgs.getMessage('extension.map.errMultipleStoreWithSameName', [storeName]));
-                } else if (fResult.result.totalSize === 0) {
-                    throw new SfdxError(msgs.getMessage('extension.map.errStoreName', [storeName]));
-                } else {
-                    storeId = fResult.result.records[0].Id;
-                }
-            }
-        } else {
-            try {
-                storeId = forceDataSoql(`SELECT Id FROM WebStore WHERE Id='${storeId}' LIMIT 1`, userName).result
-                    .records[0].Id;
-            } catch (e) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                throw new SfdxError(msgs.getMessage('extension.map.errStoreId', [storeId, '\n', e.message]));
-            }
-        }
-        return storeId;
     }
 
     private getInsertedRecord(storeid: string, registeredExternalServiceId: string, extensionName: string): string {
