@@ -56,8 +56,7 @@ export class UnMapExtension extends SfdxCommand {
         if (storeName === undefined && storeId === undefined) {
             throw new SfdxError(msgs.getMessage('extension.unmap.undefinedName'));
         }
-        const validateId = new UtilStoreValidate();
-        const storeid = validateId.validateStoreId(storeName, storeId, userName);
+        const storeid = UtilStoreValidate.validateStoreId(storeName, storeId, userName);
         const name = forceDataSoql(`SELECT Name FROM WebStore WHERE Id='${storeid}' LIMIT 1`).result.records[0].Name;
         try {
             let deletedId: string;
@@ -92,7 +91,7 @@ export class UnMapExtension extends SfdxCommand {
 }
 
 export class UtilStoreValidate {
-    public validateStoreId(storeName: string, storeId: string, userName: string): string {
+    public static validateStoreId(storeName: string, storeId: string, userName: string): string {
         let fResult: Result<QueryResult>;
         if (storeId === undefined) {
             fResult = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}'`, userName);

@@ -67,8 +67,7 @@ export class MapExtension extends SfdxCommand {
         if (storeName === undefined && storeId === undefined) {
             throw new SfdxError(msgs.getMessage('extension.map.undefinedName'));
         }
-        const validateId = new UtilStoreValidate();
-        const storeid = validateId.validateStoreId(storeName, storeId, userName);
+        const storeid = UtilStoreValidate.validateStoreId(storeName, storeId, userName);
         const registeredExternalServiceId = this.getRegisteredExtensionId(extensionName, userName);
         this.deleteDuplicateMaps(extensionName, userName, storeid);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment

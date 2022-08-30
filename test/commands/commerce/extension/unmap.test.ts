@@ -28,7 +28,6 @@ describe('Test extension unmap command', () => {
     const service = 'StoreIntegratedService';
     const DELETE_RECORD = `SELECT Id FROM StoreIntegratedService WHERE Integration='${integration}' AND storeid='${storeId}'`;
     const unmapCommand = new UnMapExtension([], config);
-    // const sfdxError = new SfdxError('error');
 
     after(() => {
         sinon.restore();
