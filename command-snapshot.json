@@ -32,6 +32,19 @@
         ]
     },
     {
+        "command": "commerce:extension:unmap",
+        "plugin": "@salesforce/commerce",
+        "flags": [
+            "registered-extension-name",
+            "store-name",
+            "store-id",
+            "loglevel",
+            "json",
+            "targetusername",
+            "apiversion"
+        ]
+    },
+    {
         "command": "commerce:files:copy",
         "plugin": "@salesforce/commerce",
         "flags": ["copysourcepath", "dirstocopy", "filestocopy", "json", "loglevel", "prompt"]
