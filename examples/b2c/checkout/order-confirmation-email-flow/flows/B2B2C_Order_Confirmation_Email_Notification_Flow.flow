@@ -88,7 +88,7 @@
             <assignToReference>orderItems</assignToReference>
             <operator>Add</operator>
             <value>
-                <elementReference>IterateOrderItems.UnitPrice</elementReference>
+                <elementReference>IterateOrderItems.GrossUnitPrice</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
@@ -102,7 +102,7 @@
             <assignToReference>orderItems</assignToReference>
             <operator>Add</operator>
             <value>
-                <elementReference>IterateOrderItems.TotalLineAmount</elementReference>
+                <elementReference>IterateOrderItems.TotalLineAmountWithTax</elementReference>
             </value>
         </assignmentItems>
         <assignmentItems>
@@ -337,8 +337,8 @@
         <queriedFields>Id</queriedFields>
         <queriedFields>Product2Id</queriedFields>
         <queriedFields>QuantityOrdered</queriedFields>
-        <queriedFields>TotalLineAmount</queriedFields>
-        <queriedFields>UnitPrice</queriedFields>
+        <queriedFields>TotalLineAmountWithTax</queriedFields>
+        <queriedFields>GrossUnitPrice</queriedFields>
         <sortField>CreatedDate</sortField>
         <sortOrder>Asc</sortOrder>
         <storeOutputAutomatically>true</storeOutputAutomatically>

@@ -55,9 +55,9 @@
          <div style="padding: 20px 20px;">
             <h2 style="font-size:14px; font-weight:bold; padding:0px; margin: 0px;">Order Summary</h2>
             <div style="padding-top:10px; margin: 0px;">{{{OrderSummary.OCE_Order_Items__c}}}</div>
-            <p style="padding-top:10px; margin: 0px;">SubTotal: {{{OrderSummary.TotalAdjustedProductAmount}}}</p>
-            <p style="padding-top:10px; margin: 0px;">Shipping: {{{OrderSummary.TotalAdjustedDeliveryAmount}}}</p>
-            <p style="padding-top:10px;; margin: 0px;">Tax: {{{OrderSummary.TotalTaxAmount}}}</p>
+            <p style="padding-top:10px; margin: 0px;">Subtotal with Tax: {{{OrderSummary.TotalAdjProductAmtWithTax}}}</p>
+            <p style="padding-top:10px; margin: 0px;">Shipping with Tax: {{{OrderSummary.TotalAdjDeliveryAmtWithTax}}}</p>
+            <p style="padding-top:10px;; margin: 0px;">Tax (included): {{{OrderSummary.TotalTaxAmount}}}</p>
             <p style="padding-top:10px; margin: 0px; font-weight: bold;">Total: {{{OrderSummary.OCE_Order_Total__c}}}</p>
          </div>
          <hr style="border: 1px solid #CDCDCD; margin:0px;"/>
