@@ -4,7 +4,7 @@
     "type:feature": "",
     "type:bug": "BUG P3",
     "type:security": "BUG P2",
-    "dependencies": "USER STORY",
+    "type:dependency": "USER STORY",
     "type:duplicate": "",
     "type:community-contrib": "USER STORY"
   },
