@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [238.0.16](https://github.com/forcedotcom/commerce-on-lightning/compare/v238.0.15...v238.0.16) (2022-09-29)
+
+
+### Bug Fixes
+
+* apex tests ([6db2e27](https://github.com/forcedotcom/commerce-on-lightning/commit/6db2e27822a5cf2af9b939dda39be1424087a110))
+
 ### [238.0.15](https://github.com/forcedotcom/commerce-on-lightning/compare/v236.0.3...v238.0.15) (2022-05-19)
 
 
