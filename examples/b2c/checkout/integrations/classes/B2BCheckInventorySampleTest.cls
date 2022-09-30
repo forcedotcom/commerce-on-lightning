@@ -3,7 +3,7 @@ public class B2BCheckInventorySampleTest {
     @testSetup static void setup() {
         Account account = new Account(Name='TestAccount');
         insert account;
-        WebStore webStore = new WebStore(Name='TestWebStore', DefaultLanguage='en_US');
+        WebStore webStore = new WebStore(Name='TestWebStore', SupportedLanguages='en_US', DefaultLanguage='en_US');
         insert webStore;
         WebCart cart = new WebCart(Name='Cart', WebStoreId=webStore.Id, AccountId=account.Id);
         insert cart;

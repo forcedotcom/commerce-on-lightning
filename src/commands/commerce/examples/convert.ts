@@ -10,11 +10,12 @@ import { fs, Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { allFlags } from '../../../lib/flags/commerce/all.flags';
 import { exampleFlags } from '../../../lib/flags/commerce/convert.flags';
-import { filterFlags, removeFlagBeforeAll } from '../../../lib/utils/args/flagsUtils';
-import { BASE_DIR, CONFIG_DIR, EXAMPLE_DIR } from '../../../lib/utils/constants/properties';
+import { addAllowedArgs, filterFlags, modifyArgFlag, removeFlagBeforeAll } from '../../../lib/utils/args/flagsUtils';
+import { BASE_DIR, CONFIG_DIR, EXAMPLE_DIR, FILE_COPY_ARGS } from '../../../lib/utils/constants/properties';
 import { copyFileSync, mkdirSync, readFileSync, renameRecursive } from '../../../lib/utils/fsUtils';
 import { shell } from '../../../lib/utils/shell';
 import { convertStoreScratchDefToExamples, parseStoreScratchDef } from '../../../lib/utils/jsonUtils';
+import { FilesCopy } from '../files/copy';
 
 const TOPIC = 'examples';
 const CMD = `commerce:${TOPIC}:convert`;
@@ -29,10 +30,13 @@ export class ExamplesConvert extends SfdxCommand {
 
     protected static flagsConfig = {
         ...exampleFlags,
-        ...filterFlags(['store-name'], allFlags),
+        ...filterFlags(['store-name', 'prompt'], allFlags),
     };
 
     public async run(): Promise<AnyJson> {
+        // Copy all example files
+        FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
+        await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         if (!this.flags.definitionfile || !fs.existsSync(this.flags.definitionfile)) {
             this.flags.definitionfile = CONFIG_DIR + '/store-scratch-def.json';

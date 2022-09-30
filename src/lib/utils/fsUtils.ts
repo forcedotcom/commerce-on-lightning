@@ -7,9 +7,15 @@
 import os from 'os';
 import path, { resolve } from 'path';
 import { promisify } from 'util';
-import { fs } from '@salesforce/core';
+import { fs, Messages } from '@salesforce/core';
 import parser from 'fast-xml-parser';
-// import he from 'he';
+import chalk from 'chalk';
+import { ux } from 'cli-ux';
+import { BASE_DIR } from './constants/properties';
+
+Messages.importMessagesDirectory(__dirname);
+
+const msgs = Messages.loadMessages('@salesforce/commerce', 'commerce');
 
 /* eslint-disable @typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-return,@typescript-eslint/no-unsafe-assignment */
 export function remove(filePath: string): void {
@@ -36,6 +42,52 @@ export function mkdirSync(name: string): string {
         /* DO NOTHING don't care if file already exists*/
     }
     return name;
+}
+export async function copyFileWithConfirm(source: string, target: string, prompt?: boolean): Promise<void> {
+    let targetFile = target;
+    // If target is a directory, a new file with the same name will be created
+    if (fs.existsSync(target))
+        if (fs.lstatSync(target).isDirectory()) targetFile = path.join(target, path.basename(source));
+
+    if (fs.existsSync(targetFile)) {
+        if (!fs.areFilesEqualSync(targetFile, source)) {
+            let promptAnswer;
+            ux.log(chalk.red(msgs.getMessage('files.fileDifference', [targetFile, source])));
+            if (prompt === true) {
+                promptAnswer = await ux.confirm(
+                    chalk.green(msgs.getMessage('files.copyPluginVersionYN', [targetFile, source]))
+                );
+            } else {
+                promptAnswer = true;
+            }
+            if (promptAnswer === true) {
+                ux.log(chalk.green(msgs.getMessage('files.overwritingFile', [targetFile, source])));
+                fs.writeFileSync(targetFile, fs.readFileSync(source));
+            } else if (promptAnswer === false) {
+                ux.log(chalk.green(msgs.getMessage('files.skippingFile', [targetFile])));
+                return;
+            }
+        }
+    } else {
+        fs.writeFileSync(targetFile, fs.readFileSync(source));
+    }
+}
+
+export async function copyFolderRecursiveWithConfirm(source: string, target: string, prompt?: boolean): Promise<void> {
+    let files = [];
+    // Check if folder needs to be created or integrated
+    const targetFolder = path.join(target, path.basename(source));
+    if (!fs.existsSync(targetFolder)) fs.mkdirSync(targetFolder);
+    // Copy
+    if (fs.lstatSync(source).isDirectory()) {
+        files = fs.readdirSync(source);
+        for (const file1 of files.filter((file: string) => !fs.existsSync(`${BASE_DIR}/${file}`))) {
+            const curSource = path.join(source, file1);
+            if (fs.lstatSync(curSource).isDirectory())
+                await copyFolderRecursiveWithConfirm(curSource, targetFolder, prompt);
+            else await copyFileWithConfirm(curSource, targetFolder, prompt);
+        }
+    }
 }
 
 export function copyFileSync(source: string, target: string): void {

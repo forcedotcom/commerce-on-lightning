@@ -14,9 +14,16 @@ Reference Implementation samples for B2B checkout integrations. Include Apex cla
 
 # This repository includes examples for:
 
+**WARNING!!** These classes are only provided as samples and MUST NOT be used "as they are" in production systems.
+
 ## 1. Delivery
 
 The example for Delivery implementation includes an Apex class (B2BDeliverySample.apxc) that makes a call to an external service to retrieve shipping rates and then saves that rate as an additional charge in the CartItems.
+
+**WARNING!!**
+This example uses live (sample) heroku service to showcase how to use a 3rd party integration to retrieve Shipping Options. The function `getShippingOptionsAndRatesFromExternalService` responds with sample hardcoded shipping options. If you need to bypass the live call, use `getShippingOptionsAndRatesFromMockedService` instead.
+
+These implementations are just a sample with hardcoded Shipping Options and **MUST NOT** be used in production systems.
 
 A test class is also included for reference. The test coverage of 76% will allow deployment from sandbox to production.
 

@@ -1,6 +1,13 @@
 {
     "nameFlagDescription": "name to print",
     "errorNoOrgResults": "No results found for the org '%s'.",
+    "files": {
+        "cmdDescription": "Copy files from source to destination folder",
+        "fileDifference": "Local file %s does not match source file %s.",
+        "copyPluginVersionYN": "Would you like replace %s with %s? Y/N",
+        "overwritingFile": "Overwriting file %s with %s",
+        "skippingFile": "Skipping replacing existing file: %s"
+    },
     "setup": {
         "cmdDescription": "Setup a devhub and scratch org from start to finish with one command",
         "resetAllDescription": "Reset org clearing all devhub and scratch orgs and sdb",
@@ -10,9 +17,6 @@
         "errorScratchOrgCreate": "Scratch Org with Admin username %s failed for ScratchOrgCreate",
         "errorStoreCreate": "Store %s with Scratch Org Admin %s failed for StoreCreate",
         "errorPaymentsQuickstartSetup": "Store %s with Scratch Org Admin %s failed for PaymentsQuickstartSetup"
-    },
-    "downloads": {
-        "hookRunning": "example init hook running before %s"
     },
     "shell": {
         "errorCheck": "TypeError: Converting circular structure to JSON",

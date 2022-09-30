@@ -2,25 +2,53 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [236.0.3](https://github.com/forcedotcom/commerce-on-lightning/compare/v234.0.17...v236.0.3) (2022-04-26)
-
+### [238.0.16](https://github.com/forcedotcom/commerce-on-lightning/compare/v238.0.15...v238.0.16) (2022-09-29)
 
 ### Bug Fixes
 
-* add release context to config.yml ([10646cc](https://github.com/forcedotcom/commerce-on-lightning/commit/10646cc5e0c210e26b7a69fc4b04998c85bdd16b))
-* alter release to salesforce-cli context in config.yml ([b6b6c16](https://github.com/forcedotcom/commerce-on-lightning/commit/b6b6c16357c674d064713d961fc320e242198ca3))
-* change main-2 to master and fix config.yml ([f3e1cf4](https://github.com/forcedotcom/commerce-on-lightning/commit/f3e1cf4fe32c9a301cbe94c0eb00b3d5e07b4c77))
-* update README.md ([bcd79aa](https://github.com/forcedotcom/commerce-on-lightning/commit/bcd79aad70daa15b8cba575eaf8c2397e2b90fb2))
+-   apex tests ([6db2e27](https://github.com/forcedotcom/commerce-on-lightning/commit/6db2e27822a5cf2af9b939dda39be1424087a110))
+
+### [238.0.15](https://github.com/forcedotcom/commerce-on-lightning/compare/v236.0.3...v238.0.15) (2022-05-19)
+
+### Features
+
+-   **cleanup:** add contributing.md update contributing.md moving development code to develop branch ([63123ee](https://github.com/forcedotcom/commerce-on-lightning/commit/63123ee24aca5fbebf22ff993c4c69df6705f3d1))
+-   enable translation workbench ([8e89fba](https://github.com/forcedotcom/commerce-on-lightning/commit/8e89fba665a5bd173510a1e0c6bbeadca8c7b9f9))
+-   i18n support for tax integration sample ([a0e7a6e](https://github.com/forcedotcom/commerce-on-lightning/commit/a0e7a6ec02309f5d998853459dce8ca297eca77c))
+-   support net and gross taxation with adjustments ([748e692](https://github.com/forcedotcom/commerce-on-lightning/commit/748e69266069d844038edc92536a076bcf545bfb))
+
+### Bug Fixes
+
+-   allow edited files to persist and setting to correct version number ([f8f569c](https://github.com/forcedotcom/commerce-on-lightning/commit/f8f569cdd775d62817f742a8650df609c38931eb))
+-   allow edited files to persist as a command instead of hook ([2d1502b](https://github.com/forcedotcom/commerce-on-lightning/commit/2d1502b30708d3f54c6073959ecb3d08a7220bff))
+-   change the timeout from unlimited to 60mins ([1de4e0a](https://github.com/forcedotcom/commerce-on-lightning/commit/1de4e0a5a38384d29d068cad423cc82e65d1c400))
+-   Correct typo on Payeezy adapter ([6bcfc36](https://github.com/forcedotcom/commerce-on-lightning/commit/6bcfc3625bd048bd89113abc00251958de817d01))
+-   do NOT backup existing example files ([a9947f8](https://github.com/forcedotcom/commerce-on-lightning/commit/a9947f884a2614ee157e0c8c22b63b7eda255a4e))
+-   ignore parsing of node value ([220da2a](https://github.com/forcedotcom/commerce-on-lightning/commit/220da2afb4bc278d65e8f35caec81c91950464b4))
+-   move test-ts-update circleci to develop ([bc968db](https://github.com/forcedotcom/commerce-on-lightning/commit/bc968db6682b9cb8e0f76842241e5fff2efe7de5))
+-   regenerating command snapshot after rebasing main to develop ([b22b291](https://github.com/forcedotcom/commerce-on-lightning/commit/b22b2911b37455268aa7893013987991d2ec31bd))
+-   resolving merge conflicts with main ([d4b0c62](https://github.com/forcedotcom/commerce-on-lightning/commit/d4b0c62ab34d2b9573b81689f3532ad34a989765))
+-   revert changes made to existing global variables ([d7acfa4](https://github.com/forcedotcom/commerce-on-lightning/commit/d7acfa40333306bf901fd142c39aafbbe14b5059))
+-   stripe payment gateway ([926b717](https://github.com/forcedotcom/commerce-on-lightning/commit/926b717ccf732d70c07a6b9913b8e8030b570be8))
+-   update old references to main-2 ([bb63ab7](https://github.com/forcedotcom/commerce-on-lightning/commit/bb63ab7a4b9a433bab3705af8cf709e875fa1f34))
+
+### [236.0.3](https://github.com/forcedotcom/commerce-on-lightning/compare/v234.0.17...v236.0.3) (2022-04-26)
+
+### Bug Fixes
+
+-   add release context to config.yml ([10646cc](https://github.com/forcedotcom/commerce-on-lightning/commit/10646cc5e0c210e26b7a69fc4b04998c85bdd16b))
+-   alter release to salesforce-cli context in config.yml ([b6b6c16](https://github.com/forcedotcom/commerce-on-lightning/commit/b6b6c16357c674d064713d961fc320e242198ca3))
+-   change main-2 to master and fix config.yml ([f3e1cf4](https://github.com/forcedotcom/commerce-on-lightning/commit/f3e1cf4fe32c9a301cbe94c0eb00b3d5e07b4c77))
+-   update README.md ([bcd79aa](https://github.com/forcedotcom/commerce-on-lightning/commit/bcd79aad70daa15b8cba575eaf8c2397e2b90fb2))
 
 ### [234.0.17](https://github.com/forcedotcom/commerce-on-lightning/compare/v234.0.15...v234.0.17) (2022-01-19)
 
-
 ### Bug Fixes
 
-* correct typo ([7485e55](https://github.com/forcedotcom/commerce-on-lightning/commit/7485e55f6012bc8926b0e1691bd3ba090f70a695))
-* removing /s from store url ([ccf364d](https://github.com/forcedotcom/commerce-on-lightning/commit/ccf364d237219b5bbfa6db547bf453cf5ff39087))
-* removing /s from store url ([40e1b92](https://github.com/forcedotcom/commerce-on-lightning/commit/40e1b925fa85db36a1ff1b1e708b6492cfd962c1))
-* update product import CSVs to expected v54 format ([8c17c13](https://github.com/forcedotcom/commerce-on-lightning/commit/8c17c13fd8bfe4068dca33bb6f146f1eb8312847))
+-   correct typo ([7485e55](https://github.com/forcedotcom/commerce-on-lightning/commit/7485e55f6012bc8926b0e1691bd3ba090f70a695))
+-   removing /s from store url ([ccf364d](https://github.com/forcedotcom/commerce-on-lightning/commit/ccf364d237219b5bbfa6db547bf453cf5ff39087))
+-   removing /s from store url ([40e1b92](https://github.com/forcedotcom/commerce-on-lightning/commit/40e1b925fa85db36a1ff1b1e708b6492cfd962c1))
+-   update product import CSVs to expected v54 format ([8c17c13](https://github.com/forcedotcom/commerce-on-lightning/commit/8c17c13fd8bfe4068dca33bb6f146f1eb8312847))
 
 ### [234.0.15](https://github.com/forcedotcom/commerce-on-lightning/compare/v234.0.14...v234.0.15) (2022-01-13)
 
