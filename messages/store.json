@@ -78,6 +78,8 @@
             "errorNoBuyerGroupNameProductImportFailed": "No Buyer Group Name - Product Import must have failed",
             "mappingAdminUserToRole": "Mapping Admin User to Role.",
             "thisDeveloperNameAlreadyExists": "This Developer Name already exists or has been previously used.",
+            "userRoleAlreadyExists": "User role '%s' already exists",
+            "createdUserRole": "Created user role '%s'",
             "creatingBuyerUserWithContactAndAccount": "Creating Buyer User with associated Contact and Account.",
             "makingAccountBuyerAccount": "Making Account a Buyer Account",
             "assigningBuyerAccountToBuyerGroup": "Assigning Buyer Account to Buyer Group.",
@@ -114,6 +116,23 @@
             "createdByQuickStartScript": "created by Quick Start script",
             "unknownError": "Unknown error:\n",
             "done": "Done"
+        }
+    },
+    "extension": {
+        "register": {
+            "cmdDescription": "Register an extension with one command",
+            "apexClassNameFlagDescription": "Name of the Apex class that needs to be extended",
+            "errApexClass": "Error while retrieving the Apex Class:",
+            "error": "Error while registering with the given registered extension name:",
+            "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
+            "regExtensionNameFlagDescription": "Unique name for extension",
+            "errEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
+            "savingConfigIntoConfig": "Successfully registered the extension. Use command [commerce:extension:map] to link the extension to a webstore.",
+            "apexNameSpaceFlagDescription": "Optional namespace for apex class",
+            "undefinedName": "Undefined registered extension name. Enter '-r <name>'"
+        },
+        "getEPN": {
+            "cmdDescription": "Lists all EPN values"
         }
     },
     "view": {

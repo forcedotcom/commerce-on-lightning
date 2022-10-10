@@ -1,0 +1,34 @@
+{
+    "extension": {
+        "map": {
+            "cmdDescription": "Maps an extension to a specific webstore",
+            "StoreNameFlagDescription": "The name of the webstore to map the extension",
+            "errStoreName": "Can't find webstore with the name:",
+            "errStoreId": "Can't find webstore ID:",
+            "error": "Error while mapping the given registered extension name:",
+            "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
+            "regExtensionNameFlagDescription": "Unique name for extension",
+            "savingConfigIntoConfig": "Successfully mapped the extension",
+            "storeId": "Optional webstore ID flag",
+            "errorEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
+            "nonexistent": "Can't find extension with registered extension name:",
+            "previousEPN": "Unmapped the extension",
+            "undefinedName": "Undefined webstore ID and webstore name. Enter either '-i <webstoreId>' or '-n <webstoreName>'.",
+            "errMultipleStoreWithSameName": "More than one webstore found with the given name. To see all the webstores with the given name, run [sfdx force:data:soql:query -q SELECT ID, NAME FROM WEBSTORE WHERE NAME = '<webstoreName>' --json] and use '-i <storeId>' to specify a specific webstore."
+        },
+        "unmap": {
+            "cmdDescription": "Unmaps an extension from a store",
+            "StoreNameFlagDescription": "The name of the webstore to map the extension",
+            "errStoreName": "Can't find webstore with the name:",
+            "errStoreId": "Can't find webstore ID:",
+            "error": "The mapped extension could not be found with the registered extension name:",
+            "extensionPointNameDescription": "Means of identifying entry points within the domain code that are capable of being extended by partners.Takes the form domain_sub-domain_interface. E.g: checkout_summary_computeTax",
+            "regExtensionNameFlagDescription": "Unique name for extension",
+            "savingConfigIntoConfig": "Successfully unmapped the extension",
+            "storeId": "Optional webstore ID flag",
+            "errorEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
+            "undefinedName": "Undefined webstore ID and webstore name. Enter either '-i <webstoreId>' or '-n <webstoreName>'.",
+            "unmappingEPN": "Unmapped the previous mapped extension:"
+        }
+    }
+}

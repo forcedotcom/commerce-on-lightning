@@ -2,40 +2,62 @@
     {
         "command": "commerce:examples:convert",
         "plugin": "@salesforce/commerce",
+        "flags": ["definitionfile", "json", "loglevel", "outputdir", "prompt", "sourcepath", "store-name", "type"]
+    },
+    {
+        "command": "commerce:extension:register",
+        "plugin": "@salesforce/commerce",
         "flags": [
-            "definitionfile",
-            "json",
+            "registered-extension-name",
+            "extension-point-name",
+            "apex-class-name",
             "loglevel",
-            "outputdir",
-            "prompt",
-            "sourcepath",
+            "json",
+            "targetusername",
+            "apiversion",
+            "apex-namespace"
+        ]
+    },
+    {
+        "command": "commerce:extension:map",
+        "plugin": "@salesforce/commerce",
+        "flags": [
+            "registered-extension-name",
             "store-name",
-            "type"
+            "store-id",
+            "loglevel",
+            "json",
+            "targetusername",
+            "apiversion"
+        ]
+    },
+    {
+        "command": "commerce:extension:unmap",
+        "plugin": "@salesforce/commerce",
+        "flags": [
+            "registered-extension-name",
+            "store-name",
+            "store-id",
+            "loglevel",
+            "json",
+            "targetusername",
+            "apiversion"
         ]
     },
     {
         "command": "commerce:files:copy",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "copysourcepath",
-            "dirstocopy",
-            "filestocopy",
-            "json",
-            "loglevel",
-            "prompt"
-        ]
+        "flags": ["copysourcepath", "dirstocopy", "filestocopy", "json", "loglevel", "prompt"]
+    },
+    {
+        "command": "commerce:extension:points:list",
+        "plugin": "@salesforce/commerce",
+        "flags": ["json", "loglevel", "targetusername", "apiversion"]
     },
     {
         "command": "commerce:payments:quickstart:setup",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "apiversion",
-            "json",
-            "loglevel",
-            "payment-adapter",
-            "store-name",
-            "targetusername"
-        ]
+        "flags": ["apiversion", "json", "loglevel", "payment-adapter", "store-name", "targetusername"]
     },
     {
         "command": "commerce:products:import",
@@ -87,27 +109,12 @@
     {
         "command": "commerce:store:open",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "all",
-            "apiversion",
-            "json",
-            "loglevel",
-            "store-name",
-            "targetdevhubusername",
-            "targetusername"
-        ]
+        "flags": ["all", "apiversion", "json", "loglevel", "store-name", "targetdevhubusername", "targetusername"]
     },
     {
         "command": "commerce:store:quickstart:create",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "apiversion",
-            "json",
-            "loglevel",
-            "store-name",
-            "targetusername",
-            "templatename"
-        ]
+        "flags": ["apiversion", "json", "loglevel", "store-name", "targetusername", "templatename"]
     },
     {
         "command": "commerce:store:quickstart:setup",

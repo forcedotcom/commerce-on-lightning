@@ -481,8 +481,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         // TODO find something to verify this is done better than a step
         if (await this.statusFileManager.getValue('adminUserMapped')) return;
         this.ux.log(msgs.getMessage('quickstart.setup.mappingAdminUserToRole'));
-        const ceoID = forceDataSoql("SELECT Id FROM UserRole WHERE Name = 'CEO'", this.org.getUsername()).result
-            .records[0].Id;
+        const ceoID = this.getUserRole();
         try {
             forceDataRecordCreate(
                 'UserRole',
@@ -505,6 +504,25 @@ export class StoreQuickstartSetup extends SfdxCommand {
         ).result.username;
         forceDataRecordUpdate('User', `UserRoleId='${newRoleID}'`, `Username='${username}'`, this.org.getUsername());
         await this.statusFileManager.setValue('adminUserMapped', true);
+    }
+
+    private getUserRole(): string {
+        const role = 'CEO';
+        let queryResult = forceDataSoql(`SELECT Id FROM UserRole WHERE Name = '${role}'`, this.org.getUsername())
+            .result;
+        if (queryResult?.records && queryResult.records.length > 0) {
+            this.ux.log(msgs.getMessage('quickstart.setup.userRoleAlreadyExists', [role]));
+            return queryResult.records[0].Id;
+        }
+        //Create the user role if it does not exist
+        forceDataRecordCreate(
+            'UserRole',
+            `Name='${role}' DeveloperName='${role}' RollupDescription='${role}' `,
+            this.org.getUsername()
+        );
+        this.ux.log(msgs.getMessage('quickstart.setup.createdUserRole', [role]));
+        return forceDataSoql(`SELECT Id FROM UserRole WHERE Name = '${role}'`, this.org.getUsername()).result.records[0]
+            .Id;
     }
 
     private async createBuyerUserWithContactAndAccount(): Promise<void> {

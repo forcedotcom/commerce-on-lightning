@@ -127,17 +127,17 @@ export function modifyArgFlag(flag: string[], value: string, argv: string[]): vo
 /**
  *
  * @param desiredFlags flags you want
- * @param allFlags the flags to pick from
+ * @param flagOptions the flags to pick from
  * @param isInclude if true then pick from desiredFlags, if false then discarded the desiredFlags
  */
 // eslint-disable-next-line @typescript-eslint/ban-types,no-shadow
-export function filterFlags(desiredFlags: string[], allFlags: {}, isInclude = true): {} {
+export function filterFlags(desiredFlags: string[], flagOptions: {}, isInclude = true): {} {
     // TODO update this to include vargs if sfdxCommand['vargsAllowList']
-    return Object.keys(allFlags)
+    return Object.keys(flagOptions)
         .filter((key) => (isInclude ? desiredFlags.includes(key) : !desiredFlags.includes(key)))
         .reduce((obj, key) => {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            obj[key] = allFlags[key];
+            obj[key] = flagOptions[key];
             return obj;
         }, {});
 }

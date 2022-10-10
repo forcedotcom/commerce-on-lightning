@@ -88,9 +88,8 @@ export class StatusFileManager {
             if (!this.status.devhubs[this.devhubAdminUsername].scratchOrgs)
                 this.status.devhubs[this.devhubAdminUsername].scratchOrgs = {};
             if (!this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername])
-                this.status.devhubs[this.devhubAdminUsername].scratchOrgs[
-                    this.scratchOrgAdminUsername
-                ] = new ScratchOrg();
+                this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername] =
+                    new ScratchOrg();
             if (position === 3) {
                 if (!this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername].stores)
                     this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername].stores = {};

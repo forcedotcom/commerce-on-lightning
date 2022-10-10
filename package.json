@@ -1,27 +1,26 @@
 {
     "name": "@salesforce/commerce",
-    "version": "238.0.16",
+    "version": "240.0.49",
     "author": "Jonathan Arndt",
     "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
     "dependencies": {
         "@mshanemc/plugin-helpers": "^2.1.0",
         "@oclif/command": "^1",
-        "@oclif/config": "^1",
+        "@oclif/config": "^1.18.3",
         "@oclif/errors": "^1",
         "@salesforce/command": "^3.1.0",
-        "@salesforce/core": "^2.20.5",
-        "fast-xml-parser": "^3.19.0",
-        "puppeteer": "^7.1.0",
+        "@salesforce/core": "^2.36.0",
+        "fast-xml-parser": "^3.21.1",
         "string-argv": "^0.3.1",
-        "tslib": "^2",
-        "yaml": "^2.0.0-4"
+        "tslib": "^2.3.1",
+        "yaml": "^2.1.1"
     },
     "devDependencies": {
         "@oclif/dev-cli": "^1",
         "@oclif/plugin-command-snapshot": "^2.0.0",
         "@salesforce/cli-plugins-testkit": "^0.0.25",
         "@salesforce/dev-config": "^2.1.0",
-        "@salesforce/dev-scripts": "^0.9.1",
+        "@salesforce/dev-scripts": "^3.1.0",
         "@salesforce/plugin-command-reference": "^1.3.0",
         "@salesforce/prettier-config": "^0.0.2",
         "@salesforce/ts-sinon": "1.3.5",
@@ -90,6 +89,7 @@
                 "subtopics": {
                     "devhub": {},
                     "examples": {},
+                    "extension": {},
                     "files": {},
                     "open": {},
                     "payments": {},
