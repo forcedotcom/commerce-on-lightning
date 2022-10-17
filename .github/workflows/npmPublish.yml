@@ -1,0 +1,12 @@
+on:
+  release:
+    # the result of the githubRelease workflow
+    types: [published]
+
+jobs:
+  my-publish:
+    uses: salesforcecli/github-workflows/.github/workflows/npmPublish.yml
+    with:
+      tag: latest
+      githubTag: ${{ github.event.release.tag_name }}
+    secrets: inherit
