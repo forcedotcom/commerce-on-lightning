@@ -1,10 +1,10 @@
 on:
   release:
-    # the result of the githubRelease workflow
+    # the result of the onPushToMain workflow
     types: [published]
 
 jobs:
-  my-publish:
+  npm:
     uses: salesforcecli/github-workflows/.github/workflows/npmPublish.yml
     with:
       tag: latest
