@@ -14,6 +14,6 @@ describe('Sleep', () => {
         await sleep(10);
         const end = performance.now();
         const sleepTime = end - start;
-        assert.equal(sleepTime >= 10 && sleepTime < 20, true);
+        assert.equal(sleepTime >= 10 && sleepTime < 35, true);
     });
 });
