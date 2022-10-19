@@ -5,6 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { strict as assert } from 'assert';
+import { performance } from 'perf_hooks';
 import { sleep } from '../../../src/lib/utils/sleep';
 
 describe('Sleep', () => {
