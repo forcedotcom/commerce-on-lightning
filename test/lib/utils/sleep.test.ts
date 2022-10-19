@@ -11,6 +11,6 @@ describe('Sleep', () => {
     it('should sleep for 10 ms', async () => {
         const s = new Date().getTime();
         await sleep(10);
-        assert.equal(new Date().getTime() - s < 20, true);
+        assert.equal(new Date().getTime() - s < 30, true);
     });
 });
