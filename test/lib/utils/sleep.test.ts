@@ -9,8 +9,12 @@ import { sleep } from '../../../src/lib/utils/sleep';
 
 describe('Sleep', () => {
     it('should sleep for 10 ms', async () => {
-        const s = new Date().getTime();
+        const start = new Date().getTime();
         await sleep(10);
-        assert.equal(new Date().getTime() - s < 110, true);
+        const end = new Date().getTime();
+        const sleepTime = end - start;
+        // eslint-disable-next-line no-console
+        console.log('sleep time: ', sleepTime);
+        assert.equal(sleepTime < 110, true);
     });
 });
