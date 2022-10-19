@@ -15,6 +15,6 @@ describe('Sleep', () => {
         const sleepTime = end - start;
         // eslint-disable-next-line no-console
         console.log('sleep time: ', sleepTime);
-        assert.equal(sleepTime < 110, true);
+        assert.equal(sleepTime < 20, true);
     });
 });
