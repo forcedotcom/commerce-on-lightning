@@ -13,8 +13,6 @@ describe('Sleep', () => {
         await sleep(10);
         const end = new Date().getTime();
         const sleepTime = end - start;
-        // eslint-disable-next-line no-console
-        console.log('sleep time: ', sleepTime);
-        assert.equal(sleepTime < 40, true);
+        assert.equal(sleepTime >= 10 && sleepTime < 20, true);
     });
 });
