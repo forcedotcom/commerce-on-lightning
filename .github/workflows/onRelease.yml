@@ -1,3 +1,5 @@
+name: publish
+
 on:
   release:
     # the result of the onPushToMain workflow
@@ -7,6 +9,8 @@ jobs:
   npm:
     uses: salesforcecli/github-workflows/.github/workflows/npmPublish.yml
     with:
+      ctc: true
+      sign: true
       tag: latest
       githubTag: ${{ github.event.release.tag_name }}
     secrets: inherit

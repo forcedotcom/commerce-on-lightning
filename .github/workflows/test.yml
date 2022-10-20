@@ -1,4 +1,5 @@
 name: tests
+
 on:
   push:
     branches-ignore: [main]
