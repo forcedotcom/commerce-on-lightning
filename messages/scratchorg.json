@@ -8,7 +8,9 @@
     "scratchOrgStoreNumberDescription": "Which store to create from config file scratchOrgs list -1 for all stores",
     "isB2cLiteAccessPermNeededDescription": "Should the script run sfdx force:org:open and wait for you to save B2CLiteAccessPerm?",
     "scratchOrgAliasDescription": "Alias name for this scratch org",
-        "apiVersionDescription": "Version of current Salesforce"
+        "apiVersionDescription": "Version of current Salesforce",
+        "wait": "The streaming client socket timeout (in minutes)"
+
   },
   "create": {
     "cmdDescription": "Create a scratch org",

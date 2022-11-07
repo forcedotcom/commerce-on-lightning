@@ -8,6 +8,7 @@ import { SfdxCommand, flags } from '@salesforce/command';
 import { fs, Messages, SfdxError } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
+import { Duration } from '@salesforce/kit';
 import { addAllowedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
 import { BASE_DIR, CONFIG_DIR, FILE_COPY_ARGS, DEVHUB_DIR } from '../../../lib/utils/constants/properties';
 import { Org, replaceErrors, SfdxProject } from '../../../lib/utils/jsonUtils';
@@ -53,10 +54,11 @@ export class ScratchOrgCreate extends SfdxCommand {
             default: '57.0',
             description: msgs.getMessage('createFlags.apiVersionDescription'),
         }),
-        prompt: flags.boolean({
-            char: 'y',
-            default: false,
-            description: 'If there is a file difference detected in example files, prompt before overwriting file',
+        wait: flags.minutes({
+            char: 'w',
+            description: msgs.getMessage('createFlags.wait'),
+            min: 6,
+            default: Duration.minutes(15),
         }),
     };
     private statusManager: StatusFileManager;
@@ -121,7 +123,7 @@ export class ScratchOrgCreate extends SfdxCommand {
 --apiversion="${this.flags['api-version'] as string}" \
 --setalias="${this.flags['scratch-org-alias'] as string}" \
 --durationdays=30 \
---wait=15 \
+--wait=${(this.flags['wait'] as Duration).minutes} \
 username="${this.flags['scratch-org-admin-username'] as string}" \
 --setdefaultusername \
 --json`;
