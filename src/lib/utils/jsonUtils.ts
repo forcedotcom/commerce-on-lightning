@@ -356,3 +356,16 @@ export class StoreConfig {
     public type = 'site';
     public authenticationType: string;
 }
+
+export class SfdxProject {
+    public packageDirectories: Record<string, any>[] = [
+        {
+            path: 'force-app',
+            default: true,
+        },
+    ];
+    public namespace: string = '';
+    public sfdcLoginUrl: string = 'http://localhost.internal.salesforce.com:6109';
+    public sourceApiVersion: string = '57.0';
+    public signupTargetLoginUrl: string;
+}

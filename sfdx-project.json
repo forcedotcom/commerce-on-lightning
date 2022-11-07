@@ -7,5 +7,5 @@
   ],
   "namespace": "",
   "sfdcLoginUrl": "http://localhost.internal.salesforce.com:6109",
-  "sourceApiVersion": "52.0"
+  "sourceApiVersion": "57.0"
 }

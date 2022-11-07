@@ -1,0 +1,42 @@
+{
+    "devHubFlags": {
+        "hubOrgAdminUsernameDescription": "username of the hub org admin"
+    },
+    "createFlags": {
+    "scratchOrgAdminUsernameDescription": "username of the admin to associate with the scratch org.",
+    "scratchOrgStoreNameDescription": "Name of scratch org store",
+    "scratchOrgStoreNumberDescription": "Which store to create from config file scratchOrgs list -1 for all stores",
+    "isB2cLiteAccessPermNeededDescription": "Should the script run sfdx force:org:open and wait for you to save B2CLiteAccessPerm?",
+    "scratchOrgAliasDescription": "Alias name for this scratch org",
+        "apiVersionDescription": "Version of current Salesforce"
+  },
+  "create": {
+    "cmdDescription": "Create a scratch org",
+    "waitingForStringToLoad": "Waiting for %s to load",
+    "permsEnabled": "Perms enabled",
+    "permsDisabled": "Perms disabled",
+    "usingScratchOrgAdmin": "Using scratch org admin %s",
+    "devhubSetupWasNotCompletedSuccessfully": "Devhub setup was not completed successfully. Please complete devhub setup before attempting to create a scratch org.'",
+    "completedCreatingScratchOrg": "Completed creating scratch org.",
+    "allDoneProceedCreatingNewStore": "All done, you can proceed with creating a new store %s",
+    "orgExists": "Org already exists: ",
+    "preparingResourcesEtc": "Preparing resources (apex, profiles, email templates, etc.)",
+    "creatingNewScratchOrgInfo": "Creating a new scratch org, note that you can create maximum of 3 scratch orgs per day, so this may fail if you have more.\n",
+    "apiVersion": "API version: %s\n",
+    "hubOrgAlias": "Hub Org Alias: %s\n",
+    "scratchOrgAdminUsername": "Scratch Org Admin Username: %s\n",
+    "thisMayTakeAFewMins": "This may take a few minutes...\n",
+    "creatingNewScratchOrg": "Creating a new scratch org",
+    "using": "Using %s",
+    "successfulOrgCreation": "Org Creation Successful",
+    "failureOrgCreation": "Org Creation Failure",
+    "sleepingBeforeCheckingIfOrgIsCreated": "Sleeping before checking if org is created yet.",
+    "waitedTimeStillNoOrgCreated": "Waited %s and still no org created",
+    "scratchOrgNowExists": "Scratch org now exists",
+    "errorOccurredMightNeedDevhubAuth\n": "Error Occurred, might be because you need to devhub auth\n",
+    "authFailed": "Auth Failed",
+    "isAlreadyInUse": "is already in use",
+    "errorOccurredDuringOrgCreateMightNeedTMPAuth": "Error Occurred during Org Create, might need to TMP Auth\n",
+    "pleaseTryAgain": "Please try again"
+  }
+}
