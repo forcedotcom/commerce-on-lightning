@@ -14,54 +14,61 @@ function contains(v: string, a): boolean {
 }
 
 /**
- * Determine if flags were passed in the UI.  This is useful to override config values if values are passed
- * into the cli
+ * Determine if flags were passed in the UI.
+ * This is useful to override config values if values are passed into the cli
  * This will ignore -v and -u for (await this.org.getDevHubOrg()).getUsername() and this.org.getUsername() respectively
  *
- * @param flagConfig
- * @param flags
  * @param argv
+ * @param flagConfig
  */
-export function getPassedArgs(
-    argv: string[],
-    flags: Record<string, unknown>,
-    flagConfig: FlagsConfig = allFlags
-): Record<string, never> {
+export function getPassedArgs(argv: string[], flagConfig: FlagsConfig = allFlags): Record<string, never> {
     // if no argv then return empty object
     if (!(argv && argv.length > 0)) return {};
-    const m = {};
-    Object.keys(flagConfig).forEach((k) => {
-        m['--' + k] = k;
-        m['-' + (flagConfig[k]['char'] as string)] = k;
-    });
-    const n = {};
+
+    const acceptedFlags = {};
+    const passedArgs = {};
     let last;
-    // eslint-disable-next-line no-console,@typescript-eslint/no-empty-function
+
+    Object.keys(flagConfig).forEach((k) => {
+        acceptedFlags['--' + k] = k;
+        acceptedFlags['-' + (flagConfig[k]['char'] as string)] = k;
+    });
+
     argv.forEach((arg) => {
         if (arg.startsWith('-')) {
-            if (arg in m) {
-                // handle single element boolean arg
+            if (arg in acceptedFlags) {
+                // for case single element boolean arg
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                if (flagConfig[m[arg]]['kind'] === 'boolean') {
+                if (flagConfig[acceptedFlags[arg]]['kind'] === 'boolean') {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    n[m[arg]] = true;
+                    passedArgs[acceptedFlags[arg]] = true;
                     last = undefined;
                 } else {
-                    // for case -v something or --hello something
+                    // for case -h 'something' or --hello 'something'
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    n[m[arg]] = undefined;
+                    passedArgs[acceptedFlags[arg]] = undefined;
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    last = m[arg];
+                    last = acceptedFlags[arg];
                 }
             }
-            // for case -vsomething excluding --hellosomething
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            else for (const k of Object.keys(m)) if (arg.startsWith(k) && k.length === 2) n[m[k]] = arg.replace(k, '');
+            // for case -v, -u and -h'something' excluding --hello'something'
+            else {
+                let isArgAssigned = false;
+                for (const k of Object.keys(acceptedFlags)) {
+                    if (k.length === 2 && arg.startsWith(k)) {
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                        passedArgs[acceptedFlags[k]] = arg.replace(k, '');
+                        isArgAssigned = true;
+                    }
+                }
+                // for case -v, -u
+                if (!isArgAssigned) last = undefined;
+            }
         }
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        else n[last] = arg;
+        else if (last !== undefined) passedArgs[last] = arg;
     });
-    return n;
+    return passedArgs;
 }
 
 /**

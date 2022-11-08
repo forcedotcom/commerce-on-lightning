@@ -43,7 +43,7 @@ export class FilesCopy extends SfdxCommand {
     };
 
     public async run(): Promise<void> {
-        // const passedArgs = getPassedArgs(this.argv, this.flags);
+        // const passedArgs = getPassedArgs(this.argv);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const prompt = this.flags.prompt;
         mkdirSync(BASE_DIR);

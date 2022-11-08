@@ -169,7 +169,7 @@ export class StoreCreate extends SfdxCommand {
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
-        const passedArgs = getPassedArgs(this.argv, this.flags);
+        const passedArgs = getPassedArgs(this.argv);
         if (!this.flags.type || (this.flags.type !== 'b2c' && this.flags.type !== 'b2b')) this.flags.type = 'b2c';
         if (!Object.keys(passedArgs).includes('definitionfile') && Object.keys(passedArgs).includes('type'))
             this.flags.definitionfile = CONFIG_DIR + '/' + (passedArgs.type as string) + '-store-scratch-def.json';

@@ -119,7 +119,7 @@ export const parseStoreScratchDef = (
                 .replace('$(hostname)', os.hostname())
         )
     );
-    const parsedArgs = getPassedArgs(argv, flags, flagConfig);
+    const parsedArgs = getPassedArgs(argv, flagConfig);
     // add more potentially from settings to be passed in cli
     if (parsedArgs['store-name']) sctDef.storeName = parsedArgs['store-name'];
     if (parsedArgs['type']) sctDef.edition = parsedArgs['type'];
