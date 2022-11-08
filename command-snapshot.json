@@ -129,5 +129,20 @@
             "targetdevhubusername",
             "targetusername"
         ]
+    },
+    {
+        "command": "commerce:scratchorg:create",
+        "plugin": "@salesforce/commerce",
+        "flags": [
+            "apiversion",
+            "targetdevhubusername",
+            "json",
+            "loglevel",
+            "prompt",
+            "targetusername",
+            "alias",
+            "wait",
+            "type"
+        ]
     }
 ]

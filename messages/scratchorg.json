@@ -25,7 +25,7 @@
     "preparingResourcesEtc": "Preparing resources (apex, profiles, email templates, etc.)",
     "creatingNewScratchOrgInfo": "Creating a new scratch org, note that you can create maximum of 3 scratch orgs per day, so this may fail if you have more.\n",
     "apiVersion": "API version: %s\n",
-    "hubOrgAlias": "Hub Org Alias: %s\n",
+    "devhubUsername": "Devhub Username: %s\n",
     "scratchOrgAdminUsername": "Scratch Org Admin Username: %s\n",
     "thisMayTakeAFewMins": "This may take a few minutes...\n",
     "creatingNewScratchOrg": "Creating a new scratch org",
