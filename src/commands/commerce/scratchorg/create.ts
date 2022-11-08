@@ -60,14 +60,17 @@ export class ScratchOrgCreate extends SfdxCommand {
             min: 6,
             default: Duration.minutes(15),
         }),
+        prompt: flags.boolean({
+            char: 'y',
+            default: false,
+            description: 'If there is a file difference detected, prompt before overwriting file',
+        }),
     };
     private statusManager: StatusFileManager;
     private devHubDir: string;
 
     public async run(): Promise<AnyJson> {
-        // copy the config files
-        FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
-        await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
+        await this.copyConfigFiles();
         this.statusManager = new StatusFileManager(this.flags.devhubUsername, this.flags['scratch-org-admin-username']);
         this.ux.log(msgs.getMessage('create.usingScratchOrgAdmin', [this.flags['scratch-org-admin-username']]));
         if (!getOrgInfo(this.flags['hub-org-admin-username']))
@@ -89,6 +92,16 @@ export class ScratchOrgCreate extends SfdxCommand {
             chalk.green.bold(msgs.getMessage('create.allDoneProceedCreatingNewStore', ['commerce:store:create']))
         );
         return { scratchOrgCreated: true };
+    }
+
+    private async copyConfigFiles(): Promise<void> {
+        // copy the config files
+        // TODO: Copy only scratch org files
+        FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
+        if (this.flags.prompt) {
+            this.argv.push('--prompt');
+        }
+        await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
     }
 
     private async getScratchOrg(): Promise<Org> {
