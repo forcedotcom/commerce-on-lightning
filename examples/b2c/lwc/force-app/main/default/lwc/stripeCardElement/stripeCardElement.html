@@ -1,0 +1,9 @@
+<template>
+    <div lwc:dom="manual" class="stripe-card-element">
+        <!-- Elements will create input elements here -->
+    </div>
+    <span class="error">{error}</span>
+    <template if:true={showTestCards}>
+        <a class="cards" href="https://stripe.com/docs/testing#cards" target="_blank"><b>stripe</b> test cards</a>
+    </template>
+</template>
