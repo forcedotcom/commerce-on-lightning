@@ -26,8 +26,8 @@ const CMD = `commerce:${TOPIC}:create`;
 const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class ScratchOrgCreate extends SfdxCommand {
-    public static readonly supportsDevhubUsername = true;
-    public static readonly supportsUsername = true;
+    public static readonly requiresDevhubUsername = true;
+    public static readonly requiresUsername = true;
     public static description = msgs.getMessage('create.cmdDescription');
     public static examples = [
         `sfdx ${CMD} --targetusername demo@1commerce.com --targetdevhubusername ceo@mydevhub.com`,

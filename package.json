@@ -1,6 +1,6 @@
 {
     "name": "@salesforce/commerce",
-    "version": "242.0.8",
+    "version": "242.0.9",
     "author": "Jonathan Arndt",
     "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
     "dependencies": {
@@ -95,6 +95,7 @@
                     "payments": {},
                     "products": {},
                     "scratchorg": {},
+                    "search": {},
                     "store": {
                         "subtopics": {
                             "view": {},
