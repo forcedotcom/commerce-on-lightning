@@ -10,7 +10,7 @@ import { AnyJson } from '@salesforce/ts-types';
 import { paymentsFlags } from '../../../../lib/flags/commerce/payments.flags';
 import { storeFlags } from '../../../../lib/flags/commerce/store.flags';
 import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../../lib/utils/args/flagsUtils';
-import { EXAMPLE_DIR, FILE_COPY_ARGS } from '../../../../lib/utils/constants/properties';
+import { STORE_DIR, FILE_COPY_ARGS, EXAMPLE_DIR } from '../../../../lib/utils/constants/properties';
 import { forceDataRecordCreate, forceDataRecordDelete, forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
 import { shell, shellJsonSfdx } from '../../../../lib/utils/shell';
 import { StoreQuickstartSetup } from '../../store/quickstart/setup';
@@ -43,19 +43,32 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         const paymentGatewayAdapterName = `${selection}Adapter`;
         const paymentGatewayProviderName = `${selection}PGP`;
         const paymentGatewayName = `${selection}PG`;
+
         const examplesDir = `${EXAMPLE_DIR}/${StoreQuickstartSetup.getStoreType(
             this.org.getUsername(),
             this.flags['store-name'],
             this.ux
         ).toLowerCase()}/checkout/payment-gateway-integration/${selection[0].toUpperCase() + selection.substr(1)}/`;
+
         this.ux.log(
             msgs.getMessage('quickstart.setup.settingUpGatewayConvertingNamedCredentialsGatewayAdapterApex', [
                 selection,
             ])
         );
-        this.ux.log(JSON.stringify(shellJsonSfdx(`sfdx force:mdapi:convert -r ${examplesDir}`), null, 4));
+        const storeDir = STORE_DIR(undefined, 'ceo@mydevhub.com', 'demo@1commerce.com', '1commerce');
+
         this.ux.log(msgs.getMessage('quickstart.setup.pushingNamedCredentialsAndGatewayAdapterApexToOrg'));
-        this.ux.log(JSON.stringify(shellJsonSfdx(`sfdx force:source:push -f -u "${this.org.getUsername()}"`), null, 4));
+        this.ux.log(
+            JSON.stringify(
+                shellJsonSfdx(
+                    `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${examplesDir} -w 1`,
+                    null,
+                    storeDir
+                ),
+                null,
+                4
+            )
+        );
         // Creating Payment Gateway Provider
         const apexClassIdRecord = forceDataSoql(
             `SELECT Id FROM ApexClass WHERE Name='${paymentGatewayAdapterName}' LIMIT 1`,
