@@ -35,7 +35,7 @@ describe('commerce:scratchorg:create', () => {
         scratchOrgCreate.statusManager = sfm;
 
         const flagObject = {
-            targetusername: orgUser,
+            username: orgUser,
             targetdevhubusername: devhubUser,
             type: 'b2c',
             apiversion: '57.0',
@@ -57,7 +57,7 @@ describe('commerce:scratchorg:create', () => {
 --setalias="${flagObject.alias}" \
 --durationdays=30 \
 --wait=${flagObject.wait} \
-username="${flagObject.targetusername}" \
+username="${flagObject.username}" \
 --setdefaultusername \
 --json`;
 

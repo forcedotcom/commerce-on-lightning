@@ -8,7 +8,6 @@ import { SfdxCommand, flags } from '@salesforce/command';
 import { fs, Messages, SfdxError } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
-import { Duration } from '@salesforce/kit';
 import { addAllowedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
 import { BASE_DIR, CONFIG_DIR, FILE_COPY_ARGS, DEVHUB_DIR } from '../../../lib/utils/constants/properties';
 import { replaceErrors, SfdxProject } from '../../../lib/utils/jsonUtils';
@@ -27,13 +26,14 @@ const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
 export class ScratchOrgCreate extends SfdxCommand {
     public static readonly requiresDevhubUsername = true;
-    public static readonly requiresUsername = true;
     public static description = msgs.getMessage('create.cmdDescription');
-    public static examples = [
-        `sfdx ${CMD} --targetusername demo@1commerce.com --targetdevhubusername ceo@mydevhub.com`,
-    ];
+    public static examples = [`sfdx ${CMD} --username demo@1commerce.com --targetdevhubusername ceo@mydevhub.com`];
 
     protected static flagsConfig = {
+        username: flags.string({
+            char: 'u',
+            description: msgs.getMessage('createFlags.scratchOrgAdminUsernameDescription'),
+        }),
         alias: flags.string({
             char: 'a',
             description: msgs.getMessage('createFlags.scratchOrgAliasDescription'),
@@ -43,11 +43,10 @@ export class ScratchOrgCreate extends SfdxCommand {
             default: 'both',
             description: 'b2b, b2c or both',
         }),
-        wait: flags.minutes({
+        wait: flags.number({
             char: 'w',
             description: msgs.getMessage('createFlags.wait'),
-            min: 6,
-            default: Duration.minutes(15),
+            default: 15,
         }),
         prompt: flags.boolean({
             char: 'y',
@@ -60,9 +59,8 @@ export class ScratchOrgCreate extends SfdxCommand {
 
     public async run(): Promise<AnyJson> {
         await this.copyConfigFiles();
-
-        this.statusManager = new StatusFileManager(this.flags.devhubUsername, this.flags['targetusername']);
-        this.ux.log(msgs.getMessage('create.usingScratchOrgAdmin', [this.flags['targetusername']]));
+        this.statusManager = new StatusFileManager(this.flags.devhubUsername, this.flags['username']);
+        this.ux.log(msgs.getMessage('create.usingScratchOrgAdmin', [this.flags['username']]));
         if (!getOrgInfo(this.flags['targetdevhubusername'] as string))
             // TODO add this as a require, ie requires devhub
             throw new SfdxError(msgs.getMessage('create.devhubSetupWasNotCompletedSuccessfully'));
@@ -90,7 +88,7 @@ export class ScratchOrgCreate extends SfdxCommand {
 
     public async createScratchOrg(cnt = 0): Promise<void> {
         if ((await this.statusManager.getScratchOrgValue('created')) === 'true') return;
-        const scratchOrg = getScratchOrgByUsername(this.flags['targetusername']);
+        const scratchOrg = getScratchOrgByUsername(this.flags['username']);
         if (scratchOrg) {
             await this.statusManager.setScratchOrgValue('created', true);
             return;
@@ -100,7 +98,7 @@ export class ScratchOrgCreate extends SfdxCommand {
             msgs.getMessage('create.creatingNewScratchOrgInfo') +
                 msgs.getMessage('create.apiVersion', [this.flags['apiversion']]) +
                 msgs.getMessage('create.devhubUsername', [this.flags['targetdevhubusername']]) +
-                msgs.getMessage('create.scratchOrgAdminUsername', [this.flags['targetusername']]) +
+                msgs.getMessage('create.scratchOrgAdminUsername', [this.flags['username']]) +
                 msgs.getMessage('create.thisMayTakeAFewMins')
         );
         const orgType = (this.flags.type as string).toLowerCase();
@@ -116,7 +114,7 @@ export class ScratchOrgCreate extends SfdxCommand {
 --setalias="${this.flags['alias'] as string}" \
 --durationdays=30 \
 --wait=${this.flags['wait'] as number} \
-username="${this.flags['targetusername'] as string}" \
+username="${this.flags['username'] as string}" \
 --setdefaultusername \
 --json`;
 
@@ -139,7 +137,7 @@ username="${this.flags['targetusername'] as string}" \
                 this.ux.log(JSON.stringify(e.message, null, 4));
                 this.ux.startSpinner(msgs.getMessage('create.sleepingBeforeCheckingIfOrgIsCreated'));
                 let count = 0;
-                while (!getScratchOrgByUsername(this.flags['targetusername'])) {
+                while (!getScratchOrgByUsername(this.flags['username'])) {
                     await sleep(10 * 1000);
                     if (count++ > 60) {
                         await this.statusManager.setScratchOrgValue(

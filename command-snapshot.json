@@ -139,7 +139,7 @@
             "json",
             "loglevel",
             "prompt",
-            "targetusername",
+            "username",
             "alias",
             "wait",
             "type"
