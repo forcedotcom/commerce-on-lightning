@@ -11,7 +11,7 @@ import { AnyJson } from '@salesforce/ts-types';
 import { Duration } from '@salesforce/kit';
 import { addAllowedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
 import { BASE_DIR, CONFIG_DIR, FILE_COPY_ARGS, DEVHUB_DIR } from '../../../lib/utils/constants/properties';
-import { Org, replaceErrors, SfdxProject } from '../../../lib/utils/jsonUtils';
+import { replaceErrors, SfdxProject } from '../../../lib/utils/jsonUtils';
 import { getOrgInfo, getScratchOrgByUsername } from '../../../lib/utils/sfdx/forceOrgList';
 import { shellJsonSfdx } from '../../../lib/utils/shell';
 import { sleep } from '../../../lib/utils/sleep';
@@ -55,7 +55,7 @@ export class ScratchOrgCreate extends SfdxCommand {
             description: 'If there is a file difference detected, prompt before overwriting file',
         }),
     };
-    private statusManager: StatusFileManager;
+    public statusManager: StatusFileManager;
     private devHubDir: string;
 
     public async run(): Promise<AnyJson> {
@@ -88,28 +88,13 @@ export class ScratchOrgCreate extends SfdxCommand {
         return { scratchOrgCreated: true };
     }
 
-    private async copyConfigFiles(): Promise<void> {
-        // copy the config files
-        // TODO: Copy only scratch org files
-        FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
-        if (this.flags.prompt) {
-            this.argv.push('--prompt');
-        }
-        await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
-    }
-
-    private async getScratchOrg(): Promise<Org> {
-        const scratchOrg = getScratchOrgByUsername(this.flags['username']);
+    public async createScratchOrg(cnt = 0): Promise<void> {
+        if ((await this.statusManager.getScratchOrgValue('created')) === 'true') return;
+        const scratchOrg = getScratchOrgByUsername(this.flags['targetusername']);
         if (scratchOrg) {
-            this.ux.setSpinnerStatus(msgs.getMessage('create.orgExists') + JSON.stringify(scratchOrg));
             await this.statusManager.setScratchOrgValue('created', true);
-            return scratchOrg;
+            return;
         }
-        return null;
-    }
-
-    private async createScratchOrg(cnt = 0): Promise<void> {
-        if ((await this.statusManager.getScratchOrgValue('created')) === 'true' || (await this.getScratchOrg())) return;
         this.ux.log(msgs.getMessage('create.preparingResourcesEtc'));
         this.ux.log(
             msgs.getMessage('create.creatingNewScratchOrgInfo') +
@@ -130,7 +115,7 @@ export class ScratchOrgCreate extends SfdxCommand {
 --apiversion="${this.flags['apiversion'] as string}" \
 --setalias="${this.flags['alias'] as string}" \
 --durationdays=30 \
---wait=${(this.flags['wait'] as Duration).minutes} \
+--wait=${this.flags['wait'] as number} \
 username="${this.flags['targetusername'] as string}" \
 --setdefaultusername \
 --json`;
@@ -154,7 +139,7 @@ username="${this.flags['targetusername'] as string}" \
                 this.ux.log(JSON.stringify(e.message, null, 4));
                 this.ux.startSpinner(msgs.getMessage('create.sleepingBeforeCheckingIfOrgIsCreated'));
                 let count = 0;
-                while (!(await this.getScratchOrg())) {
+                while (!getScratchOrgByUsername(this.flags['targetusername'])) {
                     await sleep(10 * 1000);
                     if (count++ > 60) {
                         await this.statusManager.setScratchOrgValue(
@@ -194,5 +179,15 @@ username="${this.flags['targetusername'] as string}" \
                 }
             }
         }
+    }
+
+    private async copyConfigFiles(): Promise<void> {
+        // copy the config files
+        // TODO: Copy only scratch org files
+        FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
+        if (this.flags.prompt) {
+            this.argv.push('--prompt');
+        }
+        await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
     }
 }
