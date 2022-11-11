@@ -43,6 +43,9 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         const paymentGatewayAdapterName = `${selection}Adapter`;
         const paymentGatewayProviderName = `${selection}PGP`;
         const paymentGatewayName = `${selection}PG`;
+        const hubOrgAdminUsername = 'ceo@mydevhub.com';
+        const scratchOrgAdminUsername = 'demo@1commerce.com';
+        const storeName = '1commerce';
 
         const examplesDir = `${EXAMPLE_DIR}/${StoreQuickstartSetup.getStoreType(
             this.org.getUsername(),
@@ -50,12 +53,7 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
             this.ux
         ).toLowerCase()}/checkout/payment-gateway-integration/${selection[0].toUpperCase() + selection.substr(1)}/`;
 
-        this.ux.log(
-            msgs.getMessage('quickstart.setup.settingUpGatewayConvertingNamedCredentialsGatewayAdapterApex', [
-                selection,
-            ])
-        );
-        const storeDir = STORE_DIR(undefined, 'ceo@mydevhub.com', 'demo@1commerce.com', '1commerce');
+        const storeDir = STORE_DIR(undefined, hubOrgAdminUsername, scratchOrgAdminUsername, storeName);
 
         this.ux.log(msgs.getMessage('quickstart.setup.pushingNamedCredentialsAndGatewayAdapterApexToOrg'));
         this.ux.log(
@@ -130,7 +128,7 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         this.ux.log(
             msgs.getMessage('quickstart.setup.creatingStoreIntegratedServiceUsingStoreIntegration', [
                 this.flags['store-name'] as string,
-                paymentGatewayId,
+                 ,
                 'PaymentGatewayId',
             ])
         );
