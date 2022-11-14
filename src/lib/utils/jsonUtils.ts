@@ -366,6 +366,6 @@ export class SfdxProject {
     ];
     public namespace: string = '';
     public sfdcLoginUrl: string = 'http://localhost.internal.salesforce.com:6109';
-    public sourceApiVersion: string = '57.0';
+    public sourceApiVersion: string = '52.0';
     public signupTargetLoginUrl: string;
 }

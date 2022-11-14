@@ -38,7 +38,7 @@ describe('commerce:scratchorg:create', () => {
             username: orgUser,
             targetdevhubusername: devhubUser,
             type: 'b2c',
-            apiversion: '57.0',
+            apiversion: '52.0',
             alias: 'a',
             wait: 5,
         };
