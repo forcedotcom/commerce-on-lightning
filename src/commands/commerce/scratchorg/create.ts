@@ -55,8 +55,8 @@ export class ScratchOrgCreate extends SfdxCommand {
         }),
     };
     public statusManager: StatusFileManager;
+    public devhubUsername: string;
     private devHubDir: string;
-    private devhubUsername: string;
 
     public async run(): Promise<AnyJson> {
         /*

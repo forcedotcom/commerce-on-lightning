@@ -25,10 +25,11 @@ describe('commerce:scratchorg:create', () => {
         const devhubUser = 'test_devhub@1commerce.com';
         const orgUser = 'test_org@1commerce.com';
         const sfm = new StatusFileManager(devhubUser, orgUser);
-        const stub1 = stub(sfm, 'setScratchOrgValue').resolves();
-        const stub2 = stub(sfm, 'getScratchOrgValue').resolves();
+        const setScratchOrgValueStub = stub(sfm, 'setScratchOrgValue').resolves();
+        const getScratchOrgValueStub = stub(sfm, 'getScratchOrgValue').resolves();
 
         const scratchOrgCreate = new ScratchOrgCreate([], config);
+        scratchOrgCreate.devhubUsername = devhubUser;
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         scratchOrgCreate.ux = stubInterface<UX>($$.SANDBOX);
@@ -36,7 +37,6 @@ describe('commerce:scratchorg:create', () => {
 
         const flagObject = {
             username: orgUser,
-            targetdevhubusername: devhubUser,
             type: 'b2c',
             apiversion: '52.0',
             alias: 'a',
@@ -48,10 +48,10 @@ describe('commerce:scratchorg:create', () => {
 
         const res = new Result();
         res.result = { id: 'hi', username: 'bye' };
-        const stub3 = stub(shellExports, 'shellJsonSfdx').returns(res);
+        const shellStub = stub(shellExports, 'shellJsonSfdx').returns(res);
         await scratchOrgCreate.createScratchOrg();
         const cmd = `sfdx force:org:create \
---targetdevhubusername="${flagObject.targetdevhubusername}" \
+--targetdevhubusername="${devhubUser}" \
 --definitionfile=${CONFIG_DIR}/${flagObject.type}-project-scratch-def.json \
 --apiversion="${flagObject.apiversion}" \
 --setalias="${flagObject.alias}" \
@@ -61,7 +61,7 @@ username="${flagObject.username}" \
 --setdefaultusername \
 --json`;
 
-        assert.equal(stub3.calledWith(cmd, null, '/tmp'), true);
-        [stub1, stub2, stub3].forEach((k) => k.restore());
+        assert.equal(shellStub.calledWith(cmd, null, '/tmp'), true);
+        [setScratchOrgValueStub, getScratchOrgValueStub, shellStub].forEach((k) => k.restore());
     });
 });
