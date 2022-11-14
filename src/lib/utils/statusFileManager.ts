@@ -40,7 +40,7 @@ export class StatusFileManager {
     public constructor(
         devhubAdminUsername: string,
         scratchOrgAdminUsername: string,
-        storeName: string,
+        storeName?: string,
         filePath: string = BASE_DIR + '/status.yaml'
     ) {
         this.devhubAdminUsername = devhubAdminUsername;
@@ -69,43 +69,19 @@ export class StatusFileManager {
     /**
      * Sets a key value pair
      *
-     * @param devHubConfig
-     * @param position assumed to be (devhubusername=0, scratchorgusername=1, this.storeName=2)
      * @param key
      * @param value
      */
-    /* eslint-disable @typescript-eslint/no-unsafe-member-access */
     public async setValue(key: string, value: unknown): Promise<void> {
         while (this.statusLock) await sleep(100);
         await this.read();
-        const position = 3;
         this.statusLock = true;
-        if (!this.status) this.status = new Status();
-        if (!this.status.devhubs) this.status.devhubs = {};
-        if (!this.status.devhubs[this.devhubAdminUsername])
-            this.status.devhubs[this.devhubAdminUsername] = new Devhub();
-        if (position >= 2) {
-            if (!this.status.devhubs[this.devhubAdminUsername].scratchOrgs)
-                this.status.devhubs[this.devhubAdminUsername].scratchOrgs = {};
-            if (!this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername])
-                this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername] =
-                    new ScratchOrg();
-            if (position === 3) {
-                if (!this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername].stores)
-                    this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername].stores = {};
-                if (
-                    !this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername].stores[
-                        this.storeName
-                    ]
-                )
-                    this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername].stores[
-                        this.storeName
-                    ] = new Store();
-                this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername].stores[
-                    this.storeName
-                ][key] = value;
-            }
-        }
+        this.initStatus();
+
+        const scratchOrg = this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername];
+        if (!scratchOrg.stores[this.storeName]) scratchOrg.stores[this.storeName] = new Store();
+        scratchOrg.stores[this.storeName][key] = value;
+
         this.statusLock = false;
         await this.save();
     }
@@ -113,11 +89,7 @@ export class StatusFileManager {
     /**
      * gets a key value pair from the status file
      *
-     * @param this.devhubAdminUsername
-     * @param type assumed to be (devhubusername=0, scratchorgusername=1, this.storeName=2)
      * @param key the key to index off of
-     * @param this.scratchOrgAdminUsername
-     * @param this.storeName
      */
     public async getValue(key: string): Promise<string | boolean | undefined> {
         while (this.statusLock) await sleep(100);
@@ -131,6 +103,44 @@ export class StatusFileManager {
         } catch (e) {
             return undefined;
         }
+    }
+
+    public async setScratchOrgValue(key: string, value: unknown): Promise<void> {
+        while (this.statusLock) await sleep(100);
+        await this.read();
+        this.statusLock = true;
+        this.initStatus();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername][key] = value;
+        this.statusLock = false;
+        await this.save();
+    }
+
+    public async getScratchOrgValue(key: string): Promise<string | boolean | undefined> {
+        while (this.statusLock) await sleep(100);
+        await this.read();
+        try {
+            const d = this.status.devhubs[this.devhubAdminUsername];
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            const sc = d.scratchOrgs[this.scratchOrgAdminUsername];
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+            return sc[key] || undefined;
+        } catch (e) {
+            return undefined;
+        }
+    }
+
+    private initStatus(): void {
+        if (!this.status) this.status = new Status();
+        if (!this.status.devhubs) this.status.devhubs = {};
+        if (!this.status.devhubs[this.devhubAdminUsername])
+            this.status.devhubs[this.devhubAdminUsername] = new Devhub();
+        if (!this.status.devhubs[this.devhubAdminUsername].scratchOrgs)
+            this.status.devhubs[this.devhubAdminUsername].scratchOrgs = {};
+        if (!this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername])
+            this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername] = new ScratchOrg();
+        if (!this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername].stores)
+            this.status.devhubs[this.devhubAdminUsername].scratchOrgs[this.scratchOrgAdminUsername].stores = {};
     }
 
     private async save(): Promise<void> {
