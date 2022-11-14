@@ -11,7 +11,7 @@ import { AnyJson } from '@salesforce/ts-types';
 import { addAllowedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
 import { BASE_DIR, CONFIG_DIR, FILE_COPY_ARGS, DEVHUB_DIR } from '../../../lib/utils/constants/properties';
 import { replaceErrors, SfdxProject } from '../../../lib/utils/jsonUtils';
-import { getOrgInfo, getScratchOrgByUsername } from '../../../lib/utils/sfdx/forceOrgList';
+import { getScratchOrgByUsername } from '../../../lib/utils/sfdx/forceOrgList';
 import { shellJsonSfdx } from '../../../lib/utils/shell';
 import { sleep } from '../../../lib/utils/sleep';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
@@ -56,14 +56,16 @@ export class ScratchOrgCreate extends SfdxCommand {
     };
     public statusManager: StatusFileManager;
     private devHubDir: string;
+    private devhubUsername: string;
 
     public async run(): Promise<AnyJson> {
+        /*
+        Base class reads the tagetdevhubusername or -v arg. if not provided it will use whatever is set for defaultdevhubusername config parameter
+         */
+        this.devhubUsername = this.hubOrg.getUsername();
         await this.copyConfigFiles();
-        this.statusManager = new StatusFileManager(this.flags.devhubUsername, this.flags['username']);
-        this.ux.log(msgs.getMessage('create.usingScratchOrgAdmin', [this.flags['username']]));
-        if (!getOrgInfo(this.flags['targetdevhubusername'] as string))
-            // TODO add this as a require, ie requires devhub
-            throw new SfdxError(msgs.getMessage('create.devhubSetupWasNotCompletedSuccessfully'));
+        this.statusManager = new StatusFileManager(this.devhubUsername, this.flags.username);
+        this.ux.log(msgs.getMessage('create.usingScratchOrgAdmin', [this.flags.username]));
 
         const sfdxProject: SfdxProject = Object.assign(
             new SfdxProject(),
@@ -72,9 +74,9 @@ export class ScratchOrgCreate extends SfdxCommand {
         if (!this.flags.apiversion) {
             this.flags.apiversion = sfdxProject.sourceApiVersion;
         } else {
-            sfdxProject.sourceApiVersion = this.flags['apiversion'] as string;
+            sfdxProject.sourceApiVersion = this.flags.apiversion as string;
         }
-        this.devHubDir = DEVHUB_DIR(BASE_DIR, this.flags['targetdevhubusername']);
+        this.devHubDir = DEVHUB_DIR(BASE_DIR, this.devhubUsername);
         const sfdxProjectFile = mkdirSync(this.devHubDir) + '/sfdx-project.json';
         fs.writeFileSync(sfdxProjectFile, JSON.stringify(sfdxProject, null, 4));
 
@@ -88,7 +90,7 @@ export class ScratchOrgCreate extends SfdxCommand {
 
     public async createScratchOrg(cnt = 0): Promise<void> {
         if ((await this.statusManager.getScratchOrgValue('created')) === 'true') return;
-        const scratchOrg = getScratchOrgByUsername(this.flags['username']);
+        const scratchOrg = getScratchOrgByUsername(this.flags.username);
         if (scratchOrg) {
             await this.statusManager.setScratchOrgValue('created', true);
             return;
@@ -96,9 +98,9 @@ export class ScratchOrgCreate extends SfdxCommand {
         this.ux.log(msgs.getMessage('create.preparingResourcesEtc'));
         this.ux.log(
             msgs.getMessage('create.creatingNewScratchOrgInfo') +
-                msgs.getMessage('create.apiVersion', [this.flags['apiversion']]) +
-                msgs.getMessage('create.devhubUsername', [this.flags['targetdevhubusername']]) +
-                msgs.getMessage('create.scratchOrgAdminUsername', [this.flags['username']]) +
+                msgs.getMessage('create.apiVersion', [this.flags.apiversion]) +
+                msgs.getMessage('create.devhubUsername', [this.devhubUsername]) +
+                msgs.getMessage('create.scratchOrgAdminUsername', [this.flags.username]) +
                 msgs.getMessage('create.thisMayTakeAFewMins')
         );
         const orgType = (this.flags.type as string).toLowerCase();
@@ -108,13 +110,13 @@ export class ScratchOrgCreate extends SfdxCommand {
             this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:org:create']));
             mkdirSync((this.devHubDir ? this.devHubDir : BASE_DIR) + '/force-app');
             const cmd = `sfdx force:org:create \
---targetdevhubusername="${this.flags['targetdevhubusername'] as string}" \
+--targetdevhubusername="${this.devhubUsername}" \
 --definitionfile=${CONFIG_DIR}/${orgType}-project-scratch-def.json \
---apiversion="${this.flags['apiversion'] as string}" \
---setalias="${this.flags['alias'] as string}" \
+--apiversion="${this.flags.apiversion as string}" \
+--setalias="${this.flags.alias as string}" \
 --durationdays=30 \
---wait=${this.flags['wait'] as number} \
-username="${this.flags['username'] as string}" \
+--wait=${this.flags.wait as number} \
+username="${this.flags.username as string}" \
 --setdefaultusername \
 --json`;
 
@@ -137,7 +139,7 @@ username="${this.flags['username'] as string}" \
                 this.ux.log(JSON.stringify(e.message, null, 4));
                 this.ux.startSpinner(msgs.getMessage('create.sleepingBeforeCheckingIfOrgIsCreated'));
                 let count = 0;
-                while (!getScratchOrgByUsername(this.flags['username'])) {
+                while (!getScratchOrgByUsername(this.flags.username)) {
                     await sleep(10 * 1000);
                     if (count++ > 60) {
                         await this.statusManager.setScratchOrgValue(
