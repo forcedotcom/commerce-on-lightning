@@ -20,6 +20,9 @@ const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:display`;
 const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
+//Appended string to the Site.com Sites (useful for B2B Store)
+const SITE_COM_APPENDED_PATH = "/s";
+
 export class StoreDisplay extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static readonly supportsDevhubUsername = true;
@@ -77,7 +80,7 @@ export class StoreDisplay extends SfdxCommand {
         if (dInfo) return dInfo as string;
         if (!this.flags.urlpathprefix && (await this.statusFileManager.getValue('urlpathprefix')))
             this.flags.urlpathprefix = await this.statusFileManager.getValue('urlpathprefix');
-        const urlpathprefix: string = this.flags.urlpathprefix
+        let urlpathprefix: string = this.flags.urlpathprefix
             ? (this.flags.urlpathprefix as string)
             : (this.flags['store-name'] as string).replace(/[\\W_]+/g, '');
         const domainInfo = forceDataSoql(
@@ -88,8 +91,24 @@ export class StoreDisplay extends SfdxCommand {
             !domainInfo.result.records ||
             domainInfo.result.records.length === 0 ||
             !domainInfo.result.records[0]['Domain']
-        )
-            throw new SfdxError(messages.getMessage('view.info.noStoreMatch', [this.flags['store-name']]));
+        ) {
+            // For B2B Templates, Site.com is used which means SITE_COM_APPENDED_PATH will be appended. 
+            const domainInfoForSiteCom = forceDataSoql(
+                `SELECT Domain.Domain FROM DomainSite WHERE PathPrefix='/${urlpathprefix}${SITE_COM_APPENDED_PATH}' limit 1`,
+                this.org.getUsername()
+            );
+            if(            
+                !domainInfoForSiteCom.result.records ||
+                domainInfoForSiteCom.result.records.length === 0 ||
+                !domainInfoForSiteCom.result.records[0]['Domain']){
+                    throw new SfdxError(messages.getMessage('view.info.noStoreMatch', [this.flags['store-name']]));
+                }
+            else {
+                //The B2B Store is found.
+                urlpathprefix = urlpathprefix.concat(SITE_COM_APPENDED_PATH);
+            }
+        }
+           
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         let domain = domainInfo.result.records[0]['Domain']['Domain'] as string;
         const instanceUrl = (await StoreCreate.getUserInfo(this.statusFileManager, this.flags['buyer-username']))
