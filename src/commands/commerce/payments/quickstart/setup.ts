@@ -15,6 +15,7 @@ import { forceDataRecordCreate, forceDataRecordDelete, forceDataSoql } from '../
 import { shell, shellJsonSfdx } from '../../../../lib/utils/shell';
 import { StoreQuickstartSetup } from '../../store/quickstart/setup';
 import { FilesCopy } from '../../files/copy';
+import { StatusFileManager } from '../../../../lib/utils/statusFileManager';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -26,26 +27,26 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static description = msgs.getMessage('quickstart.setup.cmdDescription');
 
-    public static examples = [`sfdx ${CMD} -p Stripe`]; // TODO documentation including examples and descriptions
+    public static examples = [`sfdx ${CMD} -p Stripe -n 1commerce`]; // TODO documentation including examples and descriptions
     protected static flagsConfig = {
         ...paymentsFlags,
         ...filterFlags(['store-name', 'prompt'], storeFlags),
     };
     public org: Org;
+    private statusFileManager: StatusFileManager;
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<AnyJson> {
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
+        const devHubUsername = (await this.org.getDevHubOrg()).getUsername();
+        const storeName = this.flags['store-name'] as string;
         const selection = this.flags['payment-adapter'] as string;
         const namedCredentialMasterLabel = selection;
         const paymentGatewayAdapterName = `${selection}Adapter`;
         const paymentGatewayProviderName = `${selection}PGP`;
         const paymentGatewayName = `${selection}PG`;
-        const hubOrgAdminUsername = 'ceo@mydevhub.com';
-        const scratchOrgAdminUsername = 'demo@1commerce.com';
-        const storeName = '1commerce';
 
         const examplesDir = `${EXAMPLE_DIR}/${StoreQuickstartSetup.getStoreType(
             this.org.getUsername(),
@@ -53,7 +54,14 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
             this.ux
         ).toLowerCase()}/checkout/payment-gateway-integration/${selection[0].toUpperCase() + selection.substr(1)}/`;
 
-        const storeDir = STORE_DIR(undefined, hubOrgAdminUsername, scratchOrgAdminUsername, storeName);
+        this.statusFileManager = new StatusFileManager(devHubUsername, this.org.getUsername(), storeName);
+
+        const storeDir = STORE_DIR(
+            undefined,
+            devHubUsername,
+            this.statusFileManager.scratchOrgAdminUsername,
+            storeName
+        );
 
         this.ux.log(msgs.getMessage('quickstart.setup.pushingNamedCredentialsAndGatewayAdapterApexToOrg'));
         this.ux.log(
@@ -128,7 +136,7 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         this.ux.log(
             msgs.getMessage('quickstart.setup.creatingStoreIntegratedServiceUsingStoreIntegration', [
                 this.flags['store-name'] as string,
-                 ,
+                paymentGatewayId,
                 'PaymentGatewayId',
             ])
         );
