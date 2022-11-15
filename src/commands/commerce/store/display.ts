@@ -83,7 +83,7 @@ export class StoreDisplay extends SfdxCommand {
         let urlpathprefix: string = this.flags.urlpathprefix
             ? (this.flags.urlpathprefix as string)
             : (this.flags['store-name'] as string).replace(/[\\W_]+/g, '');
-        const domainInfo = forceDataSoql(
+        let domainInfo = forceDataSoql(
             `SELECT Domain.Domain FROM DomainSite WHERE PathPrefix='/${urlpathprefix}' limit 1`,
             this.org.getUsername()
         );
@@ -93,14 +93,14 @@ export class StoreDisplay extends SfdxCommand {
             !domainInfo.result.records[0]['Domain']
         ) {
             // For B2B Templates, Site.com is used which means SITE_COM_APPENDED_PATH will be appended.
-            const domainInfoForSiteCom = forceDataSoql(
+            domainInfo = forceDataSoql(
                 `SELECT Domain.Domain FROM DomainSite WHERE PathPrefix='/${urlpathprefix}${SITE_COM_APPENDED_PATH}' limit 1`,
                 this.org.getUsername()
             );
             if (
-                !domainInfoForSiteCom.result.records ||
-                domainInfoForSiteCom.result.records.length === 0 ||
-                !domainInfoForSiteCom.result.records[0]['Domain']
+                !domainInfo.result.records ||
+                domainInfo.result.records.length === 0 ||
+                !domainInfo.result.records[0]['Domain']
             ) {
                 throw new SfdxError(messages.getMessage('view.info.noStoreMatch', [this.flags['store-name']]));
             } else {
