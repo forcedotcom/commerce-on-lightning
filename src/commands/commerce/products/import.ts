@@ -11,7 +11,7 @@ import { AnyJson } from '@salesforce/ts-types';
 import { productsFlags } from '../../../lib/flags/commerce/products.flags';
 import { storeFlags } from '../../../lib/flags/commerce/store.flags';
 import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
-import { BASE_DIR, CONFIG_DIR, FILE_COPY_ARGS, JSON_DIR, STORE_DIR } from '../../../lib/utils/constants/properties';
+import { BASE_DIR, FILE_COPY_ARGS, JSON_DIR, STORE_DIR } from '../../../lib/utils/constants/properties';
 import { ImportResult, parseStoreScratchDef, replaceErrors } from '../../../lib/utils/jsonUtils';
 import { forceDataRecordCreate, forceDataSoql } from '../../../lib/utils/sfdx/forceDataSoql';
 import { shellJsonSfdx } from '../../../lib/utils/shell';
@@ -61,7 +61,7 @@ export class ProductsImport extends SfdxCommand {
         // TODO figure out what is a prerequisite to run this script
         this.ux.log(chalk.green(msgs.getMessage('import.importingProducts')));
         if (this.flags.definitionfile) {
-            this.flags.definitionfile = getDefinitionFile(this.flags)
+            this.flags.definitionfile = getDefinitionFile(this.flags);
             const def = parseStoreScratchDef(this.flags);
             const out = [];
             if (def.settings && def.settings.productImport && def.settings.productImport.length > 0)

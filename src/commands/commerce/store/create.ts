@@ -14,7 +14,6 @@ import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../lib/utils/a
 import {
     BASE_DIR,
     BUYER_USER_DEF,
-    CONFIG_DIR,
     SCRATCH_ORG_DIR,
     STORE_DIR,
     FILE_COPY_ARGS,
@@ -27,11 +26,11 @@ import { sleep } from '../../../lib/utils/sleep';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { mkdirSync } from '../../../lib/utils/fsUtils';
 import { FilesCopy } from '../files/copy';
+import { getDefinitionFile } from '../../../lib/utils/sfdx/definitionFile';
 import { StoreQuickstartCreate } from './quickstart/create';
 import { StoreQuickstartSetup } from './quickstart/setup';
 import { StoreOpen } from './open';
 import { StoreDisplay } from './display';
-import { getDefinitionFile } from '../../../lib/utils/sfdx/definitionFile';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -171,7 +170,7 @@ export class StoreCreate extends SfdxCommand {
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
         if (!this.flags.type || (this.flags.type !== 'b2c' && this.flags.type !== 'b2b')) this.flags.type = 'b2c';
-        this.flags.definitionfile = getDefinitionFile(this.flags)
+        this.flags.definitionfile = getDefinitionFile(this.flags);
         this.scrDef = parseStoreScratchDef(this.flags);
         // parseStoreScratchDef overrides scrDef with arg flag values, below is needed when none are supplied so we use the values in store def file
         const modifyArgs = [

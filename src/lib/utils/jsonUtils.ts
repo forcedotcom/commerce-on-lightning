@@ -7,7 +7,7 @@
 import * as os from 'os';
 import { fs, Messages, SfdxError } from '@salesforce/core';
 import { convertKabobToCamel, convertToCamelKabob } from './stringUtils';
-import { CONFIG_DIR, EXAMPLE_DIR } from './constants/properties';
+import { EXAMPLE_DIR } from './constants/properties';
 import { getDefinitionFile } from './sfdx/definitionFile';
 
 Messages.importMessagesDirectory(__dirname);

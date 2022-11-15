@@ -6,12 +6,12 @@
  */
 import os from 'os';
 import { SfdxCommand } from '@salesforce/command';
-import { fs, Messages } from '@salesforce/core';
+import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { allFlags } from '../../../lib/flags/commerce/all.flags';
 import { exampleFlags } from '../../../lib/flags/commerce/convert.flags';
 import { addAllowedArgs, filterFlags, modifyArgFlag, removeFlagBeforeAll } from '../../../lib/utils/args/flagsUtils';
-import { BASE_DIR, CONFIG_DIR, EXAMPLE_DIR, FILE_COPY_ARGS } from '../../../lib/utils/constants/properties';
+import { BASE_DIR, EXAMPLE_DIR, FILE_COPY_ARGS } from '../../../lib/utils/constants/properties';
 import { copyFileSync, mkdirSync, readFileSync, renameRecursive } from '../../../lib/utils/fsUtils';
 import { shell } from '../../../lib/utils/shell';
 import { convertStoreScratchDefToExamples, parseStoreScratchDef } from '../../../lib/utils/jsonUtils';
