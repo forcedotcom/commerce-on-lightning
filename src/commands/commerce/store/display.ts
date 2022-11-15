@@ -20,8 +20,8 @@ const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:display`;
 const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
-//Appended string to the Site.com Sites (useful for B2B Store)
-const SITE_COM_APPENDED_PATH = "/s";
+// Appended string to the Site.com Sites (useful for B2B Store)
+const SITE_COM_APPENDED_PATH = '/s';
 
 export class StoreDisplay extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -92,23 +92,23 @@ export class StoreDisplay extends SfdxCommand {
             domainInfo.result.records.length === 0 ||
             !domainInfo.result.records[0]['Domain']
         ) {
-            // For B2B Templates, Site.com is used which means SITE_COM_APPENDED_PATH will be appended. 
+            // For B2B Templates, Site.com is used which means SITE_COM_APPENDED_PATH will be appended.
             const domainInfoForSiteCom = forceDataSoql(
                 `SELECT Domain.Domain FROM DomainSite WHERE PathPrefix='/${urlpathprefix}${SITE_COM_APPENDED_PATH}' limit 1`,
                 this.org.getUsername()
             );
-            if(            
+            if (
                 !domainInfoForSiteCom.result.records ||
                 domainInfoForSiteCom.result.records.length === 0 ||
-                !domainInfoForSiteCom.result.records[0]['Domain']){
-                    throw new SfdxError(messages.getMessage('view.info.noStoreMatch', [this.flags['store-name']]));
-                }
-            else {
-                //The B2B Store is found.
+                !domainInfoForSiteCom.result.records[0]['Domain']
+            ) {
+                throw new SfdxError(messages.getMessage('view.info.noStoreMatch', [this.flags['store-name']]));
+            } else {
+                // The B2B Store is found.
                 urlpathprefix = urlpathprefix.concat(SITE_COM_APPENDED_PATH);
             }
         }
-           
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         let domain = domainInfo.result.records[0]['Domain']['Domain'] as string;
         const instanceUrl = (await StoreCreate.getUserInfo(this.statusFileManager, this.flags['buyer-username']))
