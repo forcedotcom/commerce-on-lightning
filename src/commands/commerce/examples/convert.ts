@@ -16,6 +16,7 @@ import { copyFileSync, mkdirSync, readFileSync, renameRecursive } from '../../..
 import { shell } from '../../../lib/utils/shell';
 import { convertStoreScratchDefToExamples, parseStoreScratchDef } from '../../../lib/utils/jsonUtils';
 import { FilesCopy } from '../files/copy';
+import { getDefinitionFile } from '../../../lib/utils/sfdx/definitionFile';
 
 const TOPIC = 'examples';
 const CMD = `commerce:${TOPIC}:convert`;
@@ -37,16 +38,8 @@ export class ExamplesConvert extends SfdxCommand {
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        if (!this.flags.definitionfile || !fs.existsSync(this.flags.definitionfile)) {
-            this.flags.definitionfile = CONFIG_DIR + '/store-scratch-def.json';
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-            fs.copyFileSync(
-                CONFIG_DIR + `/${(this.flags.type as string).toLowerCase()}-store-scratch-def.json`,
-                CONFIG_DIR + '/store-scratch-def.json'
-            );
-        }
-        const scratchDef = parseStoreScratchDef(this.flags.definitionfile);
+        this.flags.definitionfile = getDefinitionFile(this.flags);
+        const scratchDef = parseStoreScratchDef(this.flags);
         const paths = convertStoreScratchDefToExamples(scratchDef);
         copyFileSync(BASE_DIR + '/sfdx-project.json', mkdirSync(this.flags.outputdir));
         if ((this.flags.sourcepath as string).indexOf('-v') >= 0)

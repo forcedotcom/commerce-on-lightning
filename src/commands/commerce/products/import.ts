@@ -20,6 +20,7 @@ import { StoreCreate } from '../store/create';
 import { exampleFlags } from '../../../lib/flags/commerce/convert.flags';
 import { FilesCopy } from '../files/copy';
 import { filesFlags } from '../../../lib/flags/commerce/files.flags';
+import { getDefinitionFile } from '../../../lib/utils/sfdx/definitionFile';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -60,12 +61,8 @@ export class ProductsImport extends SfdxCommand {
         // TODO figure out what is a prerequisite to run this script
         this.ux.log(chalk.green(msgs.getMessage('import.importingProducts')));
         if (this.flags.definitionfile) {
-            if (!fs.existsSync(this.flags.definitionfile) && this.flags.type)
-                fs.copyFileSync(
-                    CONFIG_DIR + `/${this.flags.type as string}-store-scratch-def.json`,
-                    this.flags.definitionfile
-                );
-            const def = parseStoreScratchDef(this.flags.definitionfile);
+            this.flags.definitionfile = getDefinitionFile(this.flags)
+            const def = parseStoreScratchDef(this.flags);
             const out = [];
             if (def.settings && def.settings.productImport && def.settings.productImport.length > 0)
                 for (const f of def.settings.productImport) out.push(await this.importProducts(f));

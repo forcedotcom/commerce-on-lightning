@@ -6,11 +6,9 @@
  */
 import * as os from 'os';
 import { fs, Messages, SfdxError } from '@salesforce/core';
-import { FlagsConfig } from '@salesforce/command';
-import { allFlags } from '../flags/commerce/all.flags';
 import { convertKabobToCamel, convertToCamelKabob } from './stringUtils';
 import { CONFIG_DIR, EXAMPLE_DIR } from './constants/properties';
-import { getPassedArgs } from './args/flagsUtils';
+import { getDefinitionFile } from './sfdx/definitionFile';
 
 Messages.importMessagesDirectory(__dirname);
 const msgs = Messages.loadMessages('@salesforce/commerce', 'commerce');
@@ -100,15 +98,18 @@ export const replaceErrors = (key, value) => {
     return value;
 };
 
+/**
+ * Converts definition file from flags into object
+ * if definition file does not exist, uses default template based on type
+ *
+ * @param flags this.flags
+ * @returns definition file in object form
+ */
 export const parseStoreScratchDef = (
-    defFile: string,
-    argv?: string[],
-    flags?: {},
-    flagConfig: FlagsConfig = allFlags
+    flags: Record<string, unknown>,
 ): StoreScratchDef => {
-    if (!defFile || !fs.existsSync(defFile))
-        if (flags && flags['type']) fs.copyFileSync(`${CONFIG_DIR}/${flags['type']}-store-scratch-def.json`, defFile);
-        else fs.copyFileSync(CONFIG_DIR + '/b2c-store-scratch-def.json', defFile);
+    let defFile = getDefinitionFile(flags);
+
     const sctDef = Object.assign(
         new StoreScratchDef(),
         JSON.parse(
@@ -119,11 +120,11 @@ export const parseStoreScratchDef = (
                 .replace('$(hostname)', os.hostname())
         )
     );
-    const parsedArgs = getPassedArgs(argv, flags, flagConfig);
+
     // add more potentially from settings to be passed in cli
-    if (parsedArgs['store-name']) sctDef.storeName = parsedArgs['store-name'];
-    if (parsedArgs['type']) sctDef.edition = parsedArgs['type'];
-    if (parsedArgs['templatename']) sctDef.template = parsedArgs['templatename'];
+    if (flags && flags['store-name']) sctDef.storeName = flags['store-name'];
+    if (flags && flags['type']) sctDef.edition = flags['type'];
+    if (flags && flags['templatename']) sctDef.template = flags['templatename'];
     sctDef.storeName = sctDef.storeName.replace(/ /g, '_');
     return sctDef;
 };
