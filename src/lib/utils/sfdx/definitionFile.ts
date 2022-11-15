@@ -18,7 +18,7 @@ export const getDefinitionFile = (flags: Record<string, unknown>): string => {
     // default is b2c
     let defFile = CONFIG_DIR + '/b2c-store-scratch-def.json';
     if (flags) {
-        if (!flags.definitionFile || !fs.existsSync(flags.definitionfile as string)) {
+        if (!flags.definitionfile || !fs.existsSync(flags.definitionfile as string)) {
             if (flags.type) defFile = CONFIG_DIR + '/' + (flags.type as string) + '-store-scratch-def.json';
         } else {
             defFile = flags.definitionfile as string;

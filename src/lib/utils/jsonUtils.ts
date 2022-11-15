@@ -121,10 +121,12 @@ export const parseStoreScratchDef = (
         )
     );
 
-    // add more potentially from settings to be passed in cli
-    if (flags && flags['store-name']) sctDef.storeName = flags['store-name'];
-    if (flags && flags['type']) sctDef.edition = flags['type'];
-    if (flags && flags['templatename']) sctDef.template = flags['templatename'];
+    if(flags) {
+        // add more potentially from settings to be passed in cli
+        if (flags['store-name']) sctDef.storeName = flags['store-name'];
+        if (flags['type']) sctDef.edition = flags['type'];
+        if (flags['templatename']) sctDef.template = flags['templatename'];
+    }
     sctDef.storeName = sctDef.storeName.replace(/ /g, '_');
     return sctDef;
 };
