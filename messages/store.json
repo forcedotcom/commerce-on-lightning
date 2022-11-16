@@ -32,7 +32,7 @@
         "completedStep8": "Completed Step 8",
         "communityNowAvailable": "Community is now available",
         "openingBrowserTheStoreAdminPage": "Opening the store admin page in the browser...",
-        "allDone": "All Done",
+        "allDone": "All Done With Store Creation",
         "errorStoreQuickstartCreateFailed": "StoreQuickstartCreate failed",
         "waitingForCommunity": "Waiting for community to become available",
         "communityStillNotAvailableCount": "Community still not available after count: %s retrying",
