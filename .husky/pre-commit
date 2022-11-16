@@ -1,7 +1,7 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 
-
+# please run chmod ug+x .husky/* command before doing the commit 
 
 yarn lint && yarn pretty-quick --staged
 
