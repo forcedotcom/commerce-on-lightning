@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -8,6 +8,7 @@ import { SfdxCommand } from '@salesforce/command';
 import { fs, Messages, Org, SfdxError } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
+import { JsonCollection } from '@salesforce/ts-types/lib/types/json';
 import { productsFlags } from '../../../lib/flags/commerce/products.flags';
 import { storeFlags } from '../../../lib/flags/commerce/store.flags';
 import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
@@ -26,6 +27,8 @@ Messages.importMessagesDirectory(__dirname);
 const TOPIC = 'products';
 const CMD = `commerce:${TOPIC}:import`;
 const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
+const WEBSTORE_ID = '${WEBSTORE_ID}';
+const PRODUCT_IMPORT_API_PATH = `commerce/management/webstores/${WEBSTORE_ID}/product-import`;
 
 export class ProductsImport extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -81,7 +84,7 @@ export class ProductsImport extends SfdxCommand {
             this.ux.startSpinner(msgs.getMessage('import.importingProducts'));
             this.ux.setSpinnerStatus(msgs.getMessage('import.uploading'));
             try {
-                let res = shellJsonSfdx<ImportResult>(
+                const res = shellJsonSfdx<ImportResult>(
                     `sfdx shane:data:file:upload -f ${
                         this.flags['products-file-csv'] as string
                     } -u "${this.org.getUsername()}" --json`
@@ -96,9 +99,7 @@ export class ProductsImport extends SfdxCommand {
                     msgs.getMessage('import.importingProductsImportFileIdAndStoreId', [importFileId, storeId])
                 );
                 try {
-                    res = shellJsonSfdx(
-                        `sfdx 1commerce:import:products -d "${importFileId}" -w "${storeId}" -u "${this.org.getUsername()}"`
-                    );
+                    await this.importFromUploadedFile(importFileId, storeId);
                 } catch (e) {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
                     if (e.message.indexOf('UniqueConstraintViolationException') < 0) {
@@ -275,5 +276,29 @@ export class ProductsImport extends SfdxCommand {
         productList.forEach((file) => fs.removeSync(JSON_DIR(this.storeDir) + `/${file}.json`));
         // Return BuyerGroup Name to be used in BuyerGroup Account mapping
         return newbuyergroupname;
+    }
+
+    public async importFromUploadedFile(contentVersionId: string, webStoreId: string): Promise<JsonCollection> {
+        const conn = this.org.getConnection();
+        const url = `${conn.baseUrl()}/${PRODUCT_IMPORT_API_PATH.replace(WEBSTORE_ID, webStoreId)}`;
+
+        this.ux.log(`Starting import for WebStore ID: ${webStoreId} to ${url}`);
+
+        return await conn.request({
+            method: 'POST',
+            url,
+            body: `{
+                "importConfiguration": {
+                    "importSource": {
+                        "contentVersionId": "${contentVersionId}"
+                    }
+                }
+            }`,
+            headers: {
+                key: 'Content-Type',
+                type: 'text',
+                value: 'application/json',
+            },
+        });
     }
 }
