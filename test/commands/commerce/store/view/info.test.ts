@@ -39,7 +39,7 @@ describe('commerce:store:display', () => {
             public done: boolean;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            public records: Record[] = [{ Domain: { Domain: 'hello' } }];
+            public records: Record[] = [{ Domain: { Domain: 'hello' }, PathPrefix: 'test' }];
             public totalSize: number;
         })();
         const c2 = stub(forceOrgSoqlExports, 'forceDataSoql').returns(qr);
@@ -74,22 +74,12 @@ describe('commerce:store:display', () => {
             public done: boolean;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            public records: Record[] = [{}];
+            public records: Record[] = [{ Domain: { Domain: 'hello' }, PathPrefix: 'test/s' }];
             public totalSize: number;
         })();
 
-        const qr2 = new Result<QueryResult>();
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        qr2.result = new (class implements QueryResult {
-            public done: boolean;
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            public records: Record[] = [{ Domain: { Domain: 'hello' } }];
-            public totalSize: number;
-        })();
         const queryStub = stub(forceOrgSoqlExports, 'forceDataSoql');
-        const c2 = queryStub.onFirstCall().returns(qr);
-        const c3 = queryStub.onSecondCall().returns(qr2);
+        const c2 = queryStub.returns(qr);
         const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
         const storeViewInfo = Object.assign(new StoreDisplay([], config), {
@@ -103,6 +93,6 @@ describe('commerce:store:display', () => {
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         assert.equal(await storeViewInfo.getFullStoreURL(), 'https://hello:6101/test/s');
-        [c, c1, c2, c3, d].forEach((k) => k.restore());
+        [c, c1, c2, d].forEach((k) => k.restore());
     });
 });

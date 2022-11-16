@@ -74,6 +74,7 @@ export class StoreDisplay extends SfdxCommand {
         return true;
     }
 
+    // TODO We should be able to query the url instead of manually constructing it
     private async getFullStoreURL(): Promise<string> {
         const fullStoreUrlKey = 'fullStoreUrl';
         const dInfo = await this.statusFileManager.getValue('fullStoreUrl');
@@ -83,8 +84,8 @@ export class StoreDisplay extends SfdxCommand {
         let urlpathprefix: string = this.flags.urlpathprefix
             ? (this.flags.urlpathprefix as string)
             : (this.flags['store-name'] as string).replace(/[\\W_]+/g, '');
-        let domainInfo = forceDataSoql(
-            `SELECT Domain.Domain FROM DomainSite WHERE PathPrefix='/${urlpathprefix}' limit 1`,
+        const domainInfo = forceDataSoql(
+            `SELECT Domain.Domain, PathPrefix FROM DomainSite WHERE PathPrefix='/${urlpathprefix} OR PathPrefix='/${urlpathprefix}${SITE_COM_APPENDED_PATH}' limit 1`,
             this.org.getUsername()
         );
         if (
@@ -92,25 +93,15 @@ export class StoreDisplay extends SfdxCommand {
             domainInfo.result.records.length === 0 ||
             !domainInfo.result.records[0]['Domain']
         ) {
-            // For B2B Templates, Site.com is used which means SITE_COM_APPENDED_PATH will be appended.
-            domainInfo = forceDataSoql(
-                `SELECT Domain.Domain FROM DomainSite WHERE PathPrefix='/${urlpathprefix}${SITE_COM_APPENDED_PATH}' limit 1`,
-                this.org.getUsername()
-            );
-            if (
-                !domainInfo.result.records ||
-                domainInfo.result.records.length === 0 ||
-                !domainInfo.result.records[0]['Domain']
-            ) {
-                throw new SfdxError(messages.getMessage('view.info.noStoreMatch', [this.flags['store-name']]));
-            } else {
-                // The B2B Store is found.
-                urlpathprefix = urlpathprefix.concat(SITE_COM_APPENDED_PATH);
-            }
+            throw new SfdxError(messages.getMessage('view.info.noStoreMatch', [this.flags['store-name']]));
         }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         let domain = domainInfo.result.records[0]['Domain']['Domain'] as string;
+
+        // Updating path prefix in case of appended /s
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        urlpathprefix = domainInfo.result.records[0]['PathPrefix'] as string;
         const instanceUrl = (await StoreCreate.getUserInfo(this.statusFileManager, this.flags['buyer-username']))
             .instanceUrl;
         const url = new URL(instanceUrl);
