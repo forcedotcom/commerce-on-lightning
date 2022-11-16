@@ -12,3 +12,6 @@ If this is a feat/fix, add the technical writer as a reviewer to the PR. --->
 
 ### Functionality After
 <insert gif and/or summary>
+
+### How to Test/Testing Effort 
+<insert gif and/or summary>
