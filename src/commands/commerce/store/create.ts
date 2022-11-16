@@ -27,6 +27,7 @@ import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { mkdirSync } from '../../../lib/utils/fsUtils';
 import { FilesCopy } from '../files/copy';
 import { getDefinitionFile } from '../../../lib/utils/definitionFile';
+import SearchIndex from '../search/start';
 import { StoreQuickstartCreate } from './quickstart/create';
 import { StoreQuickstartSetup } from './quickstart/setup';
 import { StoreOpen } from './open';
@@ -347,7 +348,7 @@ export class StoreCreate extends SfdxCommand {
         this.ux.log(
             msgs.getMessage('create.createSearchIndexInfo', ['https://github.com/forcedotcom/sfdx-1commerce-plugin'])
         );
-        shell(`sfdx 1commerce:search:start -u "${this.org.getUsername()}" -n "${this.scrDef.storeName as string}"`);
+        await SearchIndex.run(addAllowedArgs(this.argv, SearchIndex), this.config);
         // TODO check if index was created successfully, all i can do is assume it was
         await this.statusFileManager.setValue('indexCreated', true);
     }
