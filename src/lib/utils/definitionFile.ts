@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { fs } from '@salesforce/core';
-import { CONFIG_DIR } from '../constants/properties';
+import { CONFIG_DIR } from './constants/properties';
 
 /**
  * Retrieves definition file from flags object

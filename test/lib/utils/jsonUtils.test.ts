@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -93,7 +93,7 @@ describe('Json Utils parse store scratch def', () => {
             definitionfile: B2C_DEF_FILE,
         };
         const replacements = { storeName: 'very_cool_store' };
-        let sctDef = parseStoreScratchDef(flags);
+        const sctDef = parseStoreScratchDef(flags);
         const expectedSctDef = getStoreScratchDef({ ...B2CsctDef, ...replacements });
         assert.deepStrictEqual(sctDef, expectedSctDef);
     });

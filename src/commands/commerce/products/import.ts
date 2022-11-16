@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -20,7 +20,7 @@ import { StoreCreate } from '../store/create';
 import { exampleFlags } from '../../../lib/flags/commerce/convert.flags';
 import { FilesCopy } from '../files/copy';
 import { filesFlags } from '../../../lib/flags/commerce/files.flags';
-import { getDefinitionFile } from '../../../lib/utils/sfdx/definitionFile';
+import { getDefinitionFile } from '../../../lib/utils/definitionFile';
 
 Messages.importMessagesDirectory(__dirname);
 

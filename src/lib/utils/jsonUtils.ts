@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -8,7 +8,7 @@ import * as os from 'os';
 import { fs, Messages, SfdxError } from '@salesforce/core';
 import { convertKabobToCamel, convertToCamelKabob } from './stringUtils';
 import { EXAMPLE_DIR } from './constants/properties';
-import { getDefinitionFile } from './sfdx/definitionFile';
+import { getDefinitionFile } from './definitionFile';
 
 Messages.importMessagesDirectory(__dirname);
 const msgs = Messages.loadMessages('@salesforce/commerce', 'commerce');
@@ -99,8 +99,8 @@ export const replaceErrors = (key, value) => {
 };
 
 /**
- * Converts definition file from flags into object
- * if definition file does not exist, uses default template based on type
+ * Converts definition file from flags into StoreScratchDef object
+ * if definition file does not exist, uses b2c/b2b definition file based on type
  *
  * @param flags this.flags
  * @returns definition file in object form

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -16,7 +16,7 @@ import { copyFileSync, mkdirSync, readFileSync, renameRecursive } from '../../..
 import { shell } from '../../../lib/utils/shell';
 import { convertStoreScratchDefToExamples, parseStoreScratchDef } from '../../../lib/utils/jsonUtils';
 import { FilesCopy } from '../files/copy';
-import { getDefinitionFile } from '../../../lib/utils/sfdx/definitionFile';
+import { getDefinitionFile } from '../../../lib/utils/definitionFile';
 
 const TOPIC = 'examples';
 const CMD = `commerce:${TOPIC}:convert`;
