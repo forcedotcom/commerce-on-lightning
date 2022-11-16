@@ -46,20 +46,13 @@ describe('commerce:store:display', () => {
         // const org = stub(Org.prototype, 'getUsername').returns('test');
         const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
-        const storeViewInfo = new StoreDisplay([], config);
-        storeViewInfo.org = org;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore because protected member
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-        storeViewInfo.ux = stubInterface<UX>($$.SANDBOX);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        storeViewInfo.statusFileManager = sfm;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore because protected member
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        storeViewInfo.flags = Object.assign({}, { 'store-name': 'test' });
+        const storeViewInfo = Object.assign(new StoreDisplay([], config), {
+            org,
+            ux: stubInterface<UX>($$.SANDBOX),
+            statusFileManager: sfm,
+            flags: { 'store-name': 'test' },
+        });
+
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
@@ -97,23 +90,15 @@ describe('commerce:store:display', () => {
         const queryStub = stub(forceOrgSoqlExports, 'forceDataSoql');
         const c2 = queryStub.onFirstCall().returns(qr);
         const c3 = queryStub.onSecondCall().returns(qr2);
-        // const org = stub(Org.prototype, 'getUsername').returns('test');
         const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
-        const storeViewInfo = new StoreDisplay([], config);
-        storeViewInfo.org = org;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore because protected member
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-        storeViewInfo.ux = stubInterface<UX>($$.SANDBOX);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        storeViewInfo.statusFileManager = sfm;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore because protected member
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        storeViewInfo.flags = Object.assign({}, { 'store-name': 'test', templatename: 'B2B Commerce' });
+        const storeViewInfo = Object.assign(new StoreDisplay([], config), {
+            org,
+            ux: stubInterface<UX>($$.SANDBOX),
+            statusFileManager: sfm,
+            flags: { 'store-name': 'test', templatename: 'B2B Commerce' },
+        });
+
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
