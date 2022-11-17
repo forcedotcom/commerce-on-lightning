@@ -10,11 +10,10 @@ import { fs, Messages, Org, SfdxError } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
 import { allFlags } from '../../../lib/flags/commerce/all.flags';
-import { addAllowedArgs, filterFlags, getPassedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
+import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
 import {
     BASE_DIR,
     BUYER_USER_DEF,
-    CONFIG_DIR,
     SCRATCH_ORG_DIR,
     STORE_DIR,
     FILE_COPY_ARGS,
@@ -27,6 +26,7 @@ import { sleep } from '../../../lib/utils/sleep';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { mkdirSync } from '../../../lib/utils/fsUtils';
 import { FilesCopy } from '../files/copy';
+import { getDefinitionFile } from '../../../lib/utils/definitionFile';
 import SearchIndex from '../search/start';
 import { StoreQuickstartCreate } from './quickstart/create';
 import { StoreQuickstartSetup } from './quickstart/setup';
@@ -170,11 +170,9 @@ export class StoreCreate extends SfdxCommand {
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
-        const passedArgs = getPassedArgs(this.argv, this.flags);
         if (!this.flags.type || (this.flags.type !== 'b2c' && this.flags.type !== 'b2b')) this.flags.type = 'b2c';
-        if (!Object.keys(passedArgs).includes('definitionfile') && Object.keys(passedArgs).includes('type'))
-            this.flags.definitionfile = CONFIG_DIR + '/' + (passedArgs.type as string) + '-store-scratch-def.json';
-        this.scrDef = parseStoreScratchDef(this.flags.definitionfile, this.argv, this.flags);
+        this.flags.definitionfile = getDefinitionFile(this.flags);
+        this.scrDef = parseStoreScratchDef(this.flags);
         // parseStoreScratchDef overrides scrDef with arg flag values, below is needed when none are supplied so we use the values in store def file
         const modifyArgs = [
             { args: ['-n', '--store-name'], value: this.scrDef.storeName as string },
