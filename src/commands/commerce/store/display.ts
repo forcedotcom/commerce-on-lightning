@@ -85,7 +85,7 @@ export class StoreDisplay extends SfdxCommand {
             ? (this.flags.urlpathprefix as string)
             : (this.flags['store-name'] as string).replace(/[\\W_]+/g, '');
         const domainInfo = forceDataSoql(
-            `SELECT Domain.Domain, PathPrefix FROM DomainSite WHERE PathPrefix='/${urlpathprefix} OR PathPrefix='/${urlpathprefix}${SITE_COM_APPENDED_PATH}' limit 1`,
+            `SELECT Domain.Domain, PathPrefix FROM DomainSite WHERE PathPrefix='/${urlpathprefix}' OR PathPrefix='/${urlpathprefix}${SITE_COM_APPENDED_PATH}' limit 1`,
             this.org.getUsername()
         );
         if (
