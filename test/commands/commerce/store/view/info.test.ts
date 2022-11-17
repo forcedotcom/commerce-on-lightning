@@ -39,31 +39,60 @@ describe('commerce:store:display', () => {
             public done: boolean;
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
-            public records: Record[] = [{ Domain: { Domain: 'hello' } }];
+            public records: Record[] = [{ Domain: { Domain: 'hello' }, PathPrefix: 'test' }];
             public totalSize: number;
         })();
         const c2 = stub(forceOrgSoqlExports, 'forceDataSoql').returns(qr);
         // const org = stub(Org.prototype, 'getUsername').returns('test');
         const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
-        const storeViewInfo = new StoreDisplay([], config);
-        storeViewInfo.org = org;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore because protected member
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-        storeViewInfo.ux = stubInterface<UX>($$.SANDBOX);
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        storeViewInfo.statusFileManager = sfm;
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore because protected member
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        storeViewInfo.flags = Object.assign({}, { 'store-name': 'test' });
+        const storeViewInfo = Object.assign(new StoreDisplay([], config), {
+            org,
+            ux: stubInterface<UX>($$.SANDBOX),
+            statusFileManager: sfm,
+            flags: { 'store-name': 'test' },
+        });
+
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         assert.equal(await storeViewInfo.getFullStoreURL(), 'https://hello:6101/test');
+        [c, c1, c2, d].forEach((k) => k.restore());
+    });
+    it('should get full store url using getFullStoreURL for B2B stores', async () => {
+        const sfm = new StatusFileManager('a', 'b', 'c');
+        const d = stub(sfm, 'setValue').resolves();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        const c = stub(sfm, 'getValue').resolves();
+        const c1 = stub(StoreCreate, 'getUserInfo').resolves(
+            new UserInfo('https://dayna-lwc-2815-dev-ed.my.localhost.sfdcdev.salesforce.com:6101')
+        );
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-call
+        const qr = new Result<QueryResult>();
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        qr.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [{ Domain: { Domain: 'hello' }, PathPrefix: 'test/s' }];
+            public totalSize: number;
+        })();
+
+        const queryStub = stub(forceOrgSoqlExports, 'forceDataSoql');
+        const c2 = queryStub.returns(qr);
+        const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
+        const storeViewInfo = Object.assign(new StoreDisplay([], config), {
+            org,
+            ux: stubInterface<UX>($$.SANDBOX),
+            statusFileManager: sfm,
+            flags: { 'store-name': 'test', templatename: 'B2B Commerce' },
+        });
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
+        assert.equal(await storeViewInfo.getFullStoreURL(), 'https://hello:6101/test/s');
         [c, c1, c2, d].forEach((k) => k.restore());
     });
 });
