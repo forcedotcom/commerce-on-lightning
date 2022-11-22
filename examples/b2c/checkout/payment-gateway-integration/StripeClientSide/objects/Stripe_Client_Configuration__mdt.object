@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Stripe Client-side payments configuration</description>
+    <label>Stripe Client Configuration</label>
+    <pluralLabel>Stripe Client Configurations</pluralLabel>
+    <visibility>Protected</visibility>
+    <fields>
+        <fullName>publishableAPIKey__c</fullName>
+        <description>Stripe Publishable API Key</description>
+        <externalId>false</externalId>
+        <fieldManageability>SubscriberControlled</fieldManageability>
+        <label>publishableAPIKey</label>
+        <length>128</length>
+        <required>true</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+</CustomObject>
