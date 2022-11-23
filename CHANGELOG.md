@@ -2,6 +2,60 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [240.0.49](https://github.com/forcedotcom/commerce-on-lightning/compare/v238.0.16...v240.0.49) (2022-10-10)
+
+
+### Features
+
+* addressed comments ([0063c07](https://github.com/forcedotcom/commerce-on-lightning/commit/0063c07c12ecb6b70738725fa46ebe758a5537dc))
+* language support ([8f20afc](https://github.com/forcedotcom/commerce-on-lightning/commit/8f20afc9c22952ed9f954b2e8aedb3dd7f7653c5))
+* language support ([2f7743a](https://github.com/forcedotcom/commerce-on-lightning/commit/2f7743ae011feb987a8d6d3d416e00d341d0da6f))
+* map command implementation ([4dac0d9](https://github.com/forcedotcom/commerce-on-lightning/commit/4dac0d92fb0a39342d2f334be8f78d78f7b2e17e))
+* support large carts ([67122fc](https://github.com/forcedotcom/commerce-on-lightning/commit/67122fc29dd72ae2d8d683ab049ed590727f7a67))
+* update version for next release ([777ef4d](https://github.com/forcedotcom/commerce-on-lightning/commit/777ef4db82dd3a364f10a764a90c2764f0a4fc3e))
+
+
+### Bug Fixes
+
+* added check for nonexistantExtensionName ([7f50182](https://github.com/forcedotcom/commerce-on-lightning/commit/7f50182e303fc08dbf4d52cbcc4b654bc67730fb))
+* added delete method for existing epn ([aa52d0c](https://github.com/forcedotcom/commerce-on-lightning/commit/aa52d0cd895cd8c2c38390a2e65adc8dee510df0))
+* added delete method for existing epn ([a749468](https://github.com/forcedotcom/commerce-on-lightning/commit/a749468063dbfe506f0fe20f3d0efcd8c98b7638))
+* added jsdoc comments ([e6a9b96](https://github.com/forcedotcom/commerce-on-lightning/commit/e6a9b96008555cb3d6e7bfd200c6b8e703f80979))
+* added message for same store names ([a5fa36a](https://github.com/forcedotcom/commerce-on-lightning/commit/a5fa36a4ef9a2d5abaa6ca0dc0bf322d88d7d628))
+* added try/catch ([818d2e0](https://github.com/forcedotcom/commerce-on-lightning/commit/818d2e0c50a141cf47aa609fb46e8232381c435c))
+* added unit tests for invalid extension name ([86db9f3](https://github.com/forcedotcom/commerce-on-lightning/commit/86db9f3b1e3ea43e1053c1dd388df3042cb38757))
+* addresses all comments ([87ad409](https://github.com/forcedotcom/commerce-on-lightning/commit/87ad409d0d0cc79ba4f0a4674d9527b8efb97f5b))
+* addresses all comments ([f0c9289](https://github.com/forcedotcom/commerce-on-lightning/commit/f0c928909cd36d8ea9bc3613669c0eb1aa374ab5))
+* appended original error messages ([5f1691b](https://github.com/forcedotcom/commerce-on-lightning/commit/5f1691baf77caed53dc73fba20a3b6f8b621316c))
+* catch sfdx errors ([015a46b](https://github.com/forcedotcom/commerce-on-lightning/commit/015a46b32d3fa00249e9956e30c67a690416bab9))
+* changes to prints ([65c8be7](https://github.com/forcedotcom/commerce-on-lightning/commit/65c8be77d85181157a263a382bbc2be38238780e))
+* **conflicts:** resolve merge conflicts ([9a4bf11](https://github.com/forcedotcom/commerce-on-lightning/commit/9a4bf117d79e0fb34461358022c016dcf46fe165))
+* create user role if it does not exist ([8e6e552](https://github.com/forcedotcom/commerce-on-lightning/commit/8e6e55283180be19c4e1316955bb5c123d3ae400))
+* create user role if it does not exist ([d55f507](https://github.com/forcedotcom/commerce-on-lightning/commit/d55f507a50d8339d82873b5400bd8f3af29bafba))
+* messages ([69a8271](https://github.com/forcedotcom/commerce-on-lightning/commit/69a82717951cbd2900a4001258ba1f3b09b235cf))
+* minor format adjustment ([947c011](https://github.com/forcedotcom/commerce-on-lightning/commit/947c01141b86b2cb1f1ecb3e2874176fc574747e))
+* modified command.snapshot ([9806e5a](https://github.com/forcedotcom/commerce-on-lightning/commit/9806e5aabfce7c2fd59bab4bb46755613f467774))
+* modified error for duplicate ([cac3a9a](https://github.com/forcedotcom/commerce-on-lightning/commit/cac3a9a0a4c6e050ff70826de2ebb0c2a83928bd))
+* modified error messages ([ab93f9f](https://github.com/forcedotcom/commerce-on-lightning/commit/ab93f9fa654fa93c9e552b6039ff3d0698a58be5))
+* modified json response ([631fa15](https://github.com/forcedotcom/commerce-on-lightning/commit/631fa154f777118162c64911782cbc66e47ea269))
+* modified message ([74c1c08](https://github.com/forcedotcom/commerce-on-lightning/commit/74c1c085d3c4f122d61a68754cf83f41f1917061))
+* modified messages ([7b6b15d](https://github.com/forcedotcom/commerce-on-lightning/commit/7b6b15df204983806b0461ac589e48016bc5b97f))
+* modified README.md ([9f10762](https://github.com/forcedotcom/commerce-on-lightning/commit/9f10762fe824ede87db8800b5fcf2ce29bd73fb2))
+* modified README.md ([0034172](https://github.com/forcedotcom/commerce-on-lightning/commit/003417274bdc6f8c8fc97cacae395e7f3cb74283))
+* modified README.md ([7ac2ae4](https://github.com/forcedotcom/commerce-on-lightning/commit/7ac2ae46c95342379e763076d410d8d714488b07))
+* modified register message ([4f648db](https://github.com/forcedotcom/commerce-on-lightning/commit/4f648db94eebc044ab7e7e53fd49799a381f959e))
+* modified store.json ([f7e9956](https://github.com/forcedotcom/commerce-on-lightning/commit/f7e995603153cdc3e3b26b6ae7d1c3ac75afa437))
+* modified success message ([d98baa3](https://github.com/forcedotcom/commerce-on-lightning/commit/d98baa33c6ecef2cac3d1a172ee31d21511bf26f))
+* remove comments ([0aaf0d6](https://github.com/forcedotcom/commerce-on-lightning/commit/0aaf0d692b5fdba55459782c40938bed53bc7aff))
+* removed extra log ([73e8efd](https://github.com/forcedotcom/commerce-on-lightning/commit/73e8efd7005efd1a854a98bee93a212f3cf14093))
+* throw sfdx error for missing required flags ([5cdf5fd](https://github.com/forcedotcom/commerce-on-lightning/commit/5cdf5fd09a3c7c4fc3e1d9c441e36d1902b31ce9))
+* updated snapshot ([64fd73b](https://github.com/forcedotcom/commerce-on-lightning/commit/64fd73b7d761944692004dc34344f9f4aa3c7bdd))
+* upgrade @oclif/config from 1.17.0 to 1.18.3 ([#60](https://github.com/forcedotcom/commerce-on-lightning/issues/60)) ([f5f572e](https://github.com/forcedotcom/commerce-on-lightning/commit/f5f572e8f5390d4278bf2ba53004fa1649fa4ae2))
+* upgrade fast-xml-parser from 3.19.0 to 3.21.1 ([#61](https://github.com/forcedotcom/commerce-on-lightning/issues/61)) ([dc4e3ed](https://github.com/forcedotcom/commerce-on-lightning/commit/dc4e3ed4190eed6a170cd477ad17b0063a782a96))
+* upgrade tslib from 2.2.0 to 2.3.1 ([d0cccf2](https://github.com/forcedotcom/commerce-on-lightning/commit/d0cccf235202affa70536f843576e4fe740f20c5))
+* upgrade yaml from 2.0.0-5 to 2.1.1 ([#97](https://github.com/forcedotcom/commerce-on-lightning/issues/97)) ([3692207](https://github.com/forcedotcom/commerce-on-lightning/commit/36922074659f1f78051fbdbf603dfc18190e16af))
+* verified/signed flag ([7ffe7f6](https://github.com/forcedotcom/commerce-on-lightning/commit/7ffe7f6a8508ad12ac7e56e473dcfa006bf810fb))
+
 ### [238.0.16](https://github.com/forcedotcom/commerce-on-lightning/compare/v238.0.15...v238.0.16) (2022-09-29)
 
 ### Bug Fixes
