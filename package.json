@@ -38,7 +38,7 @@
         "eslint-plugin-import": "^2.20.2",
         "eslint-plugin-jsdoc": "^27.0.3",
         "eslint-plugin-prettier": "^3.1.3",
-        "husky": "^4.2.5",
+        "husky": "^8.0.0",
         "lint-staged": "^11.0.0",
         "mocha": "^8.3.0",
         "nyc": "^15.1.0",
@@ -127,7 +127,7 @@
         "posttest": "yarn lint && yarn test:deprecation-policy && yarn test:command-reference",
         "precommit": "npm run clean && npm run build && npm run lint && npm run version",
         "prepack": "sf-prepack",
-        "prepare": "rm -f .oclif.manifest.json && yarn run prepack",
+        "prepare": "rm -f .oclif.manifest.json && yarn run prepack && husky install",
         "prepublishOnly": "yarn run build && oclif-dev manifest",
         "pretest": "sf-compile-test",
         "prettier": "prettier --write src/**/**/*.ts && prettier --write src/**/*.ts && prettier --write src/*.ts && prettier --write test/**/*.ts && prettier --write test/**/**/*.ts",
@@ -138,13 +138,6 @@
         "test:deprecation-policy": "./bin/run snapshot:compare",
         "test:nuts": "nyc mocha \"**/*.nut.ts\" --slow 4500 --timeout 600000 --parallel",
         "version": "(oclif-dev readme && sed -i.bak -e \"s|$(echo $HOME)|~|g\" -e \"s|$(whoami)|\"\\$\\(whoami\\)\"|g\" README.md && git add README.md) || exit 0"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix; if git --no-pager diff HEAD package.json | egrep '\"version\": \"[0-9]+\\.'; then npm run version; else (npm --no-git-tag-version version patch; git add package.json; sf-husky-pre-commit); fi;",
-            "commit-msg": "sf-husky-commit-msg",
-            "pre-push": "sf-husky-pre-push"
-        }
     },
     "publishConfig": {
         "access": "public"
