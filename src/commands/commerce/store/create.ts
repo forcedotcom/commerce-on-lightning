@@ -5,12 +5,11 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import os from 'os';
-import { SfdxCommand } from '@salesforce/command';
+import { flags, SfdxCommand } from '@salesforce/command';
 import { fs, Messages, Org, SfdxError } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
-import { allFlags } from '../../../lib/flags/commerce/all.flags';
-import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
+import { addAllowedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
 import {
     BASE_DIR,
     BUYER_USER_DEF,
@@ -65,10 +64,40 @@ export class StoreCreate extends SfdxCommand {
 
     public static description = msgs.getMessage('create.cmdDescription');
     public static examples = [`sfdx ${CMD} --store-name test-store`];
-    protected static flagsConfig = filterFlags(
-        ['store-name', 'templatename', 'definitionfile', 'type', 'buyer-username', 'prompt'],
-        allFlags
-    );
+    protected static flagsConfig = {
+        'store-name': flags.string({
+            char: 'n',
+            default: '1commerce',
+            description: msgs.getMessage('setup.storeNameDescription'),
+            required: true,
+        }),
+        templatename: flags.string({
+            char: 't',
+            description: msgs.getMessage('setup.templateNameDescription'),
+        }),
+        definitionfile: flags.filepath({
+            char: 'f',
+            description: msgs.getMessage('create.configFileDescription'),
+        }),
+        type: flags.string({
+            char: 'o',
+            options: ['b2c', 'b2b'],
+            parse: (input) => input.toLowerCase(),
+            default: 'b2c',
+            description: msgs.getMessage('create.storeTypeDescription'),
+        }),
+        'buyer-username': flags.string({
+            char: 'b',
+            default: 'buyer@1commerce.com',
+            description: msgs.getMessage('setup.scratchOrgBuyerUsernameDescription'),
+        }),
+        prompt: flags.boolean({
+            char: 'y',
+            default: false,
+            description: 'If there is a file difference detected, prompt before overwriting file',
+        }),
+    };
+
     public org: Org;
     private scrDef;
     private storeDir;

@@ -5,12 +5,10 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import os from 'os';
-import { SfdxCommand } from '@salesforce/command';
+import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
-import { allFlags } from '../../../lib/flags/commerce/all.flags';
-import { exampleFlags } from '../../../lib/flags/commerce/convert.flags';
-import { addAllowedArgs, filterFlags, modifyArgFlag, removeFlagBeforeAll } from '../../../lib/utils/args/flagsUtils';
+import { addAllowedArgs, modifyArgFlag, removeFlagBeforeAll } from '../../../lib/utils/args/flagsUtils';
 import { BASE_DIR, EXAMPLE_DIR, FILE_COPY_ARGS } from '../../../lib/utils/constants/properties';
 import { copyFileSync, mkdirSync, readFileSync, renameRecursive } from '../../../lib/utils/fsUtils';
 import { shell } from '../../../lib/utils/shell';
@@ -28,10 +26,40 @@ export class ExamplesConvert extends SfdxCommand {
     public static description = messages.getMessage('convert.cmdDescription');
 
     public static examples = [`sfdx ${CMD} -f store-scratch-def.json`]; // TODO documentation including examples and descriptions
-
     protected static flagsConfig = {
-        ...exampleFlags,
-        ...filterFlags(['store-name', 'prompt'], allFlags),
+        definitionfile: flags.filepath({
+            char: 'f',
+            required: true,
+            description: messages.getMessage('convertFlags.configFileDescription'),
+        }),
+        outputdir: flags.string({
+            char: 'd',
+            default: BASE_DIR + '/force-app',
+            description: messages.getMessage('convertFlags.outputDirDescription'),
+        }),
+        sourcepath: flags.string({
+            char: 'p',
+            multiple: true,
+            default: '',
+            description: messages.getMessage('convertFlags.convertDescription'),
+        }),
+        type: flags.string({
+            char: 'o',
+            options: ['b2c', 'b2b'],
+            parse: (input) => input.toLowerCase(),
+            description: 'The type of store you want to create',
+        }),
+        'store-name': flags.string({
+            char: 'n',
+            default: '1commerce',
+            description: messages.getMessage('convertFlags.storeNameDescription'),
+            required: true,
+        }),
+        prompt: flags.boolean({
+            char: 'y',
+            default: false,
+            description: 'If there is a file difference detected, prompt before overwriting file',
+        }),
     };
 
     public async run(): Promise<AnyJson> {
