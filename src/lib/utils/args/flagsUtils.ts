@@ -33,9 +33,10 @@ export function addAllowedArgs(argv: string[], sfdxCommand): string[] {
     for (let i = 0; i < argv.length; i++) {
         let arg = argv[i];
         let value = argv[i + 1] && !argv[i + 1].startsWith('-') ? argv[++i] : undefined;
-        if (!arg.startsWith('--') && arg.length > '-v'.length) {
-            value = arg.substr('-v'.length);
-            arg = arg.substr(0, '-v'.length);
+        if (arg.indexOf('=') !== -1) {
+            const argParts = arg.split('=');
+            arg = argParts[0];
+            value = argParts[1];
         }
         if (contains(arg, flagsArr)) {
             args.push(arg);
