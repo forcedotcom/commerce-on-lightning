@@ -1,20 +1,18 @@
 /*
- * Copyright (c) 2020, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import os from 'os';
-import { SfdxCommand } from '@salesforce/command';
+import { flags, SfdxCommand } from '@salesforce/command';
 import { fs, Messages, Org, SfdxError } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
-import { allFlags } from '../../../lib/flags/commerce/all.flags';
-import { addAllowedArgs, filterFlags, getPassedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
+import { addAllowedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
 import {
     BASE_DIR,
     BUYER_USER_DEF,
-    CONFIG_DIR,
     SCRATCH_ORG_DIR,
     STORE_DIR,
     FILE_COPY_ARGS,
@@ -27,6 +25,8 @@ import { sleep } from '../../../lib/utils/sleep';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { mkdirSync } from '../../../lib/utils/fsUtils';
 import { FilesCopy } from '../files/copy';
+import { getDefinitionFile } from '../../../lib/utils/definitionFile';
+import SearchIndex from '../search/start';
 import { StoreQuickstartCreate } from './quickstart/create';
 import { StoreQuickstartSetup } from './quickstart/setup';
 import { StoreOpen } from './open';
@@ -64,10 +64,40 @@ export class StoreCreate extends SfdxCommand {
 
     public static description = msgs.getMessage('create.cmdDescription');
     public static examples = [`sfdx ${CMD} --store-name test-store`];
-    protected static flagsConfig = filterFlags(
-        ['store-name', 'templatename', 'definitionfile', 'type', 'buyer-username', 'prompt'],
-        allFlags
-    );
+    protected static flagsConfig = {
+        'store-name': flags.string({
+            char: 'n',
+            default: '1commerce',
+            description: msgs.getMessage('setup.storeNameDescription'),
+            required: true,
+        }),
+        templatename: flags.string({
+            char: 't',
+            description: msgs.getMessage('setup.templateNameDescription'),
+        }),
+        definitionfile: flags.filepath({
+            char: 'f',
+            description: msgs.getMessage('create.configFileDescription'),
+        }),
+        type: flags.string({
+            char: 'o',
+            options: ['b2c', 'b2b'],
+            parse: (input) => input.toLowerCase(),
+            default: 'b2c',
+            description: msgs.getMessage('create.storeTypeDescription'),
+        }),
+        'buyer-username': flags.string({
+            char: 'b',
+            default: 'buyer@1commerce.com',
+            description: msgs.getMessage('setup.scratchOrgBuyerUsernameDescription'),
+        }),
+        prompt: flags.boolean({
+            char: 'y',
+            default: false,
+            description: 'If there is a file difference detected, prompt before overwriting file',
+        }),
+    };
+
     public org: Org;
     private scrDef;
     private storeDir;
@@ -169,11 +199,9 @@ export class StoreCreate extends SfdxCommand {
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
-        const passedArgs = getPassedArgs(this.argv, this.flags);
         if (!this.flags.type || (this.flags.type !== 'b2c' && this.flags.type !== 'b2b')) this.flags.type = 'b2c';
-        if (!Object.keys(passedArgs).includes('definitionfile') && Object.keys(passedArgs).includes('type'))
-            this.flags.definitionfile = CONFIG_DIR + '/' + (passedArgs.type as string) + '-store-scratch-def.json';
-        this.scrDef = parseStoreScratchDef(this.flags.definitionfile, this.argv, this.flags);
+        this.flags.definitionfile = getDefinitionFile(this.flags);
+        this.scrDef = parseStoreScratchDef(this.flags);
         // parseStoreScratchDef overrides scrDef with arg flag values, below is needed when none are supplied so we use the values in store def file
         const modifyArgs = [
             { args: ['-n', '--store-name'], value: this.scrDef.storeName as string },
@@ -349,7 +377,7 @@ export class StoreCreate extends SfdxCommand {
         this.ux.log(
             msgs.getMessage('create.createSearchIndexInfo', ['https://github.com/forcedotcom/sfdx-1commerce-plugin'])
         );
-        shell(`sfdx 1commerce:search:start -u "${this.org.getUsername()}" -n "${this.scrDef.storeName as string}"`);
+        await SearchIndex.run(addAllowedArgs(this.argv, SearchIndex), this.config);
         // TODO check if index was created successfully, all i can do is assume it was
         await this.statusFileManager.setValue('indexCreated', true);
     }
