@@ -14,4 +14,24 @@ describe('flagsUtils add allowed args', () => {
         // -c is not allowed but -b is so i don't expect -c or it's value to exist in assert
         assert.deepEqual(res, ['-b', 'bye']);
     });
+    it('should add args that has long names', async () => {
+        const res = addAllowedArgs(['--test-arg', 'hi', '--buyer-username', 'bye'], StoreCreate);
+        assert.deepEqual(res, ['--buyer-username', 'bye']);
+    });
+    it('should add args that has long name and short names', async () => {
+        const res = addAllowedArgs(['-n', 'hi', '--buyer-username', 'bye'], StoreCreate);
+        assert.deepEqual(res, ['-n', 'hi', '--buyer-username', 'bye']);
+    });
+    it('should add args that has "=" in short name ', async () => {
+        const res = addAllowedArgs(['-n=hi', '-b=bye'], StoreCreate);
+        assert.deepEqual(res, ['-n', 'hi', '-b', 'bye']);
+    });
+    it('should add args that has "=" in long name', async () => {
+        const res = addAllowedArgs(['--store-name=hi', '--buyer-username=bye'], StoreCreate);
+        assert.deepEqual(res, ['--store-name', 'hi', '--buyer-username', 'bye']);
+    });
+    it('should add args that has "=" only in long name', async () => {
+        const res = addAllowedArgs(['--store-name=hi', '-b', 'bye'], StoreCreate);
+        assert.deepEqual(res, ['--store-name', 'hi', '-b', 'bye']);
+    });
 });
