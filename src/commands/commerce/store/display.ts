@@ -20,6 +20,9 @@ const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:display`;
 const messages = Messages.loadMessages('@salesforce/commerce', TOPIC);
 
+// Appended string to the Site.com Sites (useful for B2B Store)
+const SITE_COM_APPENDED_PATH = '/s';
+
 export class StoreDisplay extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static readonly supportsDevhubUsername = true;
@@ -71,27 +74,34 @@ export class StoreDisplay extends SfdxCommand {
         return true;
     }
 
+    // TODO We should be able to query the url instead of manually constructing it
     private async getFullStoreURL(): Promise<string> {
         const fullStoreUrlKey = 'fullStoreUrl';
         const dInfo = await this.statusFileManager.getValue('fullStoreUrl');
         if (dInfo) return dInfo as string;
         if (!this.flags.urlpathprefix && (await this.statusFileManager.getValue('urlpathprefix')))
             this.flags.urlpathprefix = await this.statusFileManager.getValue('urlpathprefix');
-        const urlpathprefix: string = this.flags.urlpathprefix
+        let urlpathprefix: string = this.flags.urlpathprefix
             ? (this.flags.urlpathprefix as string)
             : (this.flags['store-name'] as string).replace(/[\\W_]+/g, '');
         const domainInfo = forceDataSoql(
-            `SELECT Domain.Domain FROM DomainSite WHERE PathPrefix='/${urlpathprefix}' limit 1`,
+            `SELECT Domain.Domain, PathPrefix FROM DomainSite WHERE PathPrefix='/${urlpathprefix}' OR PathPrefix='/${urlpathprefix}${SITE_COM_APPENDED_PATH}' limit 1`,
             this.org.getUsername()
         );
         if (
             !domainInfo.result.records ||
             domainInfo.result.records.length === 0 ||
             !domainInfo.result.records[0]['Domain']
-        )
+        ) {
             throw new SfdxError(messages.getMessage('view.info.noStoreMatch', [this.flags['store-name']]));
+        }
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         let domain = domainInfo.result.records[0]['Domain']['Domain'] as string;
+
+        // Updating path prefix in case of appended /s
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+        urlpathprefix = domainInfo.result.records[0]['PathPrefix'] as string;
         const instanceUrl = (await StoreCreate.getUserInfo(this.statusFileManager, this.flags['buyer-username']))
             .instanceUrl;
         const url = new URL(instanceUrl);
