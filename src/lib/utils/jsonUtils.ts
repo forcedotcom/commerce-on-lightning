@@ -1,16 +1,14 @@
 /*
- * Copyright (c) 2020, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as os from 'os';
 import { fs, Messages, SfdxError } from '@salesforce/core';
-import { FlagsConfig } from '@salesforce/command';
-import { allFlags } from '../flags/commerce/all.flags';
 import { convertKabobToCamel, convertToCamelKabob } from './stringUtils';
-import { CONFIG_DIR, EXAMPLE_DIR } from './constants/properties';
-import { getPassedArgs } from './args/flagsUtils';
+import { EXAMPLE_DIR } from './constants/properties';
+import { getDefinitionFile } from './definitionFile';
 
 Messages.importMessagesDirectory(__dirname);
 const msgs = Messages.loadMessages('@salesforce/commerce', 'commerce');
@@ -100,15 +98,18 @@ export const replaceErrors = (key, value) => {
     return value;
 };
 
+/**
+ * Converts definition file from flags into StoreScratchDef object
+ * if definition file does not exist, uses b2c/b2b definition file based on type
+ *
+ * @param flags this.flags
+ * @returns definition file in object form
+ */
 export const parseStoreScratchDef = (
-    defFile: string,
-    argv?: string[],
-    flags?: {},
-    flagConfig: FlagsConfig = allFlags
+    flags: Record<string, unknown>,
 ): StoreScratchDef => {
-    if (!defFile || !fs.existsSync(defFile))
-        if (flags && flags['type']) fs.copyFileSync(`${CONFIG_DIR}/${flags['type']}-store-scratch-def.json`, defFile);
-        else fs.copyFileSync(CONFIG_DIR + '/b2c-store-scratch-def.json', defFile);
+    let defFile = getDefinitionFile(flags);
+
     const sctDef = Object.assign(
         new StoreScratchDef(),
         JSON.parse(
@@ -119,11 +120,13 @@ export const parseStoreScratchDef = (
                 .replace('$(hostname)', os.hostname())
         )
     );
-    const parsedArgs = getPassedArgs(argv, flags, flagConfig);
-    // add more potentially from settings to be passed in cli
-    if (parsedArgs['store-name']) sctDef.storeName = parsedArgs['store-name'];
-    if (parsedArgs['type']) sctDef.edition = parsedArgs['type'];
-    if (parsedArgs['templatename']) sctDef.template = parsedArgs['templatename'];
+
+    if(flags) {
+        // add more potentially from settings to be passed in cli
+        if (flags['store-name']) sctDef.storeName = flags['store-name'];
+        if (flags['type']) sctDef.edition = flags['type'];
+        if (flags['templatename']) sctDef.template = flags['templatename'];
+    }
     sctDef.storeName = sctDef.storeName.replace(/ /g, '_');
     return sctDef;
 };
@@ -355,4 +358,17 @@ export class StoreConfig {
     public isProgressiveRenderingEnabled = false;
     public type = 'site';
     public authenticationType: string;
+}
+
+export class SfdxProject {
+    public packageDirectories: Record<string, any>[] = [
+        {
+            path: 'force-app',
+            default: true,
+        },
+    ];
+    public namespace: string = '';
+    public sfdcLoginUrl: string = 'http://localhost.internal.salesforce.com:6109';
+    public sourceApiVersion: string = '52.0';
+    public signupTargetLoginUrl: string;
 }
