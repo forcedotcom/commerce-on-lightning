@@ -45,7 +45,9 @@
         "errorStoreQuickstartSetupFailed": "StoreQuickstartSetup failed",
         "assigningShopperProfileToBuyer": "Assigning Shopper profile to the buyer user",
         "changingPasswordForBuyer": "Changing password for the buyer user",
-        "createSearchIndexInfo": "Creating search index. You need %s plugin installed for this to work."
+        "createSearchIndexInfo": "Creating search index. You need %s plugin installed for this to work.",
+        "configFileDescription": "Store config file",
+        "storeTypeDescription": "The type of store you want to create"
     },
     "quickstart": {
         "setup": {

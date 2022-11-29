@@ -10,11 +10,12 @@ import { AnyJson } from '@salesforce/ts-types';
 import { paymentsFlags } from '../../../../lib/flags/commerce/payments.flags';
 import { storeFlags } from '../../../../lib/flags/commerce/store.flags';
 import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../../lib/utils/args/flagsUtils';
-import { EXAMPLE_DIR, FILE_COPY_ARGS } from '../../../../lib/utils/constants/properties';
+import { STORE_DIR, FILE_COPY_ARGS, EXAMPLE_DIR } from '../../../../lib/utils/constants/properties';
 import { forceDataRecordCreate, forceDataRecordDelete, forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
 import { shell, shellJsonSfdx } from '../../../../lib/utils/shell';
 import { StoreQuickstartSetup } from '../../store/quickstart/setup';
 import { FilesCopy } from '../../files/copy';
+import { StatusFileManager } from '../../../../lib/utils/statusFileManager';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -26,36 +27,54 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static description = msgs.getMessage('quickstart.setup.cmdDescription');
 
-    public static examples = [`sfdx ${CMD} -p Stripe`]; // TODO documentation including examples and descriptions
+    public static examples = [`sfdx ${CMD} -p Stripe -n 1commerce`]; // TODO documentation including examples and descriptions
     protected static flagsConfig = {
         ...paymentsFlags,
         ...filterFlags(['store-name', 'prompt'], storeFlags),
     };
     public org: Org;
+    private statusFileManager: StatusFileManager;
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<AnyJson> {
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
+        const devHubUsername = (await this.org.getDevHubOrg()).getUsername();
+        const storeName = this.flags['store-name'] as string;
         const selection = this.flags['payment-adapter'] as string;
         const namedCredentialMasterLabel = selection;
         const paymentGatewayAdapterName = `${selection}Adapter`;
         const paymentGatewayProviderName = `${selection}PGP`;
         const paymentGatewayName = `${selection}PG`;
+
         const examplesDir = `${EXAMPLE_DIR}/${StoreQuickstartSetup.getStoreType(
             this.org.getUsername(),
             this.flags['store-name'],
             this.ux
         ).toLowerCase()}/checkout/payment-gateway-integration/${selection[0].toUpperCase() + selection.substr(1)}/`;
-        this.ux.log(
-            msgs.getMessage('quickstart.setup.settingUpGatewayConvertingNamedCredentialsGatewayAdapterApex', [
-                selection,
-            ])
+
+        this.statusFileManager = new StatusFileManager(devHubUsername, this.org.getUsername(), storeName);
+
+        const storeDir = STORE_DIR(
+            undefined,
+            devHubUsername,
+            this.statusFileManager.scratchOrgAdminUsername,
+            storeName
         );
-        this.ux.log(JSON.stringify(shellJsonSfdx(`sfdx force:mdapi:convert -r ${examplesDir}`), null, 4));
+
         this.ux.log(msgs.getMessage('quickstart.setup.pushingNamedCredentialsAndGatewayAdapterApexToOrg'));
-        this.ux.log(JSON.stringify(shellJsonSfdx(`sfdx force:source:push -f -u "${this.org.getUsername()}"`), null, 4));
+        this.ux.log(
+            JSON.stringify(
+                shellJsonSfdx(
+                    `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${examplesDir} -w 1`,
+                    null,
+                    storeDir
+                ),
+                null,
+                4
+            )
+        );
         // Creating Payment Gateway Provider
         const apexClassIdRecord = forceDataSoql(
             `SELECT Id FROM ApexClass WHERE Name='${paymentGatewayAdapterName}' LIMIT 1`,
