@@ -1,7 +1,7 @@
 # commerce-on-lightning
 
 [![Version](https://img.shields.io/npm/v/@salesforce/commerce.svg)](https://npmjs.org/package/@salesforce/commerce)
-[![CircleCI](https://circleci.com/gh/forcedotcom/commerce-on-lightning.svg?style=shield)](https://circleci.com/gh/forcedotcom/commerce-on-lightning)
+[![CircleCI](https://$(whoami).com/gh/forcedotcom/commerce-on-lightning.svg?style=shield)](https://$(whoami).com/gh/forcedotcom/commerce-on-lightning)
 [![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/forcedotcom/commerce-on-lightning?branch=master&svg=true)](https://ci.appveyor.com/project/heroku/commerce-on-lightning/branch/master)
 [![Codecov](https://codecov.io/gh/forcedotcom/commerce-on-lightning/branch/master/graph/badge.svg)](https://codecov.io/gh/forcedotcom/commerce-on-lightning)
 [![Known Vulnerabilities](https://snyk.io/test/github/forcedotcom/commerce-on-lightning/badge.svg)](https://snyk.io/test/github/forcedotcom/commerce-on-lightning)
@@ -144,9 +144,9 @@ USAGE
   [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
-  -d, --outputdir=outputdir                                                         [default: ~/.commerce
-                                                                                    /force-app] Directory to output the
-                                                                                    conversion
+  -d, --outputdir=outputdir                                                         [default:
+                                                                                    ~/.commerce/force-app]
+                                                                                    Directory to output the conversion
 
   -f, --definitionfile=definitionfile                                               (required) config file
 
@@ -395,15 +395,15 @@ USAGE
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
-  -c, --products-file-csv=products-file-csv                                         [default: ~/.commerce
-                                                                                    /examples/csv/Alpine-small.csv] The
+  -c, --products-file-csv=products-file-csv                                         [default: ~/.commerce/e
+                                                                                    xamples/csv/Alpine-small.csv] The
                                                                                     csv file containing products to
                                                                                     import.  Pass in empty value to do
                                                                                     product-less import
 
-  -f, --definitionfile=definitionfile                                               [default: ~/.commerce
-                                                                                    /config/store-scratch-def.json]
-                                                                                    config file
+  -f, --definitionfile=definitionfile                                               [default: ~/.commerce/c
+                                                                                    onfig/store-scratch-def.json] config
+                                                                                    file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
@@ -677,9 +677,9 @@ USAGE
   [--apiversion <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
-  -f, --definitionfile=definitionfile                                               [default: ~/.commerce
-                                                                                    /config/store-scratch-def.json]
-                                                                                    config file
+  -f, --definitionfile=definitionfile                                               [default: ~/.commerce/c
+                                                                                    onfig/store-scratch-def.json] config
+                                                                                    file
 
   -n, --store-name=store-name                                                       (required) [default: 1commerce] name
                                                                                     of the site to create
