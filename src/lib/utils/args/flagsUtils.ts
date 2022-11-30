@@ -114,6 +114,9 @@ export const removeFlagBeforeAll = (flag: string, cmds: string[]): string[] => {
 export async function setApiVersion(org: Org, flags: OutputFlags<any>): Promise<void> {
     if (flags.apiversion) return;
 
+    if (!org) {
+        return;
+    }
     let apiVersion: string;
     const config = org.getConfigAggregator();
     if (config.getLocalConfig()?.get(CONFIG_PROP_API_VERSION)) {
@@ -124,9 +127,6 @@ export async function setApiVersion(org: Org, flags: OutputFlags<any>): Promise<
         apiVersion = config.getEnvVars().get(ENV_PROP_SFDX_API_VERSION).toString();
     } else {
         apiVersion = await org.retrieveMaxApiVersion();
-    }
-    if (!apiVersion) {
-        throw new Error('Missing Api version');
     }
     flags.apiversion = apiVersion;
 }

@@ -61,7 +61,7 @@ export class ScratchOrgCreate extends SfdxCommand {
     private devHubDir: string;
 
     public async run(): Promise<AnyJson> {
-        await setApiVersion(this.org, this.flags);
+        await setApiVersion(this.hubOrg, this.flags);
         /*
         Base class reads the tagetdevhubusername or -v arg. if not provided it will use whatever is set for defaultdevhubusername config parameter
          */

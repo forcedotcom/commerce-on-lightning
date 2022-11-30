@@ -58,6 +58,14 @@ function stubOrgWithConfigs(
 
     return org;
 }
+function restoreStubs() {
+    localConfigStub.restore();
+    globalConfigStub.restore();
+    envConfigStub.restore();
+    configAggregatorStub.restore();
+    maxApiversionStub.restore();
+}
+
 describe('flagsUtils add allowed args', () => {
     it('should add only args that the sfdxcommand Auth allows', async () => {
         const res = addAllowedArgs(['-c', 'hi', '-b', 'bye'], StoreCreate);
@@ -90,18 +98,12 @@ describe('Sets the api version based on the priority', () => {
     after(() => {
         sinon.restore();
     });
-    afterEach(() => {
-        localConfigStub.restore();
-        globalConfigStub.restore();
-        envConfigStub.restore();
-        configAggregatorStub.restore();
-        maxApiversionStub.restore();
-    });
     it('should set the version specified in flags', async () => {
         const org = await stubOrg(undefined, undefined, undefined, undefined);
         const flags = { apiversion: '56.0' };
         await setApiVersion(org, flags);
         assert.equal(flags.apiversion, '56.0');
+        restoreStubs();
     });
     it('should set the api version specified in local config', async () => {
         const localApiVersion = '54.0';
@@ -113,6 +115,7 @@ describe('Sets the api version based on the priority', () => {
         await setApiVersion(org, flags);
         assert.equal(flags['apiversion'], localApiVersion);
         sinon.assert.calledTwice(localConfigStub);
+        restoreStubs();
     });
     it('should set the api version specified in global config', async () => {
         const localApiVersion = undefined;
@@ -125,6 +128,7 @@ describe('Sets the api version based on the priority', () => {
         assert.equal(flags['apiversion'], globalApiVersion);
         sinon.assert.calledOnce(localConfigStub);
         sinon.assert.calledTwice(globalConfigStub);
+        restoreStubs();
     });
     it('should set the api version specified in env', async () => {
         const localApiVersion = undefined;
@@ -138,6 +142,7 @@ describe('Sets the api version based on the priority', () => {
         sinon.assert.calledOnce(localConfigStub);
         sinon.assert.calledOnce(globalConfigStub);
         sinon.assert.calledTwice(envConfigStub);
+        restoreStubs();
     });
     it('should set the max api version from the org when no other config is specified', async () => {
         const localApiVersion = undefined;
@@ -152,6 +157,7 @@ describe('Sets the api version based on the priority', () => {
         sinon.assert.calledOnce(globalConfigStub);
         sinon.assert.calledOnce(envConfigStub);
         sinon.assert.calledOnce(maxApiversionStub);
+        restoreStubs();
     });
     it('Handles when localconfig object is undefined', async () => {
         const globalApiVersion = '55.0';
@@ -171,6 +177,7 @@ describe('Sets the api version based on the priority', () => {
         assert.equal(flags['apiversion'], globalApiVersion);
         sinon.assert.calledOnce(localConfigStub);
         sinon.assert.calledTwice(globalConfigStub);
+        restoreStubs();
     });
     it('Handles when globalconfig object is undefined', async () => {
         const envApiVersion = '56.0';
@@ -186,6 +193,7 @@ describe('Sets the api version based on the priority', () => {
         sinon.assert.calledOnce(localConfigStub);
         sinon.assert.calledOnce(globalConfigStub);
         sinon.assert.calledTwice(envConfigStub);
+        restoreStubs();
     });
     it('Handles when envVars object is undefined', async () => {
         const orgMaxApiVersion = '57.0';
@@ -199,19 +207,12 @@ describe('Sets the api version based on the priority', () => {
         sinon.assert.calledOnce(globalConfigStub);
         sinon.assert.calledOnce(envConfigStub);
         sinon.assert.calledOnce(maxApiversionStub);
+        restoreStubs();
     });
-    it('Throws error when api version can not be determined', async () => {
-        const org = stubOrgWithConfigs(undefined, undefined, undefined, undefined);
-
+    it('handles when org is undefined', async () => {
         const flags = {};
-        let err: Error;
-        try {
-            await setApiVersion(org, flags);
-        } catch (e) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-            err = e;
-        }
-        assert.equal(err.message, 'Missing Api version');
+        await setApiVersion(undefined, flags);
+        assert.equal(flags['apiversion'], undefined);
     });
 });
 
