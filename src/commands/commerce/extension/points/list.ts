@@ -7,6 +7,7 @@
 import { SfdxCommand } from '@salesforce/command';
 import { Messages, Org } from '@salesforce/core';
 import { forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
+import { setApiVersion } from '../../../../lib/utils/args/flagsUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -23,6 +24,7 @@ export class getEPN extends SfdxCommand {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<void> {
+        await setApiVersion(this.org, this.flags);
         this.printEPN();
     }
 

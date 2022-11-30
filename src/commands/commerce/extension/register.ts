@@ -16,6 +16,7 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages, Org, SfdxError } from '@salesforce/core';
 import { forceDataRecordCreate, forceDataSoql } from '../../../lib/utils/sfdx/forceDataSoql';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
+import { setApiVersion } from '../../../lib/utils/args/flagsUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -55,6 +56,7 @@ export class RegisterExtension extends SfdxCommand {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<unknown> {
+        await setApiVersion(this.org, this.flags);
         this.ux.log(
             `Retrieving Apex Class '${
                 // eslint-disable-next-line @typescript-eslint/restrict-template-expressions

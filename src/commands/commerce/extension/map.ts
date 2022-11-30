@@ -9,6 +9,7 @@ import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages, Org, SfdxError } from '@salesforce/core';
 import { forceDataSoql, forceDataRecordCreate, forceDataRecordDelete } from '../../../lib/utils/sfdx/forceDataSoql';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
+import { setApiVersion } from '../../../lib/utils/args/flagsUtils';
 import { UtilStoreValidate } from './unmap';
 
 Messages.importMessagesDirectory(__dirname);
@@ -43,6 +44,7 @@ export class MapExtension extends SfdxCommand {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<string> {
+        await setApiVersion(this.org, this.flags);
         this.ux.log(`Accessing Store using username: ${this.org.getUsername()} \n..........`);
 
         return this.processMapExtension(

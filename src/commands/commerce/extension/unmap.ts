@@ -12,6 +12,7 @@ import { OutputFlags } from '@oclif/parser';
 import { forceDataSoql, forceDataRecordDelete } from '../../../lib/utils/sfdx/forceDataSoql';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { Result } from '../../../lib/utils/jsonUtils';
+import { setApiVersion } from '../../../lib/utils/args/flagsUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -45,6 +46,7 @@ export class UnMapExtension extends SfdxCommand {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<void> {
+        await setApiVersion(this.org, this.flags);
         this.unmapRecord(
             this.flags['registered-extension-name'],
             this.flags['store-name'],
