@@ -5,18 +5,20 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { SfdxCommand, flags } from '@salesforce/command';
-import { fs, Messages, SfdxError } from '@salesforce/core';
+import { Messages, SfdxError } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
 import { addAllowedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
 import { BASE_DIR, CONFIG_DIR, FILE_COPY_ARGS, DEVHUB_DIR } from '../../../lib/utils/constants/properties';
-import { replaceErrors, SfdxProject } from '../../../lib/utils/jsonUtils';
+import { replaceErrors } from '../../../lib/utils/jsonUtils';
 import { getScratchOrgByUsername } from '../../../lib/utils/sfdx/forceOrgList';
 import { shellJsonSfdx } from '../../../lib/utils/shell';
 import { sleep } from '../../../lib/utils/sleep';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { FilesCopy } from '../files/copy';
 import { mkdirSync } from '../../../lib/utils/fsUtils';
+import { createSfdxProjectFile } from '../../../lib/utils/definitionFile';
+import { appendCommonFlags, setApiVersion } from '../../../lib/utils/args/flagsUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -59,6 +61,7 @@ export class ScratchOrgCreate extends SfdxCommand {
     private devHubDir: string;
 
     public async run(): Promise<AnyJson> {
+        await setApiVersion(this.org, this.flags);
         /*
         Base class reads the tagetdevhubusername or -v arg. if not provided it will use whatever is set for defaultdevhubusername config parameter
          */
@@ -67,18 +70,8 @@ export class ScratchOrgCreate extends SfdxCommand {
         this.statusManager = new StatusFileManager(this.devhubUsername, this.flags.username);
         this.ux.log(msgs.getMessage('create.usingScratchOrgAdmin', [this.flags.username]));
 
-        const sfdxProject: SfdxProject = Object.assign(
-            new SfdxProject(),
-            fs.readJsonSync(BASE_DIR + '/sfdx-project.json')
-        );
-        if (!this.flags.apiversion) {
-            this.flags.apiversion = sfdxProject.sourceApiVersion;
-        } else {
-            sfdxProject.sourceApiVersion = this.flags.apiversion as string;
-        }
         this.devHubDir = DEVHUB_DIR(BASE_DIR, this.devhubUsername);
-        const sfdxProjectFile = mkdirSync(this.devHubDir) + '/sfdx-project.json';
-        fs.writeFileSync(sfdxProjectFile, JSON.stringify(sfdxProject, null, 4));
+        createSfdxProjectFile(this.flags.apiversion, this.devHubDir);
 
         await this.createScratchOrg();
         this.ux.log(chalk.green.bold(msgs.getMessage('create.completedCreatingScratchOrg')));
@@ -109,16 +102,19 @@ export class ScratchOrgCreate extends SfdxCommand {
         try {
             this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:org:create']));
             mkdirSync((this.devHubDir ? this.devHubDir : BASE_DIR) + '/force-app');
-            const cmd = `sfdx force:org:create \
+            const cmd = appendCommonFlags(
+                `sfdx force:org:create \
 --targetdevhubusername="${this.devhubUsername}" \
 --definitionfile=${CONFIG_DIR}/${orgType}-project-scratch-def.json \
---apiversion="${this.flags.apiversion as string}" \
 --setalias="${this.flags.alias as string}" \
 --durationdays=30 \
 --wait=${this.flags.wait as number} \
 username="${this.flags.username as string}" \
 --setdefaultusername \
---json`;
+--json`,
+                this.flags,
+                this.logger
+            );
 
             const res = shellJsonSfdx(cmd, null, this.devHubDir ? this.devHubDir : '/tmp');
 

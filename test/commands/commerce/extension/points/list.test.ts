@@ -20,7 +20,8 @@ describe('Test EPN list command', () => {
     const QUERY_GET_EPN =
         "SELECT Value, IsDefaultValue, IsActive FROM PicklistValueInfo WHERE EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName'";
     const epnList = new getEPN([], config);
-
+    const logger = sinon.match.any;
+    const defaultArgs = sinon.match.any;
     after(() => {
         sinon.restore();
     });
@@ -36,7 +37,7 @@ describe('Test EPN list command', () => {
             public records: Record[] = [{ Value: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_EPN).returns(epnQr);
+        forceDataSoqlStub.withArgs(QUERY_GET_EPN, '', defaultArgs, logger).returns(epnQr);
         assert.throws(() => epnList.printEPN(), TypeError);
         // assert(forceDataSoqlStub.calledWith(QUERY_GET_EPN));
         forceDataSoqlStub.restore();
@@ -52,7 +53,7 @@ describe('Test EPN list command', () => {
             public records: Record[] = [];
             public totalSize = 0;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_EPN).returns(epnQr);
+        forceDataSoqlStub.withArgs(QUERY_GET_EPN, '', defaultArgs, logger).returns(epnQr);
         assert.throws(() => epnList.printEPN(), TypeError);
         // assert(forceDataSoqlStub.calledWith(QUERY_GET_EPN));
         forceDataSoqlStub.restore();

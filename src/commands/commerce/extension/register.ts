@@ -84,7 +84,9 @@ export class RegisterExtension extends SfdxCommand {
         // checks if user passed valid EPN
         const epnVal = forceDataSoql(
             `SELECT Value FROM PicklistValueInfo WHERE Value='${storeEPN}' AND EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName' LIMIT 1`,
-            storeUserName
+            storeUserName,
+            this.flags,
+            this.logger
         );
         if (epnVal.result.totalSize === 0) {
             throw new SfdxError(msgs.getMessage('extension.register.errEPN'));
@@ -96,7 +98,9 @@ export class RegisterExtension extends SfdxCommand {
         const results = forceDataRecordCreate(
             'RegisteredExternalService',
             `DeveloperName=${storeRegisteredName} MasterLabel=${storeRegisteredName} ExtensionPointName=${storeEPN} ExternalServiceProviderId=${apexClassId} ExternalServiceProviderType='Extension'`,
-            storeUserName
+            storeUserName,
+            this.flags,
+            this.logger
         );
         // Validates/checks for already existing unique name?
         if (results instanceof SfdxError) {
@@ -114,7 +118,9 @@ export class RegisterExtension extends SfdxCommand {
         try {
             apexClassId = forceDataSoql(
                 `SELECT Id FROM ApexClass WHERE Name='${storeApexClass}' LIMIT 1`,
-                storeUserName
+                storeUserName,
+                this.flags,
+                this.logger
             ).result.records[0].Id;
         } catch (error) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -127,7 +133,9 @@ export class RegisterExtension extends SfdxCommand {
     private getInsertedRecord(storeRegisteredName: string, storeApexClass: string, storeUserName: string): string {
         const RegisteredTable = forceDataSoql(
             `SELECT Id,ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${storeRegisteredName}'`,
-            storeUserName
+            storeUserName,
+            this.flags,
+            this.logger
         );
 
         for (const element of RegisteredTable.result.records) {

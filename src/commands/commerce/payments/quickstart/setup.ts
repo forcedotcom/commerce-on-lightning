@@ -16,6 +16,7 @@ import { shell, shellJsonSfdx } from '../../../../lib/utils/shell';
 import { StoreQuickstartSetup } from '../../store/quickstart/setup';
 import { FilesCopy } from '../../files/copy';
 import { StatusFileManager } from '../../../../lib/utils/statusFileManager';
+import { appendCommonFlags, setApiVersion } from '../../../../lib/utils/args/flagsUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -37,6 +38,7 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<AnyJson> {
+        await setApiVersion(this.org, this.flags);
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
@@ -50,8 +52,9 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
 
         const examplesDir = `${EXAMPLE_DIR}/${StoreQuickstartSetup.getStoreType(
             this.org.getUsername(),
-            this.flags['store-name'],
-            this.ux
+            this.flags,
+            this.ux,
+            this.logger
         ).toLowerCase()}/checkout/payment-gateway-integration/${selection[0].toUpperCase() + selection.substr(1)}/`;
 
         this.statusFileManager = new StatusFileManager(devHubUsername, this.org.getUsername(), storeName);
@@ -67,7 +70,11 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         this.ux.log(
             JSON.stringify(
                 shellJsonSfdx(
-                    `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${examplesDir} -w 1`,
+                    appendCommonFlags(
+                        `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${examplesDir} -w 1`,
+                        this.flags,
+                        this.logger
+                    ),
                     null,
                     storeDir
                 ),
@@ -78,7 +85,9 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         // Creating Payment Gateway Provider
         const apexClassIdRecord = forceDataSoql(
             `SELECT Id FROM ApexClass WHERE Name='${paymentGatewayAdapterName}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records;
         if (!apexClassIdRecord || apexClassIdRecord.length === 0)
             throw new SfdxError(
@@ -93,16 +102,22 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         forceDataRecordCreate(
             'PaymentGatewayProvider',
             `DeveloperName=${paymentGatewayProviderName} ApexAdapterId=${apexClassId} MasterLabel=${paymentGatewayProviderName} IdempotencySupported=Yes Comments=Comments`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         // Creating Payment Gateway
         const paymentGatewayProviderId = forceDataSoql(
             `SELECT Id FROM PaymentGatewayProvider WHERE DeveloperName='${paymentGatewayProviderName}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         let namedCredentialId = forceDataSoql(
             `SELECT Id FROM NamedCredential WHERE MasterLabel='${namedCredentialMasterLabel}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         this.ux.log(
             msgs.getMessage(
@@ -113,25 +128,39 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         forceDataRecordCreate(
             'PaymentGateway',
             `MerchantCredentialId=${namedCredentialId} PaymentGatewayName=${paymentGatewayName} PaymentGatewayProviderId=${paymentGatewayProviderId} Status=Active`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         // Creating Store Integrated Service
         const storeId = forceDataSoql(
             `SELECT Id FROM WebStore WHERE Name='${this.flags['store-name'] as string}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         const serviceMappingId = forceDataSoql(
             `SELECT Id FROM StoreIntegratedService WHERE StoreId='${storeId}' AND ServiceProviderType='Payment' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         if (serviceMappingId) {
             this.ux.log(msgs.getMessage('quickstart.setup.theStoreMappingAlreadyExistsDeletingOldMpping'));
-            forceDataRecordDelete('StoreIntegratedService', serviceMappingId, this.org.getUsername());
+            forceDataRecordDelete(
+                'StoreIntegratedService',
+                serviceMappingId,
+                this.org.getUsername(),
+                this.flags,
+                this.logger
+            );
         }
         // do we really need to get storeId again here?         const storeId = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${this.devHubConfig.scratchOrgStoreName}' LIMIT 1`, this.org.getUsername).result.records[0].Id
         const paymentGatewayId = forceDataSoql(
             `SELECT Id FROM PaymentGateway WHERE PaymentGatewayName='${paymentGatewayName}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         this.ux.log(
             msgs.getMessage('quickstart.setup.creatingStoreIntegratedServiceUsingStoreIntegration', [
@@ -143,17 +172,25 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         forceDataRecordCreate(
             'StoreIntegratedService',
             `Integration=${paymentGatewayId} StoreId=${storeId} ServiceProviderType=Payment`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         // To set store mapping to a different Gateway see Store Integrations or run:"
         // force:org:open -p /lightning/page/storeDetail?lightning__webStoreId=$storeId."
         namedCredentialId = forceDataSoql(
             `SELECT Id FROM NamedCredential WHERE MasterLabel='${namedCredentialMasterLabel}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         this.ux.log(msgs.getMessage('quickstart.setup.namedCredentialWasCreatedUpdateItWithValidUsernamePassword'));
         shell(
-            `sfdx force:org:open -u ${this.org.getUsername()} -p "lightning/setup/NamedCredential/page?address=%2F${namedCredentialId}"`
+            appendCommonFlags(
+                `sfdx force:org:open -u ${this.org.getUsername()} -p "lightning/setup/NamedCredential/page?address=%2F${namedCredentialId}"`,
+                this.flags,
+                this.logger
+            )
         );
         return { quickstartSetupComplete: true };
     }

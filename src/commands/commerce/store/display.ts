@@ -12,6 +12,7 @@ import { allFlags } from '../../../lib/flags/commerce/all.flags';
 import { filterFlags } from '../../../lib/utils/args/flagsUtils';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { forceDataSoql } from '../../../lib/utils/sfdx/forceDataSoql';
+import { setApiVersion } from '../../../lib/utils/args/flagsUtils';
 import { StoreCreate } from './create';
 
 Messages.importMessagesDirectory(__dirname);
@@ -34,6 +35,7 @@ export class StoreDisplay extends SfdxCommand {
     public statusFileManager: StatusFileManager;
 
     public async run(): Promise<AnyJson> {
+        await setApiVersion(this.org, this.flags);
         let devhub = (await this.org.getDevHubOrg()).getUsername();
         if (!devhub) devhub = 'Not Supplied';
         this.statusFileManager = new StatusFileManager(
@@ -50,7 +52,12 @@ export class StoreDisplay extends SfdxCommand {
             (this.flags.urlpathprefix as string).replace(/[\\W_]+/g, '') !== (this.flags.urlpathprefix as string)
         )
             throw new SfdxError('Flag urlpathprefix must contain only alphanumeric characters');
-        const userInfo = await StoreCreate.getUserInfo(this.statusFileManager, this.flags['buyer-username']);
+        const userInfo = await StoreCreate.getUserInfo(
+            this.statusFileManager,
+            this.flags['buyer-username'],
+            this.flags,
+            this.logger
+        );
         if (!userInfo) throw new SfdxError(messages.getMessage('view.info.errorNoUserInfo'));
         const buyerPassword = userInfo.password ? userInfo.password : '';
         const fullStoreUrl = await this.getFullStoreURL();
@@ -86,7 +93,9 @@ export class StoreDisplay extends SfdxCommand {
             : (this.flags['store-name'] as string).replace(/[\\W_]+/g, '');
         const domainInfo = forceDataSoql(
             `SELECT Domain.Domain, PathPrefix FROM DomainSite WHERE PathPrefix='/${urlpathprefix}' OR PathPrefix='/${urlpathprefix}${SITE_COM_APPENDED_PATH}' limit 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         if (
             !domainInfo.result.records ||
@@ -102,8 +111,9 @@ export class StoreDisplay extends SfdxCommand {
         // Updating path prefix in case of appended /s
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         urlpathprefix = domainInfo.result.records[0]['PathPrefix'] as string;
-        const instanceUrl = (await StoreCreate.getUserInfo(this.statusFileManager, this.flags['buyer-username']))
-            .instanceUrl;
+        const instanceUrl = (
+            await StoreCreate.getUserInfo(this.statusFileManager, this.flags['buyer-username'], this.flags, this.logger)
+        ).instanceUrl;
         const url = new URL(instanceUrl);
         url.hostname = domain;
         domain = url.toString() + `${urlpathprefix}`;

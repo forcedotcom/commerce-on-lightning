@@ -67,14 +67,16 @@ export class MapExtension extends SfdxCommand {
         if (storeName === undefined && storeId === undefined) {
             throw new SfdxError(msgs.getMessage('extension.map.undefinedName'));
         }
-        const storeid = UtilStoreValidate.validateStoreId(storeName, storeId, userName);
+        const storeid = UtilStoreValidate.validateStoreId(storeName, storeId, userName, this.flags, this.logger);
         const registeredExternalServiceId = this.getRegisteredExtensionId(extensionName, userName);
         this.deleteDuplicateMaps(extensionName, userName, storeid);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
             'StoreIntegratedService',
             `Integration=${registeredExternalServiceId} StoreId=${storeid} ServiceProviderType='Extension'`,
-            userName
+            userName,
+            this.flags,
+            this.logger
         );
 
         if (results instanceof SfdxError) {
@@ -89,7 +91,9 @@ export class MapExtension extends SfdxCommand {
         try {
             registeredExternalServiceId = forceDataSoql(
                 `SELECT Id FROM RegisteredExternalService WHERE DeveloperName='${extensionName}'`,
-                userName
+                userName,
+                this.flags,
+                this.logger
             ).result.records[0].Id;
         } catch (error) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -101,9 +105,17 @@ export class MapExtension extends SfdxCommand {
 
     private getInsertedRecord(storeid: string, registeredExternalServiceId: string, extensionName: string): string {
         const StoreIntegratedTable = forceDataSoql(
-            `SELECT Id,Integration,ServiceProviderType,StoreId from StoreIntegratedService WHERE StoreId= '${storeid}' and Integration='${registeredExternalServiceId}' limit 1`
+            `SELECT Id,Integration,ServiceProviderType,StoreId from StoreIntegratedService WHERE StoreId= '${storeid}' and Integration='${registeredExternalServiceId}' limit 1`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
-        const name = forceDataSoql(`SELECT Name FROM WebStore WHERE Id='${storeid}' LIMIT 1`).result.records[0].Name;
+        const name = forceDataSoql(
+            `SELECT Name FROM WebStore WHERE Id='${storeid}' LIMIT 1`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        ).result.records[0].Name;
         for (const record of StoreIntegratedTable.result.records) {
             const finalTable = {
                 Id: record['Id'],
@@ -127,7 +139,9 @@ export class MapExtension extends SfdxCommand {
         let deletedId: string;
         const EPNQuery = forceDataSoql(
             `SELECT ExtensionPointName FROM RegisteredExternalService WHERE DeveloperName='${extensionName}'`,
-            userName
+            userName,
+            this.flags,
+            this.logger
         );
         if (EPNQuery !== undefined && EPNQuery.result !== undefined && EPNQuery.result.totalSize > 0) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -138,7 +152,9 @@ export class MapExtension extends SfdxCommand {
 
         const existingIds = forceDataSoql(
             `SELECT DeveloperName,ExternalServiceProviderType FROM RegisteredExternalService WHERE ExtensionPointName='${epnVal}' AND ExternalServiceProviderType='Extension'`,
-            userName
+            userName,
+            this.flags,
+            this.logger
         );
         for (const record of existingIds.result.records) {
             const id = (record['ExternalServiceProviderType'] as string)
@@ -146,7 +162,9 @@ export class MapExtension extends SfdxCommand {
                 .concat(record['DeveloperName'] as string);
             const deleteId = forceDataSoql(
                 `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}' AND StoreId='${storeid}'`,
-                userName
+                userName,
+                this.flags,
+                this.logger
             ).result.records[0];
             if (deleteId !== undefined) {
                 deletedId = deleteId.Id;
@@ -157,7 +175,14 @@ export class MapExtension extends SfdxCommand {
                         'because it was for the same EPN in this webstore',
                     ])
                 );
-                forceDataRecordDelete('StoreIntegratedService', deletedId, this.org.getUsername(), 'pipe');
+                forceDataRecordDelete(
+                    'StoreIntegratedService',
+                    deletedId,
+                    this.org.getUsername(),
+                    this.flags,
+                    this.logger,
+                    'pipe'
+                );
             }
         }
     }

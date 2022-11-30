@@ -29,7 +29,10 @@ export class getEPN extends SfdxCommand {
     public printEPN(): void {
         this.ux.log('Getting all ExtensionPointName values \n..........');
         const domainInfo = forceDataSoql(
-            "SELECT Value, IsDefaultValue, IsActive FROM PicklistValueInfo WHERE EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName'"
+            "SELECT Value, IsDefaultValue, IsActive FROM PicklistValueInfo WHERE EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName'",
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         // iterates through picklist to show availabe EPN vals
         for (const element of domainInfo.result.records) {

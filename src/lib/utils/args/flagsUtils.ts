@@ -5,6 +5,12 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
+import { Logger, Org } from '@salesforce/core';
+import { OutputFlags } from '@oclif/parser';
+
+export const CONFIG_PROP_API_VERSION = 'apiVersion';
+export const ENV_PROP_SFDX_API_VERSION = 'SFDX_API_VERSION';
+
 function contains(v: string, a): boolean {
     for (const i of a) if (i === v) return true;
     return false;
@@ -103,3 +109,31 @@ export const removeFlagBeforeAll = (flag: string, cmds: string[]): string[] => {
     if (!cmds) return cmds;
     return cmds.filter((c) => c !== flag);
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function setApiVersion(org: Org, flags: OutputFlags<any>): Promise<void> {
+    if (flags.apiversion) return;
+
+    let apiVersion: string;
+    const config = org.getConfigAggregator();
+    if (config.getLocalConfig()?.get(CONFIG_PROP_API_VERSION)) {
+        apiVersion = config.getLocalConfig().get(CONFIG_PROP_API_VERSION).toString();
+    } else if (config.getGlobalConfig()?.get(CONFIG_PROP_API_VERSION)) {
+        apiVersion = config.getGlobalConfig().get(CONFIG_PROP_API_VERSION).toString();
+    } else if (config.getEnvVars()?.get(ENV_PROP_SFDX_API_VERSION)) {
+        apiVersion = config.getEnvVars().get(ENV_PROP_SFDX_API_VERSION).toString();
+    } else {
+        apiVersion = await org.retrieveMaxApiVersion();
+    }
+    if (!apiVersion) {
+        throw new Error('Missing Api version');
+    }
+    flags.apiversion = apiVersion;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function appendCommonFlags(cmd: string, flags: OutputFlags<any>, logger: Logger): string {
+    if (flags?.apiversion) cmd = `${cmd} --apiversion=${flags.apiversion as string}`;
+    logger.debug(`Wrapped command: ${cmd}`);
+    return cmd;
+}

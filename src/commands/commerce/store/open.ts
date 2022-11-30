@@ -11,6 +11,7 @@ import { allFlags } from '../../../lib/flags/commerce/all.flags';
 import { filterFlags } from '../../../lib/utils/args/flagsUtils';
 import { shell } from '../../../lib/utils/shell';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
+import { appendCommonFlags, setApiVersion } from '../../../lib/utils/args/flagsUtils';
 import { StoreCreate } from './create';
 
 Messages.importMessagesDirectory(__dirname);
@@ -30,6 +31,7 @@ export class StoreOpen extends SfdxCommand {
     private statusFileManager: StatusFileManager;
 
     public async run(): Promise<AnyJson> {
+        await setApiVersion(this.org, this.flags);
         if (this.flags.all) return { res: this.viewAll() };
         let devhub = (await this.org.getDevHubOrg()).getUsername();
         if (!devhub) devhub = 'Not Supplied';
@@ -38,18 +40,26 @@ export class StoreOpen extends SfdxCommand {
             this.org.getUsername(),
             this.flags['store-name'] as string
         );
-        const storeId = await StoreCreate.getStoreId(this.statusFileManager, this.ux);
+        const storeId = await StoreCreate.getStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
         if (!storeId) throw new SfdxError(messages.getMessage('view.errorStoreId'));
         this.ux.log('Store id is: ' + storeId);
         shell(
-            `SFDX_DOMAIN_RETRY=5 sfdx force:org:open -p "/lightning/r/WebStore/${storeId}/view" -u ${this.org.getUsername()}`
+            appendCommonFlags(
+                `SFDX_DOMAIN_RETRY=5 sfdx force:org:open -p "/lightning/r/WebStore/${storeId}/view" -u ${this.org.getUsername()}`,
+                this.flags,
+                this.logger
+            )
         );
         return { storeId };
     }
 
     public viewAll(): boolean {
         shell(
-            `SFDX_DOMAIN_RETRY=5 sfdx force:org:open -u ${this.org.getUsername()} -p _ui/networks/setup/SetupNetworksPage`
+            appendCommonFlags(
+                `SFDX_DOMAIN_RETRY=5 sfdx force:org:open -u ${this.org.getUsername()} -p _ui/networks/setup/SetupNetworksPage`,
+                this.flags,
+                this.logger
+            )
         );
         return true;
     }

@@ -7,6 +7,7 @@
 import { strict as assert } from 'assert';
 import sinon, { stub } from 'sinon';
 import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
+import { Logger } from '@salesforce/core';
 import * as shellExports from '../../../../src/lib/utils/shell';
 import { Result } from '../../../../src/lib/utils/jsonUtils';
 import { forceDataSoql } from '../../../../src/lib/utils/sfdx/forceDataSoql';
@@ -23,7 +24,10 @@ describe('forceDataSoql forceDataSoql', () => {
         })();
         res.result.records.push({ Id: 'b', Name: 'a', attributes: { type: 'test', url: 'someurl' } });
         const s = stub(shellExports, 'shellJsonSfdx').returns(res);
-        assert.equal(forceDataSoql('a').result.records[0].attributes['type'], 'test');
+        assert.equal(
+            forceDataSoql('a', '', {}, sinon.createStubInstance(Logger)).result.records[0].attributes['type'],
+            'test'
+        );
         s.restore();
     });
     afterEach(() => {
