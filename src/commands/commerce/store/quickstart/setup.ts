@@ -645,7 +645,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         siteConfigMetaFile.isAvailableToGuests = true;
         siteConfigMetaFile.authenticationType = 'AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED';
         fs.writeFileSync(siteConfigMetaFileName, JSON.stringify(siteConfigMetaFile, null, 4));
-        const def = parseStoreScratchDef(this.flags.definitionfile);
+        const def = parseStoreScratchDef(this.flags);
         const relaxedLevel = def.settings.isRelaxedCSPLevel;
         const siteConfigMainAppPageFileName =
             this.storeDir +
