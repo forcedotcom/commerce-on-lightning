@@ -1,6 +1,6 @@
 {
     "name": "@salesforce/commerce",
-    "version": "242.0.14",
+    "version": "242.0.15",
     "author": "Jonathan Arndt",
     "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
     "dependencies": {
@@ -138,11 +138,6 @@
         "test:deprecation-policy": "./bin/run snapshot:compare",
         "test:nuts": "nyc mocha \"**/*.nut.ts\" --slow 4500 --timeout 600000 --parallel",
         "version": "(oclif-dev readme && sed -i.bak -e \"s|$(echo $HOME)|~|g\" -e \"s|$(whoami)|\"\\$\\(whoami\\)\"|g\" README.md && git add README.md) || exit 0"
-    },
-    "husky": {
-        "hooks": {
-            "pre-commit": "eslint \"src/**/*.ts\" \"test/**/*.ts\" --fix; if git --no-pager diff HEAD package.json | egrep '\"version\": \"[0-9]+\\.'; then npm run version; else (npm --no-git-tag-version version patch; git add package.json; sf-husky-pre-commit); fi;"
-        }
     },
     "publishConfig": {
         "access": "public"
