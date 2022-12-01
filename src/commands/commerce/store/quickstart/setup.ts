@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -7,9 +7,10 @@
 import { existsSync } from 'fs';
 import * as path from 'path';
 import { SfdxCommand } from '@salesforce/command';
-import { fs, Messages, SfdxError, Org as SfdxOrg } from '@salesforce/core';
+import { fs, Messages, SfdxError, Org as SfdxOrg, Logger } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
+import { OutputFlags } from '@oclif/parser';
 import { allFlags } from '../../../../lib/flags/commerce/all.flags';
 import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../../lib/utils/args/flagsUtils';
 import {
@@ -33,6 +34,7 @@ import { StatusFileManager } from '../../../../lib/utils/statusFileManager';
 import { ProductsImport } from '../../products/import';
 import { StoreCreate } from '../create';
 import { FilesCopy } from '../../files/copy';
+import { appendCommonFlags, setApiVersion } from '../../../../lib/utils/args/flagsUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -78,13 +80,22 @@ export class StoreQuickstartSetup extends SfdxCommand {
     private devHubUsername: string;
     private storeDir: string;
 
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    public static getStoreType(username: string, storeName: string, ux): string {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-explicit-any
+    public static getStoreType(username: string, flags: OutputFlags<any>, ux, logger: Logger): string {
         if (!ux) ux = console;
         if (this.storeType) return this.storeType;
+        if (!flags['store-name']) {
+            throw new SfdxError(msgs.getMessage('quickstart.setup.storeNameIsMissing'));
+        }
+        const storeName = flags['store-name'] as string;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
         ux.log(msgs.getMessage('quickstart.setup.checkingB2BorB2C'));
-        const storeTypeRes = forceDataSoql(`SELECT Type FROM WebStore WHERE Name = '${storeName}'`, username);
+        const storeTypeRes = forceDataSoql(
+            `SELECT Type FROM WebStore WHERE Name = '${storeName}'`,
+            username,
+            flags,
+            logger
+        );
         if (
             !storeTypeRes.result ||
             !storeTypeRes.result.records ||
@@ -101,6 +112,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
     }
 
     public async run(): Promise<AnyJson> {
+        await setApiVersion(this.org, this.flags);
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
@@ -110,12 +122,15 @@ export class StoreQuickstartSetup extends SfdxCommand {
             this.org.getUsername(),
             this.flags['store-name'] as string
         );
+        const storeType = StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger);
         // TODO this is only in store create so makes sense to key off of store
         await new Requires()
             .examplesConverted(
                 SCRATCH_ORG_DIR(BASE_DIR, this.devHubUsername, this.org.getUsername()),
                 this.flags['store-name'],
-                this.flags.definitionfile
+                storeType,
+                this.flags.definitionfile,
+                this.flags.apiversion
             )
             .build();
         this.storeDir = STORE_DIR(BASE_DIR, this.devHubUsername, this.org.getUsername(), this.flags['store-name']);
@@ -135,7 +150,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         this.ux.log(chalk.green.bold(msgs.getMessage('quickstart.setup.completedQuickstartStep1')));
         await this.setupIntegrations();
         this.ux.log(chalk.green.bold(msgs.getMessage('quickstart.setup.completedQuickstartStep2')));
-        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags['store-name'], this.ux) === 'B2B') {
+        if (storeType === 'B2B') {
             // replace sfdc_checkout__CheckoutTemplate with $(ls force-app/main/default/flows/*Checkout.flow-meta.xml | sed 's/.*flows\/\(.*\).flow-meta.xml/\1/')
             await this.updateFlowAssociatedToCheckout();
         }
@@ -161,15 +176,17 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 PACKAGE_RETRIEVE_TEMPLATE(
                     StoreQuickstartSetup.getStoreType(
                         this.org.getUsername(),
-                        this.flags['store-name'],
-                        this.ux
+                        this.flags,
+                        this.ux,
+                        this.logger
                     ).toLowerCase()
                 )
             )
             .toString()
             .replace('YourCommunitySiteNameHere', this.varargs['communitySiteName'] as string)
             .replace('YourCommunityExperienceBundleNameHere', this.varargs['communityExperienceBundleName'] as string)
-            .replace('YourCommunityNetworkNameHere', this.varargs['communityNetworkName'] as string);
+            .replace('YourCommunityNetworkNameHere', this.varargs['communityNetworkName'] as string)
+            .replace('ApiVersionHere', this.flags.apiversion as string);
         // turn sharing rule metadata off by default
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
             /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
@@ -183,21 +200,25 @@ export class StoreQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.usingToRetrieveStoreInfo', [packageRetrieve]));
         this.ux.log(msgs.getMessage('quickstart.setup.getStoreMetadatFromZip'));
         shell(
-            `sfdx force:mdapi:retrieve -u "${this.org.getUsername()}" -r "${
-                this.storeDir
-            }/experience-bundle-package" -k "${PACKAGE_RETRIEVE(this.storeDir)}"`
+            appendCommonFlags(
+                `sfdx force:mdapi:retrieve -u "${this.org.getUsername()}" -r "${
+                    this.storeDir
+                }/experience-bundle-package" -k "${PACKAGE_RETRIEVE(this.storeDir)}"`,
+                this.flags,
+                this.logger
+            )
         );
         shell(
             `unzip -o -d "${this.storeDir}/experience-bundle-package" "${this.storeDir}/experience-bundle-package/unpackaged.zip"`
         );
-        await StoreCreate.waitForStoreId(this.statusFileManager, this.ux);
+        await StoreCreate.waitForStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
         await this.statusFileManager.setValue('retrievedPackages', true);
     }
 
     private async setupIntegrations(): Promise<void> {
         if (await this.statusFileManager.getValue('integrationSetup')) return;
         this.ux.log(msgs.getMessage('quickstart.setup.setUpIntegrations'));
-        await StoreCreate.waitForStoreId(this.statusFileManager, this.ux);
+        await StoreCreate.waitForStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
         this.ux.log(msgs.getMessage('quickstart.setup.regAndMapIntegrations'));
         const integrations = [
             ['B2BCheckInventorySample', 'CHECK_INVENTORY', 'Inventory'],
@@ -244,7 +265,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
         try {
             apexClassId = forceDataSoql(
                 `SELECT Id FROM ApexClass WHERE Name='${apexClassName}' LIMIT 1`,
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             ).result.records[0].Id;
         } catch (e) {
             this.ux.log(
@@ -261,13 +284,17 @@ export class StoreQuickstartSetup extends SfdxCommand {
         forceDataRecordCreate(
             'RegisteredExternalService',
             `DeveloperName=${developerName} ExternalServiceProviderId=${apexClassId} ExternalServiceProviderType=${serviceProviderType} MasterLabel=${developerName}`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         const storeIntegratedServiceId = forceDataSoql(
             `SELECT Id FROM StoreIntegratedService WHERE ServiceProviderType='${serviceProviderType}' AND StoreId='${await this.statusFileManager.getValue(
                 'id'
             )}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         if (storeIntegratedServiceId.result.totalSize !== 0) {
             this.ux.log(
@@ -281,14 +308,18 @@ export class StoreQuickstartSetup extends SfdxCommand {
         // No mapping exists, so we will create one
         const registeredExternalServiceId = forceDataSoql(
             `SELECT Id FROM RegisteredExternalService WHERE ExternalServiceProviderId='${apexClassId}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         forceDataRecordCreate(
             'StoreIntegratedService',
             `Integration=${registeredExternalServiceId} StoreId=${await this.statusFileManager.getValue(
                 'id'
             )} ServiceProviderType=${serviceProviderType}`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
     }
 
@@ -305,7 +336,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
             `SELECT Id FROM StoreIntegratedService WHERE ServiceProviderType='${serviceProviderType}' AND StoreId='${await this.statusFileManager.getValue(
                 'id'
             )}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result;
         if (pricingIntegrationId.totalSize > 0) {
             this.ux.log(
@@ -320,7 +353,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
             `Integration=${integrationName} StoreId=${await this.statusFileManager.getValue(
                 'id'
             )} ServiceProviderType=${serviceProviderType}`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         this.ux.log(msgs.getMessage('quickstart.setup.insToRegExternalPricingIntegration'));
     }
@@ -330,7 +365,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
         // Creating Payment Gateway Provider
         const apexClassId = forceDataSoql(
             "SELECT Id FROM ApexClass WHERE Name='SalesforceAdapter' LIMIT 1",
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         this.ux.log(
             msgs.getMessage('quickstart.setup.creatingPaymentGatewayProviderRecordUsingApexAdapterId', [apexClassId])
@@ -338,16 +375,22 @@ export class StoreQuickstartSetup extends SfdxCommand {
         forceDataRecordCreate(
             'PaymentGatewayProvider',
             `DeveloperName=SalesforcePGP ApexAdapterId=${apexClassId} MasterLabel=SalesforcePGP IdempotencySupported=Yes Comments=Comments`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         // Creating Payment Gateway
         const paymentGatewayProviderId = forceDataSoql(
             "SELECT Id FROM PaymentGatewayProvider WHERE DeveloperName='SalesforcePGP' LIMIT 1",
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         const namedCredentialId = forceDataSoql(
             "SELECT Id FROM NamedCredential WHERE MasterLabel='Salesforce' LIMIT 1",
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         this.ux.log(
             msgs.getMessage(
@@ -358,16 +401,22 @@ export class StoreQuickstartSetup extends SfdxCommand {
         forceDataRecordCreate(
             'PaymentGateway',
             `MerchantCredentialId=${namedCredentialId} PaymentGatewayName=SalesforcePG PaymentGatewayProviderId=${paymentGatewayProviderId} Status=Active`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         // Creating Store Integrated Service
         const storeId = forceDataSoql(
             `SELECT Id FROM WebStore WHERE Name='${this.varargs['communityNetworkName'] as string}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         const paymentGatewayId = forceDataSoql(
             "SELECT Id FROM PaymentGateway WHERE PaymentGatewayName='SalesforcePG' LIMIT 1",
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         this.ux.log(
             msgs.getMessage('quickstart.setup.creatingStoreIntegratedServiceWithStorePaymentGatewayId', [
@@ -378,7 +427,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
         forceDataRecordCreate(
             'StoreIntegratedService',
             `Integration=${paymentGatewayId} StoreId=${storeId} ServiceProviderType=Payment`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
     }
 
@@ -400,15 +451,16 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 `<networkMemberGroups>\n        <profile>Buyer_User_Profile_From_QuickStart${
                     StoreQuickstartSetup.getStoreType(
                         this.org.getUsername(),
-                        this.flags['store-name'],
-                        this.ux
+                        this.flags,
+                        this.ux,
+                        this.logger
                     ).toLowerCase() === 'b2b'
                         ? '_B2B'
                         : ''
                 }</profile>\n        <profile>admin</profile>\n    </networkMemberGroups>`
             )
             .replace(/<status>.*/, '<status>Live</status>');
-        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags['store-name'], this.ux) === 'B2C')
+        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2C')
             data.replace(/<enableGuestChatter>.*/, '<enableGuestChatter>true</enableGuestChatter>')
                 .replace(/<enableGuestFileAccess>.*/, '<enableGuestFileAccess>true</enableGuestFileAccess>')
                 .replace(/<selfRegistration>.*/, '<selfRegistration>true</selfRegistration>');
@@ -430,8 +482,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 `    <selfRegProfile>Buyer_User_Profile_From_QuickStart${
                     StoreQuickstartSetup.getStoreType(
                         this.org.getUsername(),
-                        this.flags['store-name'],
-                        this.ux
+                        this.flags,
+                        this.ux,
+                        this.logger
                     ).toLowerCase() === 'b2b'
                         ? '_B2B'
                         : ''
@@ -455,9 +508,15 @@ export class StoreQuickstartSetup extends SfdxCommand {
             }ToDeploy.zip" ./*`
         );
         shellJsonSfdx(
-            `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${this.storeDir}/experience-bundle-package/${
-                this.varargs['communityExperienceBundleName'] as string
-            }ToDeploy.zip" --wait 60 --verbose --singlepackage`
+            appendCommonFlags(
+                `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
+                    this.storeDir
+                }/experience-bundle-package/${
+                    this.varargs['communityExperienceBundleName'] as string
+                }ToDeploy.zip" --wait 60 --verbose --singlepackage`,
+                this.flags,
+                this.logger
+            )
         );
     }
 
@@ -486,7 +545,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
             forceDataRecordCreate(
                 'UserRole',
                 `ParentRoleId='${ceoID}' Name='AdminRoleFromQuickstart' DeveloperName='AdminRoleFromQuickstart' RollupDescription='AdminRoleFromQuickstart' `,
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             );
         } catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
@@ -495,21 +556,38 @@ export class StoreQuickstartSetup extends SfdxCommand {
         }
         const newRoleID = forceDataSoql(
             "SELECT Id FROM UserRole WHERE Name = 'AdminRoleFromQuickstart'",
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         const username = shellJsonSfdx<Org>(
-            `sfdx force:user:display -u "${this.org.getUsername()}" -v "${(
-                await this.org.getDevHubOrg()
-            ).getUsername()}" --json`
+            appendCommonFlags(
+                `sfdx force:user:display -u "${this.org.getUsername()}" -v "${(
+                    await this.org.getDevHubOrg()
+                ).getUsername()}" --json`,
+                this.flags,
+                this.logger
+            )
         ).result.username;
-        forceDataRecordUpdate('User', `UserRoleId='${newRoleID}'`, `Username='${username}'`, this.org.getUsername());
+        forceDataRecordUpdate(
+            'User',
+            `UserRoleId='${newRoleID}'`,
+            `Username='${username}'`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        );
         await this.statusFileManager.setValue('adminUserMapped', true);
     }
 
     private getUserRole(): string {
         const role = 'CEO';
-        let queryResult = forceDataSoql(`SELECT Id FROM UserRole WHERE Name = '${role}'`, this.org.getUsername())
-            .result;
+        let queryResult = forceDataSoql(
+            `SELECT Id FROM UserRole WHERE Name = '${role}'`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        ).result;
         if (queryResult?.records && queryResult.records.length > 0) {
             this.ux.log(msgs.getMessage('quickstart.setup.userRoleAlreadyExists', [role]));
             return queryResult.records[0].Id;
@@ -518,11 +596,17 @@ export class StoreQuickstartSetup extends SfdxCommand {
         forceDataRecordCreate(
             'UserRole',
             `Name='${role}' DeveloperName='${role}' RollupDescription='${role}' `,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         this.ux.log(msgs.getMessage('quickstart.setup.createdUserRole', [role]));
-        return forceDataSoql(`SELECT Id FROM UserRole WHERE Name = '${role}'`, this.org.getUsername()).result.records[0]
-            .Id;
+        return forceDataSoql(
+            `SELECT Id FROM UserRole WHERE Name = '${role}'`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        ).result.records[0].Id;
     }
 
     private async createBuyerUserWithContactAndAccount(): Promise<void> {
@@ -541,9 +625,13 @@ export class StoreQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.creatingBuyerUserWithContactAndAccount'));
         try {
             shellJsonSfdx(
-                `sfdx force:user:create -u "${this.org.getUsername()}" -f "${BUYER_USER_DEF(this.storeDir)}" -v "${(
-                    await this.org.getDevHubOrg()
-                ).getUsername()}"`
+                appendCommonFlags(
+                    `sfdx force:user:create -u "${this.org.getUsername()}" -f "${BUYER_USER_DEF(this.storeDir)}" -v "${(
+                        await this.org.getDevHubOrg()
+                    ).getUsername()}"`,
+                    this.flags,
+                    this.logger
+                )
             );
         } catch (err) {
             /* eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
@@ -557,28 +645,38 @@ export class StoreQuickstartSetup extends SfdxCommand {
             this.ux.log('DUPLICATES_DETECTED in force:user:create');
             // if(err) "portal account owner must have a role"  then this.mapAdminUserToRole()
         }
-        const buyerUsername = Object.assign(new BuyerUserDef(), await fs.readJson(`${BUYER_USER_DEF(this.storeDir)}`))
-            .username;
+        const buyerUsername = Object.assign(
+            new BuyerUserDef(),
+            await fs.readJson(`${BUYER_USER_DEF(this.storeDir)}`)
+        ).username;
         this.ux.log(msgs.getMessage('quickstart.setup.makingAccountBuyerAccount'));
         const accountID = forceDataSoql(
             `SELECT Id FROM Account WHERE Name LIKE '${buyerUsername}JITUserAccount' ORDER BY CreatedDate Desc LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         forceDataRecordCreate(
             'BuyerAccount',
             `BuyerId='${accountID}' Name='BuyerAccountFromQuickstart' isActive=true`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         this.ux.log(msgs.getMessage('quickstart.setup.assigningBuyerAccountToBuyerGroup'));
         const buyergroupID = forceDataSoql(
             `SELECT Id FROM BuyerGroup WHERE Name='${await this.statusFileManager.getValue('buyerGroupName')}'`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         try {
             forceDataRecordCreate(
                 'BuyerGroupMember',
                 `BuyerGroupId='${buyergroupID}' BuyerId='${accountID}'`,
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             );
         } catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
@@ -614,7 +712,13 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const trgtGuestProfile = `${pathToGuestProfile}/profiles/${communityNetworkName} Profile.profile`;
         fs.renameSync(srcGuestProfile, trgtGuestProfile);
         shell(`cd "${scratchOrgDir}" && sfdx force:mdapi:convert -r "${pathToGuestProfile}" -d "${tmpDirName}"`);
-        shell(`cd "${scratchOrgDir}" && sfdx force:source:deploy -p "${tmpDirName}" -u "${this.org.getUsername()}"`);
+        shell(
+            appendCommonFlags(
+                `cd "${scratchOrgDir}" && sfdx force:source:deploy -p "${tmpDirName}" -u "${this.org.getUsername()}"`,
+                this.flags,
+                this.logger
+            )
+        );
 
         // Sharing Rules
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
@@ -661,15 +765,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
                     .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
             );
         }
-        const navMenuItemMetaFile =
-            this.storeDir + '/experience-bundle-package/unpackaged/navigationMenus/Default_Navigation.navigationMenu';
-        fs.writeFileSync(
-            navMenuItemMetaFile,
-            fs
-                .readFileSync(navMenuItemMetaFile)
-                .toString()
-                .replace('<publiclyAvailable>false', '<publiclyAvailable>true')
-        );
 
         this.ux.log(msgs.getMessage('quickstart.setup.enableGuestBrowsingForWebStoreAndCreateGuestBuyerProfile'));
         // Assign to Buyer Group of choice.
@@ -677,13 +772,17 @@ export class StoreQuickstartSetup extends SfdxCommand {
             'WebStore',
             "OptionsGuestBrowsingEnabled='true'",
             `Name='${communityNetworkName}'`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         );
         let guestBuyerProfileId: string;
         try {
             guestBuyerProfileId = forceDataSoql(
                 `SELECT GuestBuyerProfileId FROM WebStore WHERE Name = '${communityNetworkName}'`,
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             ).result.records[0]['GuestBuyerProfileId'] as string;
         } catch (e) {
             this.ux.log(
@@ -698,13 +797,17 @@ export class StoreQuickstartSetup extends SfdxCommand {
         }
         const buyergroupID = forceDataSoql(
             `SELECT Id FROM BuyerGroup WHERE Name='${await this.statusFileManager.getValue('buyerGroupName')}'`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         try {
             forceDataRecordCreate(
                 'BuyerGroupMember',
                 `BuyerGroupId='${buyergroupID}' BuyerId='${guestBuyerProfileId}'`,
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             );
         } catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
@@ -723,7 +826,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.addContactPointAddressesToBuyerAccount'));
         const existingCPAForBuyerAccount = forceDataSoql(
             `SELECT Id FROM ContactPointAddress WHERE ParentId='${accountId}' LIMIT 1`,
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result;
         if (existingCPAForBuyerAccount.totalSize === 0)
             [
@@ -733,7 +838,13 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 "AddressType='Billing' ParentId='$accountID' ActiveFromDate='2020-01-01' ActiveToDate='2040-01-01' City='Burlington' Country='US' IsDefault='false' Name='Non-Default Billing' PostalCode='01803' State='MA' Street='5 Wall St (Billing)'",
             ].forEach((v) =>
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-                forceDataRecordCreate('ContactPointAddress', v.replace('$accountID', accountId), this.org.getUsername())
+                forceDataRecordCreate(
+                    'ContactPointAddress',
+                    v.replace('$accountID', accountId),
+                    this.org.getUsername(),
+                    this.flags,
+                    this.logger
+                )
             );
         else
             this.ux.log(
@@ -742,11 +853,11 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 ])
             );
 
-        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags['store-name'], this.ux) === 'B2C') {
+        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2C') {
             this.ux.log(msgs.getMessage('quickstart.setup.settingUpGuestBrowsing'));
             await this.enableGuestBrowsing();
         } else if (
-            StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags['store-name'], this.ux) === 'B2B'
+            StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2B'
         ) {
             this.ux.log('Setting up Commerce Diagnostic Event Process Builder');
             const storeId = await StoreCreate.getStoreId(
@@ -755,7 +866,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
                     this.org.getUsername(),
                     this.flags['store-name'] as string
                 ),
-                this.ux
+                this.flags,
+                this.ux,
+                this.logger
             );
             const processMetaFile =
                 this.storeDir + '/experience-bundle-package/unpackaged/flows/Process_CommerceDiagnosticEvents.flow';
@@ -782,27 +895,29 @@ export class StoreQuickstartSetup extends SfdxCommand {
         fs.copyFileSync(
             `${QUICKSTART_CONFIG()}/${StoreQuickstartSetup.getStoreType(
                 this.org.getUsername(),
-                this.flags['store-name'],
-                this.ux
+                this.flags,
+                this.ux,
+                this.logger
             ).toLowerCase()}-package-deploy-template.xml`,
             `${this.storeDir}/experience-bundle-package/unpackaged/package.xml`
         );
+        let packageDeploy = XML.parse(
+            fs.readFileSync(`${this.storeDir}/experience-bundle-package/unpackaged/package.xml`).toString()
+        );
+        packageDeploy['Package']['version'] = this.flags.apiversion;
         // turn sharing rule metadata off by default
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
-            let packageDeploy = XML.parse(
-                fs.readFileSync(`${this.storeDir}/experience-bundle-package/unpackaged/package.xml`).toString()
-            );
             packageDeploy['Package']['types'] = packageDeploy['Package']['types'].filter(
                 (t) => t['members'] !== 'ProductCatalog' && t['members'] !== 'Product2'
-            );
-            fs.writeFileSync(
-                `${this.storeDir}/experience-bundle-package/unpackaged/package.xml`,
-                XML.stringify(packageDeploy)
             );
             ['ProductCatalog', 'Product2'].forEach((i) =>
                 remove(`${this.storeDir}/experience-bundle-package/unpackaged/sharingRules/${i}.sharingRules`)
             );
         }
+        fs.writeFileSync(
+            `${this.storeDir}/experience-bundle-package/unpackaged/package.xml`,
+            XML.stringify(packageDeploy)
+        );
         shell(
             `cd "${this.storeDir}/experience-bundle-package/unpackaged" && rm -f "../${
                 this.varargs['communityExperienceBundleName'] as string
@@ -812,11 +927,15 @@ export class StoreQuickstartSetup extends SfdxCommand {
         let res;
         try {
             res = shellJsonSfdx(
-                `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
-                    this.storeDir
-                }/experience-bundle-package/${
-                    this.varargs['communityExperienceBundleName'] as string
-                }ToDeploy.zip" --wait 60 --verbose --singlepackage`
+                appendCommonFlags(
+                    `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
+                        this.storeDir
+                    }/experience-bundle-package/${
+                        this.varargs['communityExperienceBundleName'] as string
+                    }ToDeploy.zip" --wait 60 --verbose --singlepackage`,
+                    this.flags,
+                    this.logger
+                )
             );
         } catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -825,11 +944,15 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 this.ux.log(msgs.getMessage('quickstart.setup.openingPageToRefreshSession', [e.message]));
                 shell('sfdx force:org:open -u ' + this.org.getUsername());
                 res = shellJsonSfdx(
-                    `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
-                        this.storeDir
-                    }/experience-bundle-package/${
-                        this.varargs['communityExperienceBundleName'] as string
-                    }ToDeploy.zip" --wait 60 --verbose --singlepackage`
+                    appendCommonFlags(
+                        `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
+                            this.storeDir
+                        }/experience-bundle-package/${
+                            this.varargs['communityExperienceBundleName'] as string
+                        }ToDeploy.zip" --wait 60 --verbose --singlepackage`,
+                        this.flags,
+                        this.logger
+                    )
                 );
             } else if (JSON.stringify(e.message).indexOf('Error parsing file') >= 0 && cnt === 0) {
                 await this.statusFileManager.setValue('retrievedPackages', false);
@@ -849,9 +972,13 @@ export class StoreQuickstartSetup extends SfdxCommand {
         if (await this.statusFileManager.getValue('communityPublished')) return;
         this.ux.log(msgs.getMessage('quickstart.setup.publishingCommunityStep7'));
         shell(
-            `sfdx force:community:publish -u "${this.org.getUsername()}" -n "${
-                this.varargs['communityNetworkName'] as string
-            }"`
+            appendCommonFlags(
+                `sfdx force:community:publish -u "${this.org.getUsername()}" -n "${
+                    this.varargs['communityNetworkName'] as string
+                }"`,
+                this.flags,
+                this.logger
+            )
         );
         // TODO check if the publish is done before moving on
         await this.statusFileManager.setValue('communityPublished', true);

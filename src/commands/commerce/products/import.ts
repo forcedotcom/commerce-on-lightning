@@ -22,6 +22,7 @@ import { exampleFlags } from '../../../lib/flags/commerce/convert.flags';
 import { FilesCopy } from '../files/copy';
 import { filesFlags } from '../../../lib/flags/commerce/files.flags';
 import { getDefinitionFile } from '../../../lib/utils/definitionFile';
+import { appendCommonFlags, setApiVersion } from '../../../lib/utils/args/flagsUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -51,6 +52,7 @@ export class ProductsImport extends SfdxCommand {
 
     // tslint:disable-next-line:no-any
     public async run(): Promise<AnyJson> {
+        await setApiVersion(this.org, this.flags);
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
@@ -75,16 +77,20 @@ export class ProductsImport extends SfdxCommand {
     }
 
     public async importProducts(productFileCsv: string): Promise<string> {
-        const storeId = await StoreCreate.getStoreId(this.statusFileManager, this.ux);
+        const storeId = await StoreCreate.getStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
         let buyerGroupName;
         if (productFileCsv) {
             this.ux.startSpinner(msgs.getMessage('import.importingProducts'));
             this.ux.setSpinnerStatus(msgs.getMessage('import.uploading'));
             try {
                 const res = shellJsonSfdx<ImportResult>(
-                    `sfdx shane:data:file:upload -f ${
-                        this.flags['products-file-csv'] as string
-                    } -u "${this.org.getUsername()}" --json`
+                    appendCommonFlags(
+                        `sfdx shane:data:file:upload -f ${
+                            this.flags['products-file-csv'] as string
+                        } -u "${this.org.getUsername()}" --json`,
+                        this.flags,
+                        this.logger
+                    )
                 );
                 this.ux.setSpinnerStatus(
                     msgs.getMessage('import.uploadedStringWithResult', [this.flags['products-file-csv']]) +
@@ -123,7 +129,9 @@ export class ProductsImport extends SfdxCommand {
                         `SELECT name FROM BuyerGroup where name = '${
                             this.flags['store-name'] as string
                         } Buyer Group' LIMIT 1`,
-                        this.org.getUsername()
+                        this.org.getUsername(),
+                        this.flags,
+                        this.logger
                     ).result.records[0].Name;
             } catch (e) {
                 await this.statusFileManager.setValue('productsImported', JSON.parse(JSON.stringify(e, replaceErrors)));
@@ -139,7 +147,7 @@ export class ProductsImport extends SfdxCommand {
 
     public async productLessImport(): Promise<string> {
         this.ux.log(msgs.getMessage('import.doingProductlessImport'));
-        const storeId = await StoreCreate.getStoreId(this.statusFileManager, this.ux);
+        const storeId = await StoreCreate.getStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
         const templates = ['WebStorePricebooks', 'WebStoreCatalogs', 'WebStoreBuyerGroups'];
         templates.forEach((f) =>
             fs.writeFileSync(
@@ -153,7 +161,9 @@ export class ProductsImport extends SfdxCommand {
         this.ux.log(msgs.getMessage('import.getStandardPricebooksForStoreReplaceJsonFiles'));
         const pricebook1 = forceDataSoql(
             "SELECT Id FROM Pricebook2 WHERE Name='Standard Price Book' AND IsStandard=true LIMIT 1",
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0].Id;
         fs.writeFileSync(
             JSON_DIR(this.storeDir) + '/PricebookEntrys.json',
@@ -163,8 +173,12 @@ export class ProductsImport extends SfdxCommand {
                 .replace('PutStandardPricebookHere', pricebook1)
         );
         // Buyer Group
-        const numberofbuyergroups = forceDataSoql('SELECT COUNT(Id) FROM BuyerGroup', this.org.getUsername()).result
-            .records[0]['expr0'] as number;
+        const numberofbuyergroups = forceDataSoql(
+            'SELECT COUNT(Id) FROM BuyerGroup',
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        ).result.records[0]['expr0'] as number;
         const newNumber = numberofbuyergroups + 1;
         const newbuyergroupname = `BUYERGROUP_FROM_QUICKSTART_${newNumber}`;
         fs.writeFileSync(
@@ -181,22 +195,30 @@ export class ProductsImport extends SfdxCommand {
         // Workaround, use throwaway community to delete all products to trigger re-insert.
         const productq = forceDataSoql(
             "SELECT COUNT(Id) FROM Product2 WHERE StockKeepingUnit In ('B-C-COFMAC-001', 'DRW-1', 'SS-DR-BB', 'ESP-001', 'TM-COFMAC-001', 'ESP-IOT-1', 'ID-PEM', 'TR-COFMAC-001', 'LRW-1', 'MRC-1', 'CP-2', 'GDG-1', 'E-ESP-001', 'ID-CAP-II', 'PS-DB', 'Q85YQ2', 'CCG-1', 'CERCG-1', 'CF-1', 'E-MR-B', 'ID-CAP-III', 'PS-EL', 'EM-ESP-001', 'CP-3', 'CL-DR-BB', 'CR-DEC', 'CREV-DR-BLEND', 'CM-MSB-300', 'COF-FIL', 'CP-1')",
-            this.org.getUsername()
+            this.org.getUsername(),
+            this.flags,
+            this.logger
         ).result.records[0]['expr0'] as number;
         if (productq > 0) {
             // Grab Product IDs to create Product Entitlements
             const products = forceDataSoql(
                 "SELECT Id FROM Product2 WHERE StockKeepingUnit In ('B-C-COFMAC-001', 'DRW-1', 'SS-DR-BB', 'ESP-001', 'TM-COFMAC-001', 'ESP-IOT-1', 'ID-PEM', 'TR-COFMAC-001', 'LRW-1', 'MRC-1', 'CP-2', 'GDG-1', 'E-ESP-001', 'ID-CAP-II', 'PS-DB', 'Q85YQ2', 'CCG-1', 'CERCG-1', 'CF-1', 'E-MR-B', 'ID-CAP-III', 'PS-EL', 'EM-ESP-001', 'CP-3', 'CL-DR-BB', 'CR-DEC', 'CREV-DR-BLEND', 'CM-MSB-300', 'COF-FIL', 'CP-1')",
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             ).result.records; // [0].Id
             // Load Product IDs into array
             const productArray = products.map((row) => row.Id); // figur e this out
             // Import Productless data
             try {
                 shellJsonSfdx(
-                    `sfdx force:data:tree:import -u "${this.org.getUsername()}" -p ${JSON_DIR(
-                        this.storeDir
-                    )}/Productless-Plan-1.json`
+                    appendCommonFlags(
+                        `sfdx force:data:tree:import -u "${this.org.getUsername()}" -p ${JSON_DIR(
+                            this.storeDir
+                        )}/Productless-Plan-1.json`,
+                        this.flags,
+                        this.logger
+                    )
                 );
             } catch (e) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
@@ -207,7 +229,9 @@ export class ProductsImport extends SfdxCommand {
             // Get newly created Entitlement Policy ID
             const policyID = forceDataSoql(
                 'SELECT Id FROM CommerceEntitlementPolicy ORDER BY CreatedDate Desc LIMIT 1',
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             ).result.records[0].Id;
             // Create new Product Entitlement records
             productArray.forEach((product) =>
@@ -216,7 +240,9 @@ export class ProductsImport extends SfdxCommand {
                         forceDataRecordCreate(
                             'CommerceEntitlementProduct',
                             `PolicyId='${policyID}' ProductId='${product}'`,
-                            this.org.getUsername()
+                            this.org.getUsername(),
+                            this.flags,
+                            this.logger
                         )
                     )
                 )
@@ -224,40 +250,56 @@ export class ProductsImport extends SfdxCommand {
             // Add Store Catalog mapping
             const catalogId = forceDataSoql(
                 "SELECT Id FROM ProductCatalog WHERE Name='CATALOG_FROM_QUICKSTART' ORDER BY CreatedDate Desc LIMIT 1",
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             ).result.records[0].Id;
             forceDataRecordCreate(
                 'WebStoreCatalog',
                 `ProductCatalogId='${catalogId}' SalesStoreId='${storeId}'`,
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             );
             // Add Store Pricebook mapping
             const pricebook2Id = forceDataSoql(
                 "SELECT Id FROM Pricebook2 WHERE Name='BASIC_PRICEBOOK_FROM_QUICKSTART' ORDER BY CreatedDate Desc LIMIT 1",
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             ).result.records[0].Id;
             forceDataRecordCreate(
                 'WebStorePricebook',
                 `IsActive=true Pricebook2Id='${pricebook2Id}' WebStoreId='${storeId}'`,
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             );
             // Add Buyer Group Pricebook mapping
             const buyergroupId = forceDataSoql(
                 `SELECT Id FROM BuyerGroup WHERE Name='${newbuyergroupname}' LIMIT 1`,
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             ).result.records[0].Id;
             forceDataRecordCreate(
                 'BuyerGroupPricebook',
                 `Pricebook2Id='${pricebook2Id}' BuyerGroupId='${buyergroupId}'`,
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags,
+                this.logger
             );
         } // Import files
         else
             try {
                 shellJsonSfdx(
-                    `sfdx force:data:tree:import -u "${this.org.getUsername()}" -p ${JSON_DIR(
-                        this.storeDir
-                    )}/Plan-1.json`
+                    appendCommonFlags(
+                        `sfdx force:data:tree:import -u "${this.org.getUsername()}" -p ${JSON_DIR(
+                            this.storeDir
+                        )}/Plan-1.json`,
+                        this.flags,
+                        this.logger
+                    )
                 );
             } catch (e) {
                 if (JSON.stringify(e).indexOf(msgs.getMessage('import.alreadyExists')) < 0) throw e;

@@ -34,13 +34,16 @@ describe('Test extension map command', () => {
     const QUERY_ID_DELETE = `SELECT Id FROM StoreIntegratedService WHERE Integration='${storeId}' AND StoreId='${storeId}'`;
     const mapCommand = new MapExtension([], config);
     const sfdxError = new SfdxError('error');
-
+    const logger = sinon.match.any;
+    const defaultArgs = sinon.match.any;
     after(() => {
         sinon.restore();
     });
     it('Throws error with a invalid Webstore Name', async () => {
         const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
-        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE, orgUserName).throws(new SfdxError('Invalid Webstore'));
+        forceDataSoqlStub
+            .withArgs(QUERY_GET_WEBSTORE, orgUserName, defaultArgs, logger)
+            .throws(new SfdxError('Invalid Webstore'));
         assert.throws(
             () => mapCommand.processMapExtension(registeredExtensionName, storeName, undefined, orgUserName),
             SfdxError
@@ -49,7 +52,9 @@ describe('Test extension map command', () => {
     });
     it('Throws error with a invalid Webstore Id', async () => {
         const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
-        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, orgUserName).throws(new SfdxError('Invalid Store Id'));
+        forceDataSoqlStub
+            .withArgs(QUERY_GET_WEBSTORE_ID, orgUserName, defaultArgs, logger)
+            .throws(new SfdxError('Invalid Store Id'));
         assert.throws(
             () => mapCommand.processMapExtension(registeredExtensionName, storeName, storeId, orgUserName),
             SfdxError
@@ -66,7 +71,7 @@ describe('Test extension map command', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName').returns(qr);
+        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName', defaultArgs, logger).returns(qr);
         assert.throws(
             () => mapCommand.processMapExtension(registeredExtensionName, storeName, storeId, orgUserName),
             SfdxError
@@ -83,7 +88,7 @@ describe('Test extension map command', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName').returns(qr);
+        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName', defaultArgs, logger).returns(qr);
         // stub EPN query call with size 1 to let it flow through the code
         const epnQr = new Result<QueryResult>();
         epnQr.result = new (class implements QueryResult {
@@ -93,7 +98,7 @@ describe('Test extension map command', () => {
             public records: Record[] = [{ Value: 'bye' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_REGISTRATION, 'testUserName').returns(epnQr);
+        forceDataSoqlStub.withArgs(QUERY_GET_REGISTRATION, 'testUserName', defaultArgs, logger).returns(epnQr);
         // // stub get epn call
         const getEPN = new Result<QueryResult>();
         getEPN.result = new (class implements QueryResult {
@@ -103,7 +108,7 @@ describe('Test extension map command', () => {
             public records: Record[] = [];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GETEPN, 'testUserName').returns(getEPN);
+        forceDataSoqlStub.withArgs(QUERY_GETEPN, 'testUserName', defaultArgs, logger).returns(getEPN);
         const concat = new Result<QueryResult>();
         concat.result = new (class implements QueryResult {
             public done: boolean;
@@ -112,7 +117,7 @@ describe('Test extension map command', () => {
             public records: Record[] = [];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_CONCAT, 'testUserName').returns(concat);
+        forceDataSoqlStub.withArgs(QUERY_CONCAT, 'testUserName', defaultArgs, logger).returns(concat);
         const del = new Result<QueryResult>();
         del.result = new (class implements QueryResult {
             public done: boolean;
@@ -121,7 +126,7 @@ describe('Test extension map command', () => {
             public records: Record[] = [];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_ID_DELETE, 'testUserName').returns(del);
+        forceDataSoqlStub.withArgs(QUERY_ID_DELETE, 'testUserName', defaultArgs, logger).returns(del);
         // // stub insert record call
         const recordQr = new Result<QueryResult>();
         recordQr.result = new (class implements QueryResult {
@@ -132,7 +137,7 @@ describe('Test extension map command', () => {
             public totalSize = 1;
         })();
         const forceDataRecordStub = sinon.stub(forceOrgSoqlExports, 'forceDataRecordCreate');
-        forceDataRecordStub.withArgs(service, INSERT_RECORD, 'testUserName').returns(sfdxError);
+        forceDataRecordStub.withArgs(service, INSERT_RECORD, 'testUserName', defaultArgs, logger).returns(sfdxError);
         const jsonqr = new Result<QueryResult>();
         jsonqr.result = new (class implements QueryResult {
             public done: boolean;
@@ -141,7 +146,7 @@ describe('Test extension map command', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_INSERTED_RECORD, 'testUserName').returns(jsonqr);
+        forceDataSoqlStub.withArgs(QUERY_GET_INSERTED_RECORD, 'testUserName', defaultArgs, logger).returns(jsonqr);
         assert.throws(
             () => mapCommand.processMapExtension(registeredExtensionName, storeName, storeId, orgUserName),
             SfdxError

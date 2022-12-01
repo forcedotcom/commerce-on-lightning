@@ -30,6 +30,8 @@ describe('Test extension register function', () => {
     const QUERY_REGISTER_TABLE = `SELECT Id,ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${registeredExtensionName}'`;
     const registerExtension = new RegisterExtension([], config);
     const sfdxError = new SfdxError('error');
+    const logger = sinon.match.any;
+    const defaultArgs = sinon.match.any;
 
     after(() => {
         sinon.restore();
@@ -37,7 +39,9 @@ describe('Test extension register function', () => {
 
     it('Throws error with a invalid Apex class', async () => {
         const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
-        forceDataSoqlStub.withArgs(QUERY_GET_APEX_CLASS, orgUserName).throws(new SfdxError('Invalid Apex'));
+        forceDataSoqlStub
+            .withArgs(QUERY_GET_APEX_CLASS, orgUserName, defaultArgs, logger)
+            .throws(new SfdxError('Invalid Apex'));
         assert.throws(
             () => registerExtension.registerApex(registeredExtensionName, epn, apexClass, orgUserName),
             SfdxError
@@ -56,7 +60,7 @@ describe('Test extension register function', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_APEX_CLASS, 'testUserName').returns(qr);
+        forceDataSoqlStub.withArgs(QUERY_GET_APEX_CLASS, 'testUserName', sinon.match.any, sinon.match.any).returns(qr);
         // stub EPN query call
         const epnQr = new Result<QueryResult>();
         epnQr.result = new (class implements QueryResult {
@@ -66,7 +70,7 @@ describe('Test extension register function', () => {
             public records: Record[] = [];
             public totalSize = 0;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_EPN_LIST).returns(epnQr);
+        forceDataSoqlStub.withArgs(QUERY_GET_EPN_LIST, orgUserName, defaultArgs, logger).returns(epnQr);
         assert.throws(
             () => registerExtension.registerApex(registeredExtensionName, epn, apexClass, orgUserName),
             SfdxError
@@ -85,7 +89,7 @@ describe('Test extension register function', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_APEX_CLASS, 'testUserName').returns(qr);
+        forceDataSoqlStub.withArgs(QUERY_GET_APEX_CLASS, 'testUserName', defaultArgs, logger).returns(qr);
         // stub EPN query call with size 1 to let it flow through the code
         const epnQr = new Result<QueryResult>();
         epnQr.result = new (class implements QueryResult {
@@ -95,7 +99,7 @@ describe('Test extension register function', () => {
             public records: Record[] = [{ Value: 'bye' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_EPN_LIST, 'testUserName').returns(epnQr);
+        forceDataSoqlStub.withArgs(QUERY_GET_EPN_LIST, 'testUserName', defaultArgs, logger).returns(epnQr);
         // // stub insert record call
         const recordQr = new Result<QueryResult>();
         recordQr.result = new (class implements QueryResult {
@@ -106,7 +110,9 @@ describe('Test extension register function', () => {
             public totalSize = 1;
         })();
         const forceDataRecordStub = sinon.stub(forceOrgSoqlExports, 'forceDataRecordCreate');
-        forceDataRecordStub.withArgs(service, QUERY_GET_INSERTED_RECORD, 'testUserName').returns(sfdxError);
+        forceDataRecordStub
+            .withArgs(service, QUERY_GET_INSERTED_RECORD, 'testUserName', defaultArgs, logger)
+            .returns(sfdxError);
         const jsonqr = new Result<QueryResult>();
         jsonqr.result = new (class implements QueryResult {
             public done: boolean;
@@ -115,7 +121,7 @@ describe('Test extension register function', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_REGISTER_TABLE, 'testUserName').returns(jsonqr);
+        forceDataSoqlStub.withArgs(QUERY_REGISTER_TABLE, 'testUserName', defaultArgs, logger).returns(jsonqr);
         assert.throws(
             () => registerExtension.registerApex(registeredExtensionName, epn, apexClass, orgUserName),
             TypeError

@@ -15,6 +15,7 @@ import { ScratchOrgCreate } from '../../../../src/commands/commerce/scratchorg/c
 import { Result } from '../../../../src/lib/utils/jsonUtils';
 import * as shellExports from '../../../../src/lib/utils/shell';
 import { CONFIG_DIR } from '../../../../src/lib/utils/constants/properties';
+import * as flagHelpers from '../../../../src/lib/utils/args/flagsUtils';
 
 describe('commerce:scratchorg:create', () => {
     const config = stubInterface<IConfig>($$.SANDBOX, {});
@@ -49,7 +50,7 @@ describe('commerce:scratchorg:create', () => {
         const res = new Result();
         res.result = { id: 'hi', username: 'bye' };
         const shellStub = stub(shellExports, 'shellJsonSfdx').returns(res);
-        await scratchOrgCreate.createScratchOrg();
+
         const cmd = `sfdx force:org:create \
 --targetdevhubusername="${devhubUser}" \
 --definitionfile=${CONFIG_DIR}/${flagObject.type}-project-scratch-def.json \
@@ -60,8 +61,11 @@ describe('commerce:scratchorg:create', () => {
 username="${flagObject.username}" \
 --setdefaultusername \
 --json`;
+        const flagHelperStub = stub(flagHelpers, 'appendCommonFlags').returns(cmd);
+
+        await scratchOrgCreate.createScratchOrg();
 
         assert.equal(shellStub.calledWith(cmd, null, '/tmp'), true);
-        [setScratchOrgValueStub, getScratchOrgValueStub, shellStub].forEach((k) => k.restore());
+        [setScratchOrgValueStub, getScratchOrgValueStub, shellStub, flagHelperStub].forEach((k) => k.restore());
     });
 });

@@ -4,8 +4,6 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-import { fs } from '@salesforce/core';
-import { SFDX_DIR } from '../constants/properties';
 import { shellJsonSfdx } from '../shell';
 import { Org, OrgListResult, Result } from '../jsonUtils';
 
@@ -29,18 +27,3 @@ const getOrg = (resultType: string, by: string, value: string): Org => {
 // might be better/quicker to get it from ~/.sfdx/huborgusername.json
 export const getHubOrgByUsername = (username: string): Org => getOrg('nonScratchOrgs', 'username', username);
 export const getScratchOrgByUsername = (username: string): Org => getOrg('scratchOrgs', 'username', username);
-
-export const getOrgInfo = (username: string): Org => {
-    try {
-        return Object.assign(new Org(), shellJsonSfdx(`sfdx force:org:display -u "${username}"`).result);
-    } catch (e) {
-        return undefined;
-    }
-};
-
-export const getOrgInfoFast = (username: string): Org => {
-    const path = `${SFDX_DIR()}/${username}.json`;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-return
-    if (fs.fileExistsSync(path)) return Object.assign(new Org(), fs.readJsonSync(path));
-    return undefined;
-};

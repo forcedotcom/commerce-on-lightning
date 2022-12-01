@@ -28,13 +28,17 @@ describe('Test extension unmap command', () => {
     const service = 'StoreIntegratedService';
     const DELETE_RECORD = `SELECT Id FROM StoreIntegratedService WHERE Integration='${integration}' AND storeid='${storeId}'`;
     const unmapCommand = new UnMapExtension([], config);
+    const logger = sinon.match.any;
+    const defaultArgs = sinon.match.any;
 
     after(() => {
         sinon.restore();
     });
     it('Throws error with a invalid Webstore Name', async () => {
         const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
-        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE, orgUserName).throws(new TypeError('Invalid Webstore'));
+        forceDataSoqlStub
+            .withArgs(QUERY_GET_WEBSTORE, orgUserName, defaultArgs, logger)
+            .throws(new TypeError('Invalid Webstore'));
         assert.throws(
             () => unmapCommand.unmapRecord(registeredExtensionName, storeName, undefined, orgUserName),
             TypeError
@@ -43,7 +47,9 @@ describe('Test extension unmap command', () => {
     });
     it('Throws error with a invalid Webstore Id', async () => {
         const forceDataSoqlStub = sinon.stub(forceOrgSoqlExports, 'forceDataSoql');
-        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, orgUserName).throws(new SfdxError('Invalid Store Id'));
+        forceDataSoqlStub
+            .withArgs(QUERY_GET_WEBSTORE_ID, orgUserName, defaultArgs, logger)
+            .throws(new SfdxError('Invalid Store Id'));
         assert.throws(
             () => unmapCommand.unmapRecord(registeredExtensionName, storeName, storeId, orgUserName),
             SfdxError
@@ -60,7 +66,7 @@ describe('Test extension unmap command', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName').returns(qr);
+        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName', defaultArgs, logger).returns(qr);
         // stub EPN query call with size 1 to let it flow through the code
         const epnQr = new Result<QueryResult>();
         epnQr.result = new (class implements QueryResult {
@@ -70,7 +76,7 @@ describe('Test extension unmap command', () => {
             public records: Record[] = [{ Value: 'bye' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_STORENAME, 'testUserName').returns(epnQr);
+        forceDataSoqlStub.withArgs(QUERY_GET_STORENAME, 'testUserName', defaultArgs, logger).returns(epnQr);
         // // stub insert record call
         const recordQr = new Result<QueryResult>();
         recordQr.result = new (class implements QueryResult {
@@ -81,7 +87,7 @@ describe('Test extension unmap command', () => {
             public totalSize = 1;
         })();
         const forceDataRecordStub = sinon.stub(forceOrgSoqlExports, 'forceDataRecordDelete');
-        forceDataRecordStub.withArgs(service, DELETE_RECORD, 'testUserName');
+        forceDataRecordStub.withArgs(service, DELETE_RECORD, 'testUserName', defaultArgs, logger);
         assert.throws(
             () => unmapCommand.unmapRecord(registeredExtensionName, storeName, storeId, orgUserName),
             TypeError
@@ -99,7 +105,7 @@ describe('Test extension unmap command', () => {
             public records: Record[] = [{ Id: 'hi' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName').returns(qr);
+        forceDataSoqlStub.withArgs(QUERY_GET_WEBSTORE_ID, 'testUserName', defaultArgs, logger).returns(qr);
         // stub EPN query call with size 1 to let it flow through the code
         const epnQr = new Result<QueryResult>();
         epnQr.result = new (class implements QueryResult {
@@ -109,7 +115,7 @@ describe('Test extension unmap command', () => {
             public records: Record[] = [{ Value: 'bye' }];
             public totalSize = 1;
         })();
-        forceDataSoqlStub.withArgs(QUERY_GET_STORENAME, 'testUserName').returns(epnQr);
+        forceDataSoqlStub.withArgs(QUERY_GET_STORENAME, 'testUserName', defaultArgs, logger).returns(epnQr);
         // // stub insert record call
         const recordQr = new Result<QueryResult>();
         recordQr.result = new (class implements QueryResult {
