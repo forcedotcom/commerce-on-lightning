@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
@@ -765,15 +765,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
                     .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
             );
         }
-        const navMenuItemMetaFile =
-            this.storeDir + '/experience-bundle-package/unpackaged/navigationMenus/Default_Navigation.navigationMenu';
-        fs.writeFileSync(
-            navMenuItemMetaFile,
-            fs
-                .readFileSync(navMenuItemMetaFile)
-                .toString()
-                .replace('<publiclyAvailable>false', '<publiclyAvailable>true')
-        );
 
         this.ux.log(msgs.getMessage('quickstart.setup.enableGuestBrowsingForWebStoreAndCreateGuestBuyerProfile'));
         // Assign to Buyer Group of choice.
@@ -916,9 +907,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
         packageDeploy['Package']['version'] = this.flags.apiversion;
         // turn sharing rule metadata off by default
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
-            let packageDeploy = XML.parse(
-                fs.readFileSync(`${this.storeDir}/experience-bundle-package/unpackaged/package.xml`).toString()
-            );
             packageDeploy['Package']['types'] = packageDeploy['Package']['types'].filter(
                 (t) => t['members'] !== 'ProductCatalog' && t['members'] !== 'Product2'
             );

@@ -10,7 +10,7 @@ import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
 import { addAllowedArgs, modifyArgFlag, removeFlagBeforeAll } from '../../../lib/utils/args/flagsUtils';
 import { BASE_DIR, EXAMPLE_DIR, FILE_COPY_ARGS } from '../../../lib/utils/constants/properties';
-import { copyFileSync, mkdirSync, readFileSync, renameRecursive } from '../../../lib/utils/fsUtils';
+import { mkdirSync, readFileSync, renameRecursive } from '../../../lib/utils/fsUtils';
 import { shell } from '../../../lib/utils/shell';
 import { convertStoreScratchDefToExamples, parseStoreScratchDef } from '../../../lib/utils/jsonUtils';
 import { FilesCopy } from '../files/copy';
@@ -69,7 +69,6 @@ export class ExamplesConvert extends SfdxCommand {
         this.flags.definitionfile = getDefinitionFile(this.flags);
         const scratchDef = parseStoreScratchDef(this.flags);
         const paths = convertStoreScratchDefToExamples(scratchDef);
-        copyFileSync(BASE_DIR + '/sfdx-project.json', mkdirSync(this.flags.outputdir));
         if ((this.flags.sourcepath as string).indexOf('-v') >= 0)
             this.flags.sourcepath = removeFlagBeforeAll('-v', this.flags.sourcepath);
         if (!this.flags.sourcepath && this.flags['examples-convert'])
