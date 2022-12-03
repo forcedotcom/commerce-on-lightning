@@ -199,11 +199,18 @@ export class StoreQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.setUpIntegrations'));
         await StoreCreate.waitForStoreId(this.statusFileManager, this.ux);
         this.ux.log(msgs.getMessage('quickstart.setup.regAndMapIntegrations'));
-        const integrations = [
+        var integrations = [
             ['B2BCheckInventorySample', 'CHECK_INVENTORY', 'Inventory'],
             ['B2BDeliverySample', 'COMPUTE_SHIPPING', 'Shipment'],
             ['B2BTaxSample', 'COMPUTE_TAXES', 'Tax'],
         ];
+        if(StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags['store-name'], this.ux) === 'B2C') {
+            integrations = [
+                ['B2BCheckInventorySample', 'CHECK_INVENTORY_B2C', 'Inventory'],
+                ['B2CDeliverySample', 'COMPUTE_SHIPPING_B2C', 'Shipment'],
+                ['B2BTaxSample', 'COMPUTE_TAXES_B2C', 'Tax'],
+            ]; 
+        }
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         integrations.forEach((args) => this.registerAndMapIntegration(...args));
         this.ux.log(msgs.getMessage('quickstart.setup.doneRegAndMapIntegrations'));
@@ -279,6 +286,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
             return;
         }
         // No mapping exists, so we will create one
+/*
         const registeredExternalServiceId = forceDataSoql(
             `SELECT Id FROM RegisteredExternalService WHERE ExternalServiceProviderId='${apexClassId}' LIMIT 1`,
             this.org.getUsername()
@@ -286,6 +294,15 @@ export class StoreQuickstartSetup extends SfdxCommand {
         forceDataRecordCreate(
             'StoreIntegratedService',
             `Integration=${registeredExternalServiceId} StoreId=${await this.statusFileManager.getValue(
+                'id'
+            )} ServiceProviderType=${serviceProviderType}`,
+            this.org.getUsername()
+        );
+*/
+        const integrationName = `${serviceProviderType}'__'${developerName}`;
+        forceDataRecordCreate(
+            'StoreIntegratedService',
+            `Integration=${integrationName} StoreId=${await this.statusFileManager.getValue(
                 'id'
             )} ServiceProviderType=${serviceProviderType}`,
             this.org.getUsername()
