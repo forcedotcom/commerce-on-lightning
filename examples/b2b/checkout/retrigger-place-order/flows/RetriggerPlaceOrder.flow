@@ -9,7 +9,7 @@
         <actionType>apex</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
         <inputParameters>
-            <name>cartOrorderIds</name>
+            <name>cartOrOrderIds</name>
             <value>
                 <elementReference>$Record.AttachedToId</elementReference>
             </value>

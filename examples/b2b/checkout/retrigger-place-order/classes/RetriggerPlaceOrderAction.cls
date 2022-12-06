@@ -11,6 +11,7 @@ global class RetriggerPlaceOrderAction {
         Id cartOrOrderId = cartOrOrderIds[0];
         String sObjName = cartOrOrderId.getSObjectType().getDescribe().getName();
         List<String> results = new List<String>();
+        //The ProcessException attachedToId is used as a basis for comparing
         if(sObjName != null && sObjName.equalsIgnoreCase('Order')){
             List<CartCheckoutSession> sessions = [Select WebCartId from CartCheckoutSession where OrderId = :cartOrOrderId];
        		  CartCheckoutSession existingSession = sessions[0];
