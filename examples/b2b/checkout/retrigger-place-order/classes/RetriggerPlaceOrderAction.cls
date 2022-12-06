@@ -11,13 +11,13 @@ global class RetriggerPlaceOrderAction {
         String sObjName = cartOrOrderId.getSObjectType().getDescribe().getName();
         List<String> results = new List<String>();
         if(sObjName != null && sObjName.equalsIgnoreCase('Order')){
-            List<CartCheckoutSession> sessions = [Select WebCartId from CartCheckoutSession where OrderId = :cartOrorderId];
-       		  CartCheckoutSession existingSession = sessions[0];
+            List<CartCheckoutSession> sessions = [Select WebCartId from CartCheckoutSession where OrderId = :cartOrOrderId];
+       		CartCheckoutSession existingSession = sessions[0];
             String orderReferenceNumber = Sfdc_Checkout.CheckoutOrderService.cartToOrderSummary(existingSession.WebCartId);
             results.add(orderReferenceNumber);
         }
         if(sObjName != null && sObjName.equalsIgnoreCase('WebCart')){
-             String orderReferenceNumber = Sfdc_Checkout.CheckoutOrderService.cartToOrderSummary(cartOrorderId);
+             String orderReferenceNumber = Sfdc_Checkout.CheckoutOrderService.cartToOrderSummary(cartOrOrderId);
         	   results.add(orderReferenceNumber);
         }
         return results;
