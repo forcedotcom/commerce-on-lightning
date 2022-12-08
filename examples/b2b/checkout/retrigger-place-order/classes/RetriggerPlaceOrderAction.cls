@@ -1,8 +1,8 @@
 global class RetriggerPlaceOrderAction {
 
-    @InvocableMethod(callout=false label='Create Order and order summary for Cart' description='Create order and order summary' category='Commerce')
+    @InvocableMethod(callout=false label='Create Order and Order Summary for Cart' description='Create Order and Order Summary' category='Commerce')
     global static List<String> retriggerPlaceOrder(List<ID> cartOrOrderIds) {
-    //The RetriggerPlace Flow invokes this action and it only has one OrderOrCartId
+    //The Retrigger Place Flow invokes this action and it only has one OrderOrCartId
         if (cartOrOrderIds == null || cartOrOrderIds.size() != 1) {
             String errorMessage = 'Invalid parameter in retriggerPlaceOrder';
             throw new IllegalArgumentException (errorMessage);
@@ -13,13 +13,15 @@ global class RetriggerPlaceOrderAction {
 
         List<String> results = new List<String>();
 
-        //The ProcessException attachedToId is used as a basis for comparing
+        //The ProcessExceptionEvent's attachedToId is used as a basis for
+        //comparing whether the sobject is of the type order or cart
+        //which can only invoke the retrigger Api
         if(sObjName != null && sObjName.equalsIgnoreCase('Order')){
             List<CartCheckoutSession> sessions = [Select WebCartId from CartCheckoutSession where OrderId = :cartOrOrderId];
             if(sessions != null || sessions.size() != 0){
               CartCheckoutSession existingSession = sessions[0];
               Id webCartId =existingSession.WebCartId;
-              String orderReferenceNumber =invokeReferenceApi(cartOrOrderId);
+              String orderReferenceNumber =invokeReferenceApi(webCartId);
               results.add(orderReferenceNumber);
             }
         }
