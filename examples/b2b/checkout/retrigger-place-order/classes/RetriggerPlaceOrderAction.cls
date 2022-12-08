@@ -10,19 +10,35 @@ global class RetriggerPlaceOrderAction {
 
         Id cartOrOrderId = cartOrOrderIds[0];
         String sObjName = cartOrOrderId.getSObjectType().getDescribe().getName();
+
         List<String> results = new List<String>();
+
         //The ProcessException attachedToId is used as a basis for comparing
         if(sObjName != null && sObjName.equalsIgnoreCase('Order')){
             List<CartCheckoutSession> sessions = [Select WebCartId from CartCheckoutSession where OrderId = :cartOrOrderId];
-       		  CartCheckoutSession existingSession = sessions[0];
-            String orderReferenceNumber = Sfdc_Checkout.CheckoutOrderService.cartToOrderSummary(existingSession.WebCartId);
-            results.add(orderReferenceNumber);
+            if(sessions != null || sessions.size() != 0){
+              CartCheckoutSession existingSession = sessions[0];
+              Id webCartId =existingSession.WebCartId;
+              String orderReferenceNumber =invokeReferenceApi(cartOrOrderId);
+              results.add(orderReferenceNumber);
+            }
         }
         if(sObjName != null && sObjName.equalsIgnoreCase('WebCart')){
-             String orderReferenceNumber = Sfdc_Checkout.CheckoutOrderService.cartToOrderSummary(cartOrOrderId);
-        	   results.add(orderReferenceNumber);
+            String orderReferenceNumber =invokeReferenceApi(cartOrOrderId);
+            results.add(orderReferenceNumber);
         }
         return results;
     }
 
+    global static String invokeReferenceApi(Id webCartId){
+      String orderReferenceNumber = null;
+      List<WebCart> webcart = [Select Status from WebCart where id = :webCartId];
+      if(webcart != null || webcart.size() != 0){
+        WebCart currentWebCart = webcart[0];
+        if(currentWebCart.Status.equalsIgnoreCase('PendingClosed')){
+          orderReferenceNumber = Sfdc_Checkout.CheckoutOrderService.cartToOrderSummary(webCartId);
+          }
+       }
+        return orderReferenceNumber;
+    }
 }

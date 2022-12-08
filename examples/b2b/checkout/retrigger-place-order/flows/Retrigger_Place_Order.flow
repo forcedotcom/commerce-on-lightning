@@ -18,8 +18,8 @@
     </actionCalls>
     <apiVersion>57.0</apiVersion>
     <environments>Default</environments>
-    <interviewLabel>RetriggerPlaceOrder {!$Flow.CurrentDateTime}</interviewLabel>
-    <label>RetriggerPlaceOrder</label>
+    <interviewLabel>Retrigger Place Order {!$Flow.CurrentDateTime}</interviewLabel>
+    <label>Retrigger Place Order</label>
     <processMetadataValues>
         <name>BuilderType</name>
         <value>
