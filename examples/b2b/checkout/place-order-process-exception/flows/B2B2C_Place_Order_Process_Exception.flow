@@ -10,7 +10,7 @@
             <assignToReference>Category</assignToReference>
             <operator>Assign</operator>
             <value>
-                <stringValue>PlaceOrderFailed</stringValue>
+                <stringValue>Place Order</stringValue>
             </value>
         </assignmentItems>
         <connector>
