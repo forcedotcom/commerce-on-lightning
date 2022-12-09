@@ -22,12 +22,16 @@ global class RetriggerPlaceOrderAction {
               CartCheckoutSession existingSession = sessions[0];
               Id webCartId =existingSession.WebCartId;
               String orderReferenceNumber =invokeReferenceApi(webCartId);
-              results.add(orderReferenceNumber);
+              if(orderReferenceNumber!=null){
+                results.add(orderReferenceNumber);
+              }
             }
         }
         if(sObjName != null && sObjName.equalsIgnoreCase('WebCart')){
             String orderReferenceNumber =invokeReferenceApi(cartOrOrderId);
-            results.add(orderReferenceNumber);
+            if(orderReferenceNumber!=null){
+              results.add(orderReferenceNumber);
+            }
         }
         return results;
     }
