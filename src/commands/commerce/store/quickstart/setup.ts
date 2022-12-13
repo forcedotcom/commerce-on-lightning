@@ -41,6 +41,7 @@ Messages.importMessagesDirectory(__dirname);
 const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:quickstart:setup`;
 const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
+const defaultProfile = 'Buyer_User_Profile_From_QuickStart';
 
 export class StoreQuickstartSetup extends SfdxCommand {
     // TODO add apiversion to all shell'd commands
@@ -113,7 +114,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
 
     public async run(): Promise<AnyJson> {
         await setApiVersion(this.org, this.flags);
-        // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
         this.devHubUsername = (await this.org.getDevHubOrg()).getUsername();
@@ -456,16 +456,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
             .toString()
             .replace(
                 /<networkMemberGroups>([\s|\S]*?)<\/networkMemberGroups>/,
-                `<networkMemberGroups>\n        <profile>Buyer_User_Profile_From_QuickStart${
-                    StoreQuickstartSetup.getStoreType(
-                        this.org.getUsername(),
-                        this.flags,
-                        this.ux,
-                        this.logger
-                    ).toLowerCase() === 'b2b'
-                        ? '_B2B'
-                        : ''
-                }</profile>\n        <profile>admin</profile>\n    </networkMemberGroups>`
+                `<networkMemberGroups>\n        <profile>${this.getBuyerProfileUsingTemplate()}</profile>\n        <profile>admin</profile>\n    </networkMemberGroups>`
             )
             .replace(/<status>.*/, '<status>Live</status>');
         if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2C')
@@ -1013,5 +1004,22 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 .replace('sfdc_checkout__CheckoutTemplate', mainFlowName.toString())
         );
         await this.statusFileManager.setValue('updatedFlowAssociatedToCheckout', true);
+    }
+
+    private getBuyerProfileUsingTemplate(): Promise<String> {
+        let template;
+        if (!(template = this.statusFileManager.getValue('template'))) return Promise.resolve(defaultProfile);
+        else {
+            this.ux.log(`Template is ${template}`);
+            switch (template) {
+                case 'B2B Commerce':
+                    return Promise.resolve(defaultProfile + '_B2B');
+                case 'B2B Commerce (LWR)':
+                case 'B2C Commerce (LWR)':
+                    return Promise.resolve(defaultProfile);
+                default:
+                    throw new Error("Template doesn't exist.");
+            }
+        }
     }
 }

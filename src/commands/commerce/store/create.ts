@@ -239,6 +239,8 @@ export class StoreCreate extends SfdxCommand {
             this.org.getUsername(),
             this.scrDef.storeName
         );
+        // Writing the template name to status file so we can use it in StoreQuickstartSetup
+        await this.statusFileManager.setValue('template', this.flags.templatename);
         this.storeDir = STORE_DIR(BASE_DIR, this.devhubUsername, this.org.getUsername(), this.scrDef.storeName); // TODO keep steps with status file and config but decouple them from this plugin add it to orchestration plugin
         if (await this.statusFileManager.getValue('done')) {
             this.ux.log(msgs.getMessage('create.statusIndicatesCompletedSkipping'));
@@ -277,6 +279,7 @@ export class StoreCreate extends SfdxCommand {
         buyerUserDefTemplate.username = this.flags['buyer-username'] as string;
         buyerUserDefTemplate.email = this.varargs['buyerEmail'] as string;
         buyerUserDefTemplate.alias = (this.varargs['buyerAlias'] as string) || 'buyer';
+        // TODO template
         buyerUserDefTemplate.profileName =
             buyerUserDefTemplate.profileName + ((this.flags.type as string) === 'b2b' ? '_B2B' : '');
         fs.writeFileSync(BUYER_USER_DEF(this.storeDir), JSON.stringify(buyerUserDefTemplate, null, 4));
