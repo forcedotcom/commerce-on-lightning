@@ -12,6 +12,7 @@ b2c.config-override.js
 status
 status_*
 \.sfdx
+\.sf
 *.zip
 *.swp
 *.bak
