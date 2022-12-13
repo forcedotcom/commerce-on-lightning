@@ -39,6 +39,7 @@ Messages.importMessagesDirectory(__dirname);
 const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:create`;
 const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
+const defaultProfile = 'Buyer_User_Profile_From_QuickStart';
 
 export class StoreCreate extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -280,8 +281,7 @@ export class StoreCreate extends SfdxCommand {
         buyerUserDefTemplate.email = this.varargs['buyerEmail'] as string;
         buyerUserDefTemplate.alias = (this.varargs['buyerAlias'] as string) || 'buyer';
         // TODO template
-        buyerUserDefTemplate.profileName =
-            buyerUserDefTemplate.profileName + ((this.flags.type as string) === 'b2b' ? '_B2B' : '');
+        buyerUserDefTemplate.profileName = this.getBuyerProfileUsingTemplate(this.flags.templatename);
         fs.writeFileSync(BUYER_USER_DEF(this.storeDir), JSON.stringify(buyerUserDefTemplate, null, 4));
         await this.createCommunity();
         this.ux.log(chalk.green.bold(msgs.getMessage('create.completedStep6')));
@@ -455,5 +455,18 @@ export class StoreCreate extends SfdxCommand {
         await SearchIndex.run(addAllowedArgs(this.argv, SearchIndex), this.config);
         // TODO check if index was created successfully, all i can do is assume it was
         await this.statusFileManager.setValue('indexCreated', true);
+    }
+
+    private getBuyerProfileUsingTemplate(template: string): string {
+        this.ux.log(`Template: ${template}`);
+        switch (template) {
+            case 'B2B Commerce':
+                return defaultProfile + '_B2B';
+            case 'B2B Commerce (LWR)':
+            case 'B2C Commerce (LWR)':
+                return defaultProfile;
+            default:
+                throw new Error("Template doesn't exist.");
+        }
     }
 }

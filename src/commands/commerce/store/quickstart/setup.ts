@@ -451,12 +451,14 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const networkMetaFile = `${this.storeDir}/experience-bundle-package/unpackaged/networks/${
             this.varargs['communityNetworkName'] as string
         }.network`;
+        let buyerProfile = await this.getBuyerProfileUsingTemplate();
+        this.ux.log(`Buyer profile: ${buyerProfile}`);
         const data = fs
             .readFileSync(networkMetaFile)
             .toString()
             .replace(
                 /<networkMemberGroups>([\s|\S]*?)<\/networkMemberGroups>/,
-                `<networkMemberGroups>\n        <profile>${this.getBuyerProfileUsingTemplate()}</profile>\n        <profile>admin</profile>\n    </networkMemberGroups>`
+                `<networkMemberGroups>\n        <profile>${buyerProfile}</profile>\n        <profile>admin</profile>\n    </networkMemberGroups>`
             )
             .replace(/<status>.*/, '<status>Live</status>');
         if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2C')
@@ -468,27 +470,17 @@ export class StoreQuickstartSetup extends SfdxCommand {
         await this.statusFileManager.setValue('memberListUpdatedCommunityActive', true);
     }
 
-    private updateSelfRegProfile(): void {
+    private async updateSelfRegProfile(): Promise<void> {
         const networkMetaFile = `${this.storeDir}/experience-bundle-package/unpackaged/networks/${
             this.varargs['communityNetworkName'] as string
         }.network`;
+        let buyerProfile = await this.getBuyerProfileUsingTemplate();
+        this.ux.log(`Buyer profile: ${buyerProfile}`);
         let data = fs
             .readFileSync(networkMetaFile)
             .toString()
             .replace(/<selfRegProfile>.*<\/selfRegProfile>/g, '')
-            .replace(
-                '</Network>',
-                `    <selfRegProfile>Buyer_User_Profile_From_QuickStart${
-                    StoreQuickstartSetup.getStoreType(
-                        this.org.getUsername(),
-                        this.flags,
-                        this.ux,
-                        this.logger
-                    ).toLowerCase() === 'b2b'
-                        ? '_B2B'
-                        : ''
-                }</selfRegProfile>\n</Network>`
-            );
+            .replace('</Network>', `    <selfRegProfile>${buyerProfile}</selfRegProfile>\n</Network>`);
         const r = {
             disableReputationRecordConversations: false,
             enableDirectMessages: false,
@@ -1006,9 +998,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
         await this.statusFileManager.setValue('updatedFlowAssociatedToCheckout', true);
     }
 
-    private getBuyerProfileUsingTemplate(): Promise<String> {
+    private async getBuyerProfileUsingTemplate(): Promise<String> {
         let template;
-        if (!(template = this.statusFileManager.getValue('template'))) return Promise.resolve(defaultProfile);
+        if (!(template = await this.statusFileManager.getValue('template'))) return Promise.resolve(defaultProfile);
         else {
             this.ux.log(`Template is ${template}`);
             switch (template) {
