@@ -1,35 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Profile xmlns="http://soap.sforce.com/2006/04/metadata">
     <classAccesses>
-        <apexClass>B2BCheckInventorySample</apexClass>
+        <apexClass>B2CCheckInventorySample</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>B2BCheckInventorySampleTest</apexClass>
+        <apexClass>B2CCheckInventorySampleTest</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>B2BDeliverySample</apexClass>
+        <apexClass>B2CDeliverySample</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>B2BDeliverySampleTest</apexClass>
+        <apexClass>B2CDeliverySampleTest</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>B2BPricingSample</apexClass>
+        <apexClass>B2CPricingSample</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>B2BPricingSampleTest</apexClass>
+        <apexClass>B2CPricingSampleTest</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>B2BTaxSample</apexClass>
+        <apexClass>B2CTaxSample</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>
-        <apexClass>B2BTaxSampleTest</apexClass>
+        <apexClass>B2CTaxSampleTest</apexClass>
         <enabled>false</enabled>
     </classAccesses>
     <classAccesses>

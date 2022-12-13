@@ -220,11 +220,19 @@ export class StoreQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.setUpIntegrations'));
         await StoreCreate.waitForStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
         this.ux.log(msgs.getMessage('quickstart.setup.regAndMapIntegrations'));
-        const integrations = [
+        let integrations = [
             ['B2BCheckInventorySample', 'CHECK_INVENTORY', 'Inventory'],
             ['B2BDeliverySample', 'COMPUTE_SHIPPING', 'Shipment'],
             ['B2BTaxSample', 'COMPUTE_TAXES', 'Tax'],
         ];
+        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2C') {
+            //provide a unique integration name so that it will not be overwritten by B2B store in the same org
+            integrations = [
+                ['B2CCheckInventorySample', 'CHECK_INVENTORY_B2C', 'Inventory'],
+                ['B2CDeliverySample', 'COMPUTE_SHIPPING_B2C', 'Shipment'],
+                ['B2CTaxSample', 'COMPUTE_TAXES_B2C', 'Tax'],
+            ];
+        }
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         integrations.forEach((args) => this.registerAndMapIntegration(...args));
         this.ux.log(msgs.getMessage('quickstart.setup.doneRegAndMapIntegrations'));

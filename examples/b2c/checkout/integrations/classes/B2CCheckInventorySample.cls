@@ -1,6 +1,6 @@
 // This must implement the sfdc_checkout.CartInventoryValidation interface
 // in order to be processed by the checkout flow and used for your Check Inventory integration.
-global class B2BCheckInventorySample implements sfdc_checkout.CartInventoryValidation {
+global class B2CCheckInventorySample implements sfdc_checkout.CartInventoryValidation {
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, ID cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -29,10 +29,10 @@ global class B2BCheckInventorySample implements sfdc_checkout.CartInventoryValid
                     cartId
                 );
             }
-            
+
             // Get all available quantities for products in the cart (cart items) from an external service.
-            Map<String, Object> quantitiesFromExternalService = getQuantitiesFromExternalService(quantitiesFromSalesforce.keySet());            
-            
+            Map<String, Object> quantitiesFromExternalService = getQuantitiesFromExternalService(quantitiesFromSalesforce.keySet());
+
             // For each cart item SKU, check that the quantity from the external service
             // is greater or equal to the quantity in the cart.
             // If that is not true, set the integration status to "Failed".
@@ -47,9 +47,9 @@ global class B2BCheckInventorySample implements sfdc_checkout.CartInventoryValid
                        jobInfo,
                        cartId
                    );
-                } 
+                }
                 else if (quantityFromExternalService < quantityFromSalesforce){
-                   String errorMessage = 'Insufficient quantity for the product with sku ' + sku + ': ' 
+                   String errorMessage = 'Insufficient quantity for the product with sku ' + sku + ': '
                                + quantityFromSalesforce + ' needed, but only '
                                + quantityFromExternalService + ' available.';
                    return integrationStatusFailedWithCartValidationOutputError(
@@ -78,7 +78,7 @@ global class B2BCheckInventorySample implements sfdc_checkout.CartInventoryValid
         }
         return integStatus;
     }
-    
+
     private Map<String, Object> getQuantitiesFromExternalService (Set<String> skus) {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
@@ -108,8 +108,8 @@ global class B2BCheckInventorySample implements sfdc_checkout.CartInventoryValid
         else {
             throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
-    }  
-    
+    }
+
     private sfdc_checkout.IntegrationStatus integrationStatusFailedWithCartValidationOutputError(
         sfdc_checkout.IntegrationStatus integrationStatus, String errorMessage, sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
             integrationStatus.status = sfdc_checkout.IntegrationStatus.Status.FAILED;

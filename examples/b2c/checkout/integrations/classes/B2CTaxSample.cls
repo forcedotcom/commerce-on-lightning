@@ -1,6 +1,6 @@
 // This must implement the sfdc_checkout.CartTaxCalculations interface
 // in order to be processed by the checkout flow and used for your Taxes integration.
-global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
+global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -23,10 +23,10 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId][0].CartDeliveryGroupId;
             CartDeliveryGroup deliveryGroup = [SELECT DeliverToState, DeliverToCountry FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId][0];
             String taxType = [SELECT TaxType FROM WebCart WHERE Id = :cartId][0].TaxType;
-            
+
 
             Map<ID, CartItem> cartItemsMap = new Map<ID, CartItem>([SELECT Id, Sku, Quantity, TotalLineAmount, AdjustmentAmount, (Select Id, TotalAmount from CartItemPriceAdjustments) FROM CartItem  WHERE CartId = :cartId]);
-            
+
             // Get the tax rates and tax amounts from an external service
             // Other parameters will be passed here, like ship_from, bill_to, more details about the ship_to, etc.
             Map<String, Object> dataFromExternalService = getDataFromExternalService(
@@ -35,7 +35,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
 
             // If there are taxes from a previously cancelled checkout, delete them.
             delete [SELECT Id FROM CartTax WHERE CartItemId IN (Select Id FROM CartItem WHERE CartId = :cartId)];
-            
+
             // For each cart item, insert a new tax line in the CartTax entity.
             // The total tax is automatically rolled up to TotalLineTaxAmount in the corresponding CartItem line.
             CartTax[] cartTaxestoInsert = new CartTax[]{};
@@ -60,9 +60,9 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
                 );
                 cartTaxestoInsert.add(tax);
 
-                List<Object> itemTaxList = (List<Object>)cartItemsMapFromExternalService.get('itemizedPromotionTaxAmounts');                
+                List<Object> itemTaxList = (List<Object>)cartItemsMapFromExternalService.get('itemizedPromotionTaxAmounts');
                 for (Object cipaTax : itemTaxList) {
-                    CartTax promoTax = new CartTax( 
+                    CartTax promoTax = new CartTax(
                         Amount = (Decimal)((Map<String, Object>) cipaTax).get('taxAmount'),
                         CartItemId = cartItemId,
                         Name = (String)cartItemsMapFromExternalService.get('taxName'),
@@ -92,7 +92,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
         }
         return integStatus;
     }
-    
+
     private Map<String, Object> getDataFromExternalService (
         Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
 
@@ -105,7 +105,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
         request.setHeader('Content-Type', 'application/json');
         request.setBody(requestBody);
         HttpResponse response = http.send(request);
-        
+
         // If the request is successful, parse the JSON response
         if (response.getStatusCode() == 200) {
             Map<String, Object> resultsFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
