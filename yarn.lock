@@ -576,7 +576,7 @@
     is-wsl "^2.1.1"
     tslib "^2.3.1"
 
-"@oclif/config@^1.18.3":
+"@oclif/config@^1.18.6":
   version "1.18.6"
   resolved "https://phx-nexus-proxy.internal.salesforce.com/nexus/content/groups/npm-all/@oclif/config/-/config-1.18.6.tgz#37367026b3110a2f04875509b1920a8ee4489f21"
   integrity sha512-OWhCpdu4QqggOPX1YPZ4XVmLLRX+lhGjXV6RNA7sogOwLqlEmSslnN/lhR5dkhcWZbKWBQH29YCrB3LDPRu/IA==
