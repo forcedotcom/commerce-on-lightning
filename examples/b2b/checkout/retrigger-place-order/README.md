@@ -1,6 +1,6 @@
 # Re Trigger Place Order Flow
 
-The implementation provided in this directory contains flow metadata files that you can deploy to any Salesforce B2B2C Commerce enabled org. Use these files to set up an end-to-end Re-Trigger Place Order flow that will let the Commerce Admin Re-trigger the Place Order Flow once he fixes the issues with Place Order process
+The implementation provided in this directory contains flow metadata files that you can deploy to any Salesforce B2B or B2B2C Commerce enabled org. Use these files to set up an end-to-end Re-Trigger Place Order flow that will let the Commerce Admin Re-trigger the Place Order Flow once he fixes the issues with Place Order process
 
 
 ##  The advantages of using a ReTrigger Place Order Flow:
