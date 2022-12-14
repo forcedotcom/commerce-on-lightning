@@ -1,6 +1,6 @@
 # Place Order Process Exception Flow
 
-The implementation provided in this directory contains flow metadata files that you can deploy to any Salesforce B2B2C Commerce enabled org. Use these files to set up an end-to-end Place Order Exception Handling flow that handles `PlaceOrderFailed` ExceptionType event and creates exception record with priority `High`
+The implementation provided in this directory contains flow metadata files that you can deploy to any Salesforce B2B or B2B2C Commerce enabled org. Use these files to set up an end-to-end Place Order Exception Handling flow that handles `PlaceOrderFailed` ExceptionType event and creates a ProcessException record with priority `High`
 
 
 ##  The advantages of using a ProcessException Event:
