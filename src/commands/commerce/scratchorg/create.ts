@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { SfdxCommand, flags } from '@salesforce/command';
-import { Messages, SfdxError } from '@salesforce/core';
+import { Messages, SfdxError, fs } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
 import { addAllowedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
@@ -72,12 +72,17 @@ export class ScratchOrgCreate extends SfdxCommand {
          */
         this.devhubUsername = this.hubOrg.getUsername();
         await this.copyConfigFiles();
+        this.ux.log(
+            `After config: ${fs.existsSync('/Users/tarcan.gul/.commerce/config/both-project-aura-scratch-def.json')}`
+        );
         this.statusManager = new StatusFileManager(this.devhubUsername, this.flags.username);
         this.ux.log(msgs.getMessage('create.usingScratchOrgAdmin', [this.flags.username]));
 
         this.devHubDir = DEVHUB_DIR(BASE_DIR, this.devhubUsername);
         createSfdxProjectFile(this.flags.apiversion, this.devHubDir);
-
+        this.ux.log(
+            `After config: ${fs.existsSync('/Users/tarcan.gul/.commerce/config/both-project-aura-scratch-def.json')}`
+        );
         await this.createScratchOrg();
         this.ux.log(chalk.green.bold(msgs.getMessage('create.completedCreatingScratchOrg')));
         this.ux.log(
@@ -97,7 +102,9 @@ export class ScratchOrgCreate extends SfdxCommand {
             this.ux.warn("The --aura flag doesn't apply to B2C stores. Setting aura flag to false");
             this.flags.aura = false;
         }
-
+        this.ux.log(
+            `After config: ${fs.existsSync('/Users/tarcan.gul/.commerce/config/both-project-aura-scratch-def.json')}`
+        );
         this.ux.log(msgs.getMessage('create.preparingResourcesEtc'));
         this.ux.log(
             msgs.getMessage('create.creatingNewScratchOrgInfo') +

@@ -142,19 +142,13 @@
             "username",
             "alias",
             "wait",
-            "type"
+            "type",
+            "aura"
         ]
     },
     {
         "command": "commerce:search:start",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "store-name",
-            "store-id",
-            "targetusername",
-            "apiversion",
-            "json",
-            "loglevel"
-        ]
+        "flags": ["store-name", "store-id", "targetusername", "apiversion", "json", "loglevel"]
     }
 ]

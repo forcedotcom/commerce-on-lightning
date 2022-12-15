@@ -83,6 +83,7 @@ export async function copyFolderRecursiveWithConfirm(source: string, target: str
         files = fs.readdirSync(source);
         for (const file1 of files.filter((file: string) => !fs.existsSync(`${BASE_DIR}/${file}`))) {
             const curSource = path.join(source, file1);
+            ux.log(`curSource: ${curSource}, targetFolder: ${targetFolder}`);
             if (fs.lstatSync(curSource).isDirectory())
                 await copyFolderRecursiveWithConfirm(curSource, targetFolder, prompt);
             else await copyFileWithConfirm(curSource, targetFolder, prompt);
