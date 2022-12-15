@@ -4,6 +4,7 @@
     "features": [
         "Communities",
         "B2BCommerce",
+        "B2BAuraTemplateEnabled",
         "B2CCommerceGMV",
         "PersonAccounts",
         "OrderManagement",

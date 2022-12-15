@@ -55,6 +55,11 @@ export class ScratchOrgCreate extends SfdxCommand {
             default: false,
             description: 'If there is a file difference detected, prompt before overwriting file',
         }),
+        aura: flags.boolean({
+            char: 'r',
+            default: false,
+            description: 'If there is a file difference detected, prompt before overwriting file',
+        }),
     };
     public statusManager: StatusFileManager;
     public devhubUsername: string;
@@ -88,6 +93,11 @@ export class ScratchOrgCreate extends SfdxCommand {
             await this.statusManager.setScratchOrgValue('created', true);
             return;
         }
+        if (this.flags.aura && this.flags.type === 'b2c') {
+            this.ux.warn("The --aura flag doesn't apply to B2C stores. Setting aura flag to false");
+            this.flags.aura = false;
+        }
+
         this.ux.log(msgs.getMessage('create.preparingResourcesEtc'));
         this.ux.log(
             msgs.getMessage('create.creatingNewScratchOrgInfo') +
@@ -105,7 +115,7 @@ export class ScratchOrgCreate extends SfdxCommand {
             const cmd = appendCommonFlags(
                 `sfdx force:org:create \
 --targetdevhubusername="${this.devhubUsername}" \
---definitionfile=${CONFIG_DIR}/${orgType}-project-scratch-def.json \
+--definitionfile=${CONFIG_DIR}/${orgType}-project${this.flags.aura ? '-aura' : ''}-scratch-def.json \
 --setalias="${this.flags.alias as string}" \
 --durationdays=30 \
 --wait=${this.flags.wait as number} \
@@ -184,6 +194,7 @@ username="${this.flags.username as string}" \
         if (this.flags.prompt) {
             this.argv.push('--prompt');
         }
+        this.ux.log(JSON.stringify(this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
     }
 }
