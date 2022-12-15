@@ -54,12 +54,7 @@ export class ScratchOrgCreate extends SfdxCommand {
             char: 'y',
             default: false,
             description: 'If there is a file difference detected, prompt before overwriting file',
-        }),
-        aura: flags.boolean({
-            char: 'r',
-            default: false,
-            description: 'If there is a file difference detected, prompt before overwriting file',
-        }),
+        })
     };
     public statusManager: StatusFileManager;
     public devhubUsername: string;
@@ -72,17 +67,11 @@ export class ScratchOrgCreate extends SfdxCommand {
          */
         this.devhubUsername = this.hubOrg.getUsername();
         await this.copyConfigFiles();
-        this.ux.log(
-            `After config: ${fs.existsSync('/Users/tarcan.gul/.commerce/config/both-project-aura-scratch-def.json')}`
-        );
         this.statusManager = new StatusFileManager(this.devhubUsername, this.flags.username);
         this.ux.log(msgs.getMessage('create.usingScratchOrgAdmin', [this.flags.username]));
 
         this.devHubDir = DEVHUB_DIR(BASE_DIR, this.devhubUsername);
         createSfdxProjectFile(this.flags.apiversion, this.devHubDir);
-        this.ux.log(
-            `After config: ${fs.existsSync('/Users/tarcan.gul/.commerce/config/both-project-aura-scratch-def.json')}`
-        );
         await this.createScratchOrg();
         this.ux.log(chalk.green.bold(msgs.getMessage('create.completedCreatingScratchOrg')));
         this.ux.log(
@@ -98,13 +87,7 @@ export class ScratchOrgCreate extends SfdxCommand {
             await this.statusManager.setScratchOrgValue('created', true);
             return;
         }
-        if (this.flags.aura && this.flags.type === 'b2c') {
-            this.ux.warn("The --aura flag doesn't apply to B2C stores. Setting aura flag to false");
-            this.flags.aura = false;
-        }
-        this.ux.log(
-            `After config: ${fs.existsSync('/Users/tarcan.gul/.commerce/config/both-project-aura-scratch-def.json')}`
-        );
+
         this.ux.log(msgs.getMessage('create.preparingResourcesEtc'));
         this.ux.log(
             msgs.getMessage('create.creatingNewScratchOrgInfo') +
@@ -201,7 +184,6 @@ username="${this.flags.username as string}" \
         if (this.flags.prompt) {
             this.argv.push('--prompt');
         }
-        this.ux.log(JSON.stringify(this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
     }
 }
