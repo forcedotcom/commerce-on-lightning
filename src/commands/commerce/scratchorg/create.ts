@@ -5,7 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import { SfdxCommand, flags } from '@salesforce/command';
-import { Messages, SfdxError, fs } from '@salesforce/core';
+import { Messages, SfdxError } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
 import { addAllowedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
@@ -54,7 +54,7 @@ export class ScratchOrgCreate extends SfdxCommand {
             char: 'y',
             default: false,
             description: 'If there is a file difference detected, prompt before overwriting file',
-        })
+        }),
     };
     public statusManager: StatusFileManager;
     public devhubUsername: string;
@@ -105,7 +105,7 @@ export class ScratchOrgCreate extends SfdxCommand {
             const cmd = appendCommonFlags(
                 `sfdx force:org:create \
 --targetdevhubusername="${this.devhubUsername}" \
---definitionfile=${CONFIG_DIR}/${orgType}-project${this.flags.aura ? '-aura' : ''}-scratch-def.json \
+--definitionfile=${CONFIG_DIR}/${orgType}-project-scratch-def.json \
 --setalias="${this.flags.alias as string}" \
 --durationdays=30 \
 --wait=${this.flags.wait as number} \

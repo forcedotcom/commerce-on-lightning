@@ -62,7 +62,6 @@ export class FilesCopy extends SfdxCommand {
         if (Array.isArray(filesToCopy)) files = filesToCopy;
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
         else files = filesToCopy !== null ? filesToCopy.split(',') : null;
-        this.ux.log(JSON.stringify(files));
         if (sourceBaseDir !== null) {
             for (const d of dirs) {
                 await copyFolderRecursiveWithConfirm(`${sourceBaseDir}/${d}`, BASE_DIR, prompt);
