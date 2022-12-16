@@ -67,21 +67,27 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         );
 
         this.ux.log(msgs.getMessage('quickstart.setup.pushingNamedCredentialsAndGatewayAdapterApexToOrg'));
-        this.ux.log(
-            JSON.stringify(
-                shellJsonSfdx(
-                    appendCommonFlags(
-                        `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${examplesDir} -w 1`,
-                        this.flags,
-                        this.logger
+        try {
+            this.ux.log(
+                JSON.stringify(
+                    shellJsonSfdx(
+                        appendCommonFlags(
+                            `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${examplesDir} -w 1`,
+                            this.flags,
+                            this.logger
+                        ),
+                        null,
+                        storeDir
                     ),
                     null,
-                    storeDir
-                ),
-                null,
-                4
-            )
-        );
+                    4
+                )
+            );
+        } catch (e) {
+            if (e instanceof Error) {
+                this.ux.log(e.message);
+            }
+        }
         // Creating Payment Gateway Provider
         const apexClassIdRecord = forceDataSoql(
             `SELECT Id FROM ApexClass WHERE Name='${paymentGatewayAdapterName}' LIMIT 1`,
