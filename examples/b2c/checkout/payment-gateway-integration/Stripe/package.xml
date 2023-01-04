@@ -3,6 +3,7 @@
     <types>
         <members>StripeAdapter</members>
         <members>StripeValidationException</members>
+        <members>QueryUtils</members>
         <name>ApexClass</name>
     </types>
     <types> 
