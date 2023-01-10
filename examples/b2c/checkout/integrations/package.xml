@@ -9,16 +9,14 @@
       <name>Translations</name>
     </types>
     <types>
-        <members>B2BCheckInventorySample</members>
-        <members>B2BCheckInventorySampleTest</members>
-        <members>B2BPricingSample</members>
-        <members>B2BPricingSampleTest</members>
-        <members>B2BDeliverySample</members>
-        <members>B2BDeliverySampleTest</members>
+        <members>B2CCheckInventorySample</members>
+        <members>B2CCheckInventorySampleTest</members>
+        <members>B2CPricingSample</members>
+        <members>B2CPricingSampleTest</members>
         <members>B2CDeliverySample</members>
         <members>B2CDeliverySampleTest</members>
-        <members>B2BTaxSample</members>
-        <members>B2BTaxSampleTest</members>
+        <members>B2CTaxSample</members>
+        <members>B2CTaxSampleTest</members>
         <name>ApexClass</name>
     </types>
     <types>

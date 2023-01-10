@@ -6,11 +6,13 @@
  */
 
 import { flags, SfdxCommand } from '@salesforce/command';
-import { Messages, Org, SfdxError } from '@salesforce/core';
+import { Logger, Messages, Org, SfdxError } from '@salesforce/core';
 import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
+import { OutputFlags } from '@oclif/parser';
 import { forceDataSoql, forceDataRecordDelete } from '../../../lib/utils/sfdx/forceDataSoql';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { Result } from '../../../lib/utils/jsonUtils';
+import { setApiVersion } from '../../../lib/utils/args/flagsUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -44,6 +46,7 @@ export class UnMapExtension extends SfdxCommand {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<void> {
+        await setApiVersion(this.org, this.flags);
         this.unmapRecord(
             this.flags['registered-extension-name'],
             this.flags['store-name'],
@@ -56,12 +59,19 @@ export class UnMapExtension extends SfdxCommand {
         if (storeName === undefined && storeId === undefined) {
             throw new SfdxError(msgs.getMessage('extension.unmap.undefinedName'));
         }
-        const storeid = UtilStoreValidate.validateStoreId(storeName, storeId, userName);
-        const name = forceDataSoql(`SELECT Name FROM WebStore WHERE Id='${storeid}' LIMIT 1`).result.records[0].Name;
+        const storeid = UtilStoreValidate.validateStoreId(storeName, storeId, userName, this.flags, this.logger);
+        const name = forceDataSoql(
+            `SELECT Name FROM WebStore WHERE Id='${storeid}' LIMIT 1`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        ).result.records[0].Name;
         let deletedId: string;
         const existingIds = forceDataSoql(
             `SELECT DeveloperName,ExternalServiceProviderType FROM RegisteredExternalService WHERE DeveloperName='${extensionName}' AND ExternalServiceProviderType='Extension'`,
-            userName
+            userName,
+            this.flags,
+            this.logger
         );
         if (existingIds.result !== undefined && existingIds.result.totalSize === 0) {
             throw new SfdxError(msgs.getMessage('extension.unmap.error', [extensionName, '\n', existingIds.message]));
@@ -72,10 +82,19 @@ export class UnMapExtension extends SfdxCommand {
                 .concat(record['DeveloperName'] as string);
             const deleteId = forceDataSoql(
                 `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}' AND StoreId='${storeid}'`,
-                userName
+                userName,
+                this.flags,
+                this.logger
             ).result.records[0];
             deletedId = deleteId.Id;
-            forceDataRecordDelete('StoreIntegratedService', deletedId, this.org.getUsername(), 'pipe');
+            forceDataRecordDelete(
+                'StoreIntegratedService',
+                deletedId,
+                this.org.getUsername(),
+                this.flags,
+                this.logger,
+                'pipe'
+            );
             this.ux.log(
                 msgs.getMessage('extension.unmap.savingConfigIntoConfig', [
                     // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -89,10 +108,17 @@ export class UnMapExtension extends SfdxCommand {
 }
 
 export class UtilStoreValidate {
-    public static validateStoreId(storeName: string, storeId: string, userName: string): string {
+    public static validateStoreId(
+        storeName: string,
+        storeId: string,
+        userName: string,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        passedFlags: OutputFlags<any>,
+        logger: Logger
+    ): string {
         let fResult: Result<QueryResult>;
         if (storeId === undefined) {
-            fResult = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}'`, userName);
+            fResult = forceDataSoql(`SELECT Id FROM WebStore WHERE Name='${storeName}'`, userName, passedFlags, logger);
             if (fResult !== undefined && fResult.result !== undefined) {
                 if (fResult.result.totalSize > 1) {
                     throw new SfdxError(msgs.getMessage('extension.map.multiple', [storeName]));
@@ -104,8 +130,12 @@ export class UtilStoreValidate {
             }
         } else {
             try {
-                storeId = forceDataSoql(`SELECT Id FROM WebStore WHERE Id='${storeId}' LIMIT 1`, userName).result
-                    .records[0].Id;
+                storeId = forceDataSoql(
+                    `SELECT Id FROM WebStore WHERE Id='${storeId}' LIMIT 1`,
+                    userName,
+                    passedFlags,
+                    logger
+                ).result.records[0].Id;
             } catch (e) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 throw new SfdxError(msgs.getMessage('extension.map.errStoreId', [storeId, '\n', e.message]));

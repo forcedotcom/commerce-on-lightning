@@ -7,18 +7,21 @@
 import { fs } from '@salesforce/core';
 import { ExamplesConvert } from '../../commands/commerce/examples/convert';
 import { BASE_DIR, STATUS_FILE } from './constants/properties';
+import { createSfdxProjectFile } from './definitionFile';
 
 /**
  * Builder pattern for command requirements or just call one method statically
  * order matters
  */
 export class Requires {
-    private commands: CMD[] = [];
+    public commands: CMD[] = [];
 
     public static async examplesConverted(
         dir: string = BASE_DIR,
         storeName = '',
+        storeType = '',
         configFile = '',
+        apiVersion = '',
         force = 'false'
     ): Promise<void> {
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
@@ -27,7 +30,8 @@ export class Requires {
             if (fs.existsSync(dir + '/force-app') && !fs.lstatSync(dir + '/force-app').isDirectory())
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
                 fs.unlinkSync(dir + '/force-app'); // this shouldn't happen, but if it does...
-            await ExamplesConvert.run(['-d', dir, '-n', storeName, '-f', configFile]);
+            createSfdxProjectFile(apiVersion, dir);
+            await ExamplesConvert.run(['-d', dir, '-n', storeName, '-f', configFile, '-o', storeType]);
         }
     }
 
@@ -35,8 +39,15 @@ export class Requires {
         this.commands.push(new CMD('step', [step, status]));
         return this;
     }
-    public examplesConverted(dir: string = BASE_DIR, storeName = '', configFile = '', force = 'false'): Requires {
-        this.commands.push(new CMD('examplesConverted', [dir, storeName, configFile, force]));
+    public examplesConverted(
+        dir: string = BASE_DIR,
+        storeName = '',
+        storeType = '',
+        configFile = '',
+        apiVersion = '',
+        force = 'false'
+    ): Requires {
+        this.commands.push(new CMD('examplesConverted', [dir, storeName, storeType, configFile, apiVersion, force]));
         return this;
     }
     public async build(): Promise<void> {

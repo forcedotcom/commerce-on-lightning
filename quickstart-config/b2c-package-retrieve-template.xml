@@ -20,5 +20,5 @@
         <members>*</members>
         <name>NavigationMenu</name>
     </types>
-    <version>52.0</version>
+    <version>ApiVersionHere</version>
 </Package>

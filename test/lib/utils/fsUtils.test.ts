@@ -58,7 +58,7 @@ describe('fsUtils xml', () => {
                 '    <members>*</members>\n' +
                 '    <name>NavigationMenu</name>\n' +
                 '  </types>\n' +
-                '  <version>52</version>\n' +
+                '  <version>ApiVersionHere</version>\n' +
                 '</Package>\n'
         );
     });

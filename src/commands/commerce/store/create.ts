@@ -1,20 +1,19 @@
 /*
- * Copyright (c) 2020, salesforce.com, inc.
+ * Copyright (c) 2022, salesforce.com, inc.
  * All rights reserved.
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import os from 'os';
-import { SfdxCommand } from '@salesforce/command';
-import { fs, Messages, Org, SfdxError } from '@salesforce/core';
+import { flags, SfdxCommand } from '@salesforce/command';
+import { fs, Logger, Messages, Org, SfdxError } from '@salesforce/core';
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
-import { allFlags } from '../../../lib/flags/commerce/all.flags';
-import { addAllowedArgs, filterFlags, getPassedArgs, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
+import { OutputFlags } from '@oclif/parser';
+import { addAllowedArgs, appendCommonFlags, modifyArgFlag } from '../../../lib/utils/args/flagsUtils';
 import {
     BASE_DIR,
     BUYER_USER_DEF,
-    CONFIG_DIR,
     SCRATCH_ORG_DIR,
     STORE_DIR,
     FILE_COPY_ARGS,
@@ -27,6 +26,9 @@ import { sleep } from '../../../lib/utils/sleep';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { mkdirSync } from '../../../lib/utils/fsUtils';
 import { FilesCopy } from '../files/copy';
+import { getDefinitionFile } from '../../../lib/utils/definitionFile';
+import SearchIndex from '../search/start';
+import { setApiVersion } from '../../../lib/utils/args/flagsUtils';
 import { StoreQuickstartCreate } from './quickstart/create';
 import { StoreQuickstartSetup } from './quickstart/setup';
 import { StoreOpen } from './open';
@@ -64,10 +66,40 @@ export class StoreCreate extends SfdxCommand {
 
     public static description = msgs.getMessage('create.cmdDescription');
     public static examples = [`sfdx ${CMD} --store-name test-store`];
-    protected static flagsConfig = filterFlags(
-        ['store-name', 'templatename', 'definitionfile', 'type', 'buyer-username', 'prompt'],
-        allFlags
-    );
+    protected static flagsConfig = {
+        'store-name': flags.string({
+            char: 'n',
+            default: '1commerce',
+            description: msgs.getMessage('setup.storeNameDescription'),
+            required: true,
+        }),
+        templatename: flags.string({
+            char: 't',
+            description: msgs.getMessage('setup.templateNameDescription'),
+        }),
+        definitionfile: flags.filepath({
+            char: 'f',
+            description: msgs.getMessage('create.configFileDescription'),
+        }),
+        type: flags.string({
+            char: 'o',
+            options: ['b2c', 'b2b'],
+            parse: (input) => input.toLowerCase(),
+            default: 'b2c',
+            description: msgs.getMessage('create.storeTypeDescription'),
+        }),
+        'buyer-username': flags.string({
+            char: 'b',
+            default: 'buyer@1commerce.com',
+            description: msgs.getMessage('setup.scratchOrgBuyerUsernameDescription'),
+        }),
+        prompt: flags.boolean({
+            char: 'y',
+            default: false,
+            description: 'If there is a file difference detected, prompt before overwriting file',
+        }),
+    };
+
     public org: Org;
     private scrDef;
     private storeDir;
@@ -76,8 +108,11 @@ export class StoreCreate extends SfdxCommand {
 
     public static async getStoreId(
         statusFileManager: StatusFileManager,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cmdFlags: OutputFlags<any>,
         // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
         ux,
+        logger: Logger,
         cnt = 0,
         setPerms = true
     ): Promise<string> {
@@ -86,7 +121,9 @@ export class StoreCreate extends SfdxCommand {
         try {
             const res = forceDataSoql(
                 `SELECT Id FROM WebStore WHERE Name='${statusFileManager.storeName}' LIMIT 1`,
-                statusFileManager.scratchOrgAdminUsername
+                statusFileManager.scratchOrgAdminUsername,
+                cmdFlags,
+                logger
             );
             if (!res.result.records || res.result.records.length === 0 || !res.result.records[0]) return null;
             storeId = res.result.records[0].Id;
@@ -102,18 +139,25 @@ export class StoreCreate extends SfdxCommand {
                     await ux.prompt(msgs.getMessage('create.enter'), { required: false });
                     ux.log(chalk.green(msgs.getMessage('create.assumingYouSavedThePerm')));
                     /* eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
-                    return await this.getStoreId(statusFileManager, ux, ++cnt);
+                    return await this.getStoreId(statusFileManager, cmdFlags, ux, logger, ++cnt);
                 }
                 // await ScratchOrgCreate.addB2CLiteAccessPerm(flags.scratchOrgAdminUsername, ux);
-                return await this.getStoreId(statusFileManager, ux, ++cnt);
+                return await this.getStoreId(statusFileManager, cmdFlags, ux, logger, ++cnt);
             } else throw e;
         }
         await statusFileManager.setValue('id', storeId);
         return storeId;
     }
     // does this belong here?
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    public static async waitForStoreId(statusFileManager: StatusFileManager, ux, time = 10 * 3): Promise<void> {
+    public static async waitForStoreId(
+        statusFileManager: StatusFileManager,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cmdFlags: OutputFlags<any>,
+        // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+        ux,
+        logger: Logger,
+        time = 10 * 3
+    ): Promise<void> {
         if (!ux || !ux.stopSpinner) {
             ux = console;
             /* eslint-disable no-console */
@@ -126,12 +170,14 @@ export class StoreCreate extends SfdxCommand {
         let count = 0;
         // eslint-disable-next-line no-constant-condition
         while (true) {
-            if (await StoreCreate.getStoreId(statusFileManager, ux))
+            if (await StoreCreate.getStoreId(statusFileManager, cmdFlags, ux, logger))
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return ux.stopSpinner(
                     `${msgs.getMessage('create.doneWithStoreId')} ${await StoreCreate.getStoreId(
                         statusFileManager,
-                        ux
+                        cmdFlags,
+                        ux,
+                        logger
                     )}`
                 );
             ux.setSpinnerStatus('Store not yet created, waiting 10 seconds...');
@@ -145,7 +191,10 @@ export class StoreCreate extends SfdxCommand {
 
     public static async getUserInfo(
         statusFileManager: StatusFileManager,
-        scratchOrgBuyerUsername: string
+        scratchOrgBuyerUsername: string,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        cmdFlags: OutputFlags<any>,
+        logger: Logger
     ): Promise<UserInfo> {
         if (await statusFileManager.getValue('userInfo')) {
             const userInfo = Object.assign(new UserInfo(), await statusFileManager.getValue('userInfo'));
@@ -153,9 +202,15 @@ export class StoreCreate extends SfdxCommand {
         }
         try {
             const output = shellJsonSfdx(
-                `sfdx force:user:display -u "${scratchOrgBuyerUsername}" ${
-                    statusFileManager.devhubAdminUsername ? '-v "' + statusFileManager.devhubAdminUsername + '"' : ''
-                } --json`
+                appendCommonFlags(
+                    `sfdx force:user:display -u "${scratchOrgBuyerUsername}" ${
+                        statusFileManager.devhubAdminUsername
+                            ? '-v "' + statusFileManager.devhubAdminUsername + '"'
+                            : ''
+                    } --json`,
+                    cmdFlags,
+                    logger
+                )
             );
             console.log(JSON.stringify(output));
             await statusFileManager.setValue('userInfo', output.result);
@@ -166,14 +221,13 @@ export class StoreCreate extends SfdxCommand {
     }
     public async run(): Promise<AnyJson> {
         this.devhubUsername = (await this.org.getDevHubOrg()).getUsername();
+        await setApiVersion(this.org, this.flags);
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
-        const passedArgs = getPassedArgs(this.argv, this.flags);
         if (!this.flags.type || (this.flags.type !== 'b2c' && this.flags.type !== 'b2b')) this.flags.type = 'b2c';
-        if (!Object.keys(passedArgs).includes('definitionfile') && Object.keys(passedArgs).includes('type'))
-            this.flags.definitionfile = CONFIG_DIR + '/' + (passedArgs.type as string) + '-store-scratch-def.json';
-        this.scrDef = parseStoreScratchDef(this.flags.definitionfile, this.argv, this.flags);
+        this.flags.definitionfile = getDefinitionFile(this.flags);
+        this.scrDef = parseStoreScratchDef(this.flags);
         // parseStoreScratchDef overrides scrDef with arg flag values, below is needed when none are supplied so we use the values in store def file
         const modifyArgs = [
             { args: ['-n', '--store-name'], value: this.scrDef.storeName as string },
@@ -246,7 +300,8 @@ export class StoreCreate extends SfdxCommand {
 
     private async createCommunity(cnt = 0): Promise<void> {
         try {
-            if (await StoreCreate.getStoreId(this.statusFileManager, this.ux, 0, false)) return;
+            if (await StoreCreate.getStoreId(this.statusFileManager, this.flags, this.ux, this.logger, 0, false))
+                return;
         } catch (e) {
             /* Expect exception here if store hasn't been created yet*/
         }
@@ -255,7 +310,7 @@ export class StoreCreate extends SfdxCommand {
         if (!res) throw new SfdxError(msgs.getMessage('create.errorStoreQuickstartCreateFailed'));
         this.ux.startSpinner(msgs.getMessage('create.waitingForCommunity'));
         try {
-            await StoreCreate.waitForStoreId(this.statusFileManager, this.ux, 2);
+            await StoreCreate.waitForStoreId(this.statusFileManager, this.flags, this.ux, this.logger, 2);
         } catch (e) {
             if (cnt > 10) {
                 await this.statusFileManager.setValue('id', JSON.parse(JSON.stringify(e, replaceErrors)));
@@ -276,19 +331,44 @@ export class StoreCreate extends SfdxCommand {
         } catch (e) {
             /* IGNORE */
         }
-        await new Requires().examplesConverted(scratchOrgDir, this.scrDef.storeName, this.flags.definitionfile).build();
+        const req = new Requires();
+        await req
+            .examplesConverted(
+                scratchOrgDir,
+                this.scrDef.storeName,
+                this.flags.type,
+                this.flags.definitionfile,
+                this.flags.apiversion
+            )
+            .build();
         this.ux.startSpinner(msgs.getMessage('create.pushingStoreSources'));
         try {
             this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:source:push']));
             shellJsonSfdx(
-                `cd ${scratchOrgDir} && echo y | sfdx force:source:tracking:clear -u "${this.org.getUsername()}"`
+                appendCommonFlags(
+                    `cd ${scratchOrgDir} && echo y | sfdx force:source:tracking:clear -u "${this.org.getUsername()}"`,
+                    this.flags,
+                    this.logger
+                )
             );
-            shellJsonSfdx(`cd ${scratchOrgDir} && sfdx force:source:push -f -u "${this.org.getUsername()}"`);
+            shellJsonSfdx(
+                appendCommonFlags(
+                    `cd ${scratchOrgDir} && sfdx force:source:push -f -u "${this.org.getUsername()}"`,
+                    this.flags,
+                    this.logger
+                )
+            );
         } catch (e) {
             if (e.message && JSON.stringify(e.message).indexOf(msgs.getMessage('create.checkInvalidSession')) >= 0) {
                 this.ux.log(msgs.getMessage('create.preMessageOpeningPageSessinonRefresh', [e.message]));
                 shell('sfdx force:org:open -u ' + this.org.getUsername()); // todo might puppet this
-                shellJsonSfdx(`cd ${scratchOrgDir} && sfdx force:source:push -f -u "${this.org.getUsername()}"`);
+                shellJsonSfdx(
+                    appendCommonFlags(
+                        `cd ${scratchOrgDir} && sfdx force:source:push -f -u "${this.org.getUsername()}"`,
+                        this.flags,
+                        this.logger
+                    )
+                );
             } else {
                 await this.statusFileManager.setValue('pushedSources', JSON.parse(JSON.stringify(e, replaceErrors)));
                 throw e;
@@ -314,7 +394,12 @@ export class StoreCreate extends SfdxCommand {
         if ((await this.statusFileManager.getValue('assignedShopperProfileToBuyerUser')) === 'true')
             if (!(await this.statusFileManager.getValue('userInfo')))
                 try {
-                    userInfo = StoreCreate.getUserInfo(this.statusFileManager, this.flags['buyer-username']);
+                    userInfo = StoreCreate.getUserInfo(
+                        this.statusFileManager,
+                        this.flags['buyer-username'],
+                        this.flags,
+                        this.logger
+                    );
                     if (userInfo) return await this.statusFileManager.setValue('userInfo', userInfo);
                 } catch (e) {
                     /* DO nothing it creates it below */
@@ -322,16 +407,26 @@ export class StoreCreate extends SfdxCommand {
             else return;
         this.ux.log(msgs.getMessage('create.assigningShopperProfileToBuyer'));
         shell(
-            'sfdx force:user:permset:assign --permsetname CommerceUser ' +
-                `--targetusername "${this.org.getUsername()}"  --onbehalfof "${this.flags['buyer-username'] as string}"`
+            appendCommonFlags(
+                'sfdx force:user:permset:assign --permsetname CommerceUser ' +
+                    `--targetusername "${this.org.getUsername()}"  --onbehalfof "${
+                        this.flags['buyer-username'] as string
+                    }"`,
+                this.flags,
+                this.logger
+            )
         );
         this.ux.log(msgs.getMessage('create.changingPasswordForBuyer'));
         try {
             shellJsonSfdx(
-                `sfdx force:user:password:generate -u "${this.org.getUsername()}" -o "${
-                    this.flags['buyer-username'] as string
-                    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                }" -v "${this.devhubUsername}"`
+                appendCommonFlags(
+                    `sfdx force:user:password:generate -u "${this.org.getUsername()}" -o "${
+                        this.flags['buyer-username'] as string
+                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                    }" -v "${this.devhubUsername}"`,
+                    this.flags,
+                    this.logger
+                )
             );
         } catch (e) {
             if (e.message.indexOf('INSUFFICIENT_ACCESS') < 0) {
@@ -340,7 +435,12 @@ export class StoreCreate extends SfdxCommand {
             }
             this.ux.log(chalk.red.bold(JSON.parse(e.message).message));
         }
-        userInfo = await StoreCreate.getUserInfo(this.statusFileManager, this.flags['buyer-username']);
+        userInfo = await StoreCreate.getUserInfo(
+            this.statusFileManager,
+            this.flags['buyer-username'],
+            this.flags,
+            this.logger
+        );
         await this.statusFileManager.setValue('userInfo', userInfo);
     }
 
@@ -349,7 +449,7 @@ export class StoreCreate extends SfdxCommand {
         this.ux.log(
             msgs.getMessage('create.createSearchIndexInfo', ['https://github.com/forcedotcom/sfdx-1commerce-plugin'])
         );
-        shell(`sfdx 1commerce:search:start -u "${this.org.getUsername()}" -n "${this.scrDef.storeName as string}"`);
+        await SearchIndex.run(addAllowedArgs(this.argv, SearchIndex), this.config);
         // TODO check if index was created successfully, all i can do is assume it was
         await this.statusFileManager.setValue('indexCreated', true);
     }

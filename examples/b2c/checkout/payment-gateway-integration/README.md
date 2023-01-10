@@ -28,6 +28,10 @@ A gateway adapter to interact with the Payeezy gateway.
 
 A gateway adapter to interact with the Stripe gateway.
 
+## Stripe Client Side Gateway
+
+A gateway adapter to interact with the Stripe gateway through client side.
+
 # Additional Setup
 
 The following also needs to be set up for a successful Checkout experience:

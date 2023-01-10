@@ -32,7 +32,7 @@
         "completedStep8": "Completed Step 8",
         "communityNowAvailable": "Community is now available",
         "openingBrowserTheStoreAdminPage": "Opening the store admin page in the browser...",
-        "allDone": "All Done",
+        "allDone": "All Done With Store Creation",
         "errorStoreQuickstartCreateFailed": "StoreQuickstartCreate failed",
         "waitingForCommunity": "Waiting for community to become available",
         "communityStillNotAvailableCount": "Community still not available after count: %s retrying",
@@ -45,7 +45,9 @@
         "errorStoreQuickstartSetupFailed": "StoreQuickstartSetup failed",
         "assigningShopperProfileToBuyer": "Assigning Shopper profile to the buyer user",
         "changingPasswordForBuyer": "Changing password for the buyer user",
-        "createSearchIndexInfo": "Creating search index. You need %s plugin installed for this to work."
+        "createSearchIndexInfo": "Creating search index. You need %s plugin installed for this to work.",
+        "configFileDescription": "Store config file",
+        "storeTypeDescription": "The type of store you want to create"
     },
     "quickstart": {
         "setup": {
@@ -94,6 +96,7 @@
             "settingUpGuestBrowsing": "Setting up Guest Browsing.",
             "checkingB2BorB2C": "Checking if B2B or B2C.",
             "storeTypeDoesNotExist": "Store Type didn't exist",
+            "storeNameIsMissing": "Store name is missing",
             "creatingPackageToDeployWithNewFlow": "Creating the package to deploy, including the new flow.",
             "deployNewZipWithFlowIgnoringWarningsCleanUp": "Deploy the new zip including the flow, ignoring warnings, then clean-up.",
             "checkInvalidSession": "INVALID_SESSION_ID: Session expired or invalid",

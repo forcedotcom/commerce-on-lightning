@@ -9,6 +9,7 @@ import sinon, { stub } from 'sinon';
 import { StubbedType } from '@salesforce/ts-sinon';
 import { UX } from '@salesforce/command';
 import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
+import { Logger } from '@salesforce/core';
 import * as sleepExports from '../../../../src/lib/utils/sleep';
 import * as shellExports from '../../../../src/lib/utils/shell';
 import * as forceOrgSoqlExports from '../../../../src/lib/utils/sfdx/forceDataSoql';
@@ -18,14 +19,23 @@ import { StoreCreate } from '../../../../src/commands/commerce/store/create';
 
 describe('commerce:store:create', () => {
     let uxStub: StubbedType<UX>;
-    afterEach(() => {
+    const logger = new Logger('test');
+    let loggerStub: sinon.SinonStub;
+    const defaultFlags = {};
+    after(() => {
         sinon.restore();
+    });
+    beforeEach(() => {
+        loggerStub = sinon.stub(logger, 'debug').returns(logger);
+    });
+    afterEach(() => {
+        loggerStub.restore();
     });
     it('should get storeId using statusManager', async () => {
         const sfm = new StatusFileManager('a', 'b', 'c');
         const s = stub(sfm, 'setValue').resolves();
         const c = stub(sfm, 'getValue').resolves('hi');
-        assert.equal(await StoreCreate.getStoreId(sfm, UX), 'hi');
+        assert.equal(await StoreCreate.getStoreId(sfm, defaultFlags, UX, logger), 'hi');
         [c, s].forEach((a) => a.restore());
     });
     it('should get storeid using getStoreId', async () => {
@@ -41,7 +51,7 @@ describe('commerce:store:create', () => {
             public totalSize: number;
         })();
         const c1 = stub(forceOrgSoqlExports, 'forceDataSoql').returns(qr);
-        assert.equal(await StoreCreate.getStoreId(sfm, uxStub), 'hi');
+        assert.equal(await StoreCreate.getStoreId(sfm, defaultFlags, uxStub, logger), 'hi');
         [c, c1, s].forEach((a) => a.restore());
     });
     it('should wait for storeid using waitForStoreId', async () => {
@@ -50,7 +60,7 @@ describe('commerce:store:create', () => {
         // const c = stub(sfm, 'getValue').resolves('hi');
         const c = stub(StoreCreate, 'getStoreId').resolves('hi');
         const c1 = stub(sleepExports, 'sleep').resolves(); // don't sleep
-        assert.doesNotThrow(async () => await StoreCreate.waitForStoreId(sfm, uxStub, 0));
+        assert.doesNotThrow(async () => await StoreCreate.waitForStoreId(sfm, defaultFlags, uxStub, logger, 0));
         [c, c1, s].forEach((a) => a.restore());
     });
     it('should get user info using getUserInfo', async () => {
@@ -60,7 +70,7 @@ describe('commerce:store:create', () => {
         const res = new Result();
         res.result = { id: 'hi', username: 'bye' };
         const c1 = stub(shellExports, 'shellJsonSfdx').returns(res);
-        assert.equal((await StoreCreate.getUserInfo(sfm, 'test')).username, 'bye');
+        assert.equal((await StoreCreate.getUserInfo(sfm, 'test', defaultFlags, logger)).username, 'bye');
         [c, c1, s].forEach((a) => a.restore());
     });
 });

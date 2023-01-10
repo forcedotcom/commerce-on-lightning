@@ -5,63 +5,15 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 
-import { FlagsConfig } from '@salesforce/command';
-import { allFlags } from '../../flags/commerce/all.flags';
+import { Logger, Org } from '@salesforce/core';
+import { OutputFlags } from '@oclif/parser';
+
+export const CONFIG_PROP_API_VERSION = 'apiVersion';
+export const ENV_PROP_SFDX_API_VERSION = 'SFDX_API_VERSION';
 
 function contains(v: string, a): boolean {
     for (const i of a) if (i === v) return true;
     return false;
-}
-
-/**
- * Determine if flags were passed in the UI.  This is useful to override config values if values are passed
- * into the cli
- * This will ignore -v and -u for (await this.org.getDevHubOrg()).getUsername() and this.org.getUsername() respectively
- *
- * @param flagConfig
- * @param flags
- * @param argv
- */
-export function getPassedArgs(
-    argv: string[],
-    flags: Record<string, unknown>,
-    flagConfig: FlagsConfig = allFlags
-): Record<string, never> {
-    // if no argv then return empty object
-    if (!(argv && argv.length > 0)) return {};
-    const m = {};
-    Object.keys(flagConfig).forEach((k) => {
-        m['--' + k] = k;
-        m['-' + (flagConfig[k]['char'] as string)] = k;
-    });
-    const n = {};
-    let last;
-    // eslint-disable-next-line no-console,@typescript-eslint/no-empty-function
-    argv.forEach((arg) => {
-        if (arg.startsWith('-')) {
-            if (arg in m) {
-                // handle single element boolean arg
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                if (flagConfig[m[arg]]['kind'] === 'boolean') {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    n[m[arg]] = true;
-                    last = undefined;
-                } else {
-                    // for case -v something or --hello something
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    n[m[arg]] = undefined;
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                    last = m[arg];
-                }
-            }
-            // for case -vsomething excluding --hellosomething
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-            else for (const k of Object.keys(m)) if (arg.startsWith(k) && k.length === 2) n[m[k]] = arg.replace(k, '');
-        }
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        else n[last] = arg;
-    });
-    return n;
 }
 
 /**
@@ -87,9 +39,10 @@ export function addAllowedArgs(argv: string[], sfdxCommand): string[] {
     for (let i = 0; i < argv.length; i++) {
         let arg = argv[i];
         let value = argv[i + 1] && !argv[i + 1].startsWith('-') ? argv[++i] : undefined;
-        if (!arg.startsWith('--') && arg.length > '-v'.length) {
-            value = arg.substr('-v'.length);
-            arg = arg.substr(0, '-v'.length);
+        if (arg.indexOf('=') !== -1) {
+            const argParts = arg.split('=');
+            arg = argParts[0];
+            value = argParts[1];
         }
         if (contains(arg, flagsArr)) {
             args.push(arg);
@@ -156,3 +109,31 @@ export const removeFlagBeforeAll = (flag: string, cmds: string[]): string[] => {
     if (!cmds) return cmds;
     return cmds.filter((c) => c !== flag);
 };
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function setApiVersion(org: Org, flags: OutputFlags<any>): Promise<void> {
+    if (flags.apiversion) return;
+
+    if (!org) {
+        return;
+    }
+    let apiVersion: string;
+    const config = org.getConfigAggregator();
+    if (config.getLocalConfig()?.get(CONFIG_PROP_API_VERSION)) {
+        apiVersion = config.getLocalConfig().get(CONFIG_PROP_API_VERSION).toString();
+    } else if (config.getGlobalConfig()?.get(CONFIG_PROP_API_VERSION)) {
+        apiVersion = config.getGlobalConfig().get(CONFIG_PROP_API_VERSION).toString();
+    } else if (config.getEnvVars()?.get(ENV_PROP_SFDX_API_VERSION)) {
+        apiVersion = config.getEnvVars().get(ENV_PROP_SFDX_API_VERSION).toString();
+    } else {
+        apiVersion = await org.retrieveMaxApiVersion();
+    }
+    flags.apiversion = apiVersion;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function appendCommonFlags(cmd: string, flags: OutputFlags<any>, logger: Logger): string {
+    if (flags?.apiversion) cmd = `${cmd} --apiversion=${flags.apiversion as string}`;
+    logger.debug(`Wrapped command: ${cmd}`);
+    return cmd;
+}

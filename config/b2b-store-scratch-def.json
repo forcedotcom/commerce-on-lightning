@@ -1,7 +1,7 @@
 {
     "storeName": "Test B2B Company",
     "edition": "B2B",
-    "template": "B2B Commerce",
+    "template": "B2B Commerce (LWR)",
     "settings": {
         "checkout": {
             "paymentGatewayIntegration": "Salesforce",

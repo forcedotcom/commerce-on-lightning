@@ -2,7 +2,8 @@
   "convertFlags": {
     "configFileDescription": "config file",
     "outputDirDescription": "Directory to output the conversion",
-    "convertDescription": "Files to convert"
+    "convertDescription": "Files to convert",
+    "storeNameDescription" : "Store name"
   },
   "convert": {
     "cmdDescription": "Convert repo examples to SFDX scratch org"

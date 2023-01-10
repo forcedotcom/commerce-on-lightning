@@ -11,6 +11,7 @@ import { AnyJson } from '@salesforce/ts-types';
 import { storeFlags } from '../../../../lib/flags/commerce/store.flags';
 import { filterFlags } from '../../../../lib/utils/args/flagsUtils';
 import { shellJsonSfdx } from '../../../../lib/utils/shell';
+import { appendCommonFlags, setApiVersion } from '../../../../lib/utils/args/flagsUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -47,6 +48,7 @@ export class StoreQuickstartCreate extends SfdxCommand {
 
     // eslint-disable-next-line @typescript-eslint/require-await
     public async run(): Promise<AnyJson> {
+        await setApiVersion(this.org, this.flags);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         return { quickstartCreateSuccess: this.createCommunity() };
     }
@@ -70,13 +72,19 @@ export class StoreQuickstartCreate extends SfdxCommand {
             // TODO make urlpathprefix and description a vararg
             // TODO make a community create object to avoid any
             output = shellJsonSfdx(
-                `sfdx force:community:create -u "${this.org.getUsername()}"` +
-                    ` --name "${this.flags['store-name'] as string}" ` +
-                    `--templatename "${this.flags.templatename as string}" ` +
-                    `--urlpathprefix "${urlPathPrefix}" ` +
-                    '--description "' + // TODO allow this to be optionaly passed in varargs along with above
-                    msgs.getMessage('quickstart.create.storeCreatedByQuickStartScript', [this.flags['store-name']]) +
-                    '" --json'
+                appendCommonFlags(
+                    `sfdx force:community:create -u "${this.org.getUsername()}"` +
+                        ` --name "${this.flags['store-name'] as string}" ` +
+                        `--templatename "${this.flags.templatename as string}" ` +
+                        `--urlpathprefix "${urlPathPrefix}" ` +
+                        '--description "' + // TODO allow this to be optionaly passed in varargs along with above
+                        msgs.getMessage('quickstart.create.storeCreatedByQuickStartScript', [
+                            this.flags['store-name'],
+                        ]) +
+                        '" --json',
+                    this.flags,
+                    this.logger
+                )
             );
         } catch (e) {
             this.ux.stopSpinner(chalk.red(msgs.getMessage('quickstart.create.failed')));
