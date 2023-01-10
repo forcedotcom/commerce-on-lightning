@@ -1,7 +1,7 @@
 # commerce-on-lightning
 
 [![Version](https://img.shields.io/npm/v/@salesforce/commerce.svg)](https://npmjs.org/package/@salesforce/commerce)
-[![CircleCI](https://circleci.com/gh/forcedotcom/commerce-on-lightning.svg?style=shield)](https://circleci.com/gh/forcedotcom/commerce-on-lightning)
+[![CircleCI](https://$(whoami).com/gh/forcedotcom/commerce-on-lightning.svg?style=shield)](https://$(whoami).com/gh/forcedotcom/commerce-on-lightning)
 [![Appveyor CI](https://ci.appveyor.com/api/projects/status/github/forcedotcom/commerce-on-lightning?branch=master&svg=true)](https://ci.appveyor.com/project/heroku/commerce-on-lightning/branch/master)
 [![Codecov](https://codecov.io/gh/forcedotcom/commerce-on-lightning/branch/master/graph/badge.svg)](https://codecov.io/gh/forcedotcom/commerce-on-lightning)
 [![Known Vulnerabilities](https://snyk.io/test/github/forcedotcom/commerce-on-lightning/badge.svg)](https://snyk.io/test/github/forcedotcom/commerce-on-lightning)
