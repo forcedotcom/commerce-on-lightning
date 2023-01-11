@@ -8,7 +8,7 @@ on:
 
 jobs:
   npm:
-    uses: salesforcecli/github-workflows/.github/workflows/npmPublish.yml
+    uses: salesforcecli/github-workflows/.github/workflows/npmPublish.yml@main
     with:
       ctc: true
       sign: true
