@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [242.0.26](https://github.com/forcedotcom/commerce-on-lightning/compare/v240.0.49...v242.0.26) (2023-01-11)
+
+
+### Features
+
+* add support for LWR stores ([0a10f5f](https://github.com/forcedotcom/commerce-on-lightning/commit/0a10f5fce95e0afbed53af90ebfb9983fdb0cef4))
+* allow scratch orgs to be created with aura template instead of new default of LWR ([4888cc0](https://github.com/forcedotcom/commerce-on-lightning/commit/4888cc020f0831079cc409fab9f0a8bd0b46c112))
+* allow API version to be passed as flag ([ee82a7e](https://github.com/forcedotcom/commerce-on-lightning/commit/ee82a7e0299d2893fc2f0309f97f792d9ba5b8d4))
+* add commands from `commerce-lightning-orchestration` and `sfdx-1commerce-plugin` ([07c85a4](https://github.com/forcedotcom/commerce-on-lightning/commit/07c85a47d0b7fa1a425e82380cfe01d4bd4d1db4))
+
+### Bug Fixes
+
+* resolve issue with B2B/B2C naming for checkout in examples folder ([68394a8](https://github.com/forcedotcom/commerce-on-lightning/commit/68394a8a1af0ac555fb7bf5e583816ac663e8fc8))
+* resolve all-done bug with the store cannot be found for B2B stores ([3c926fb](https://github.com/forcedotcom/commerce-on-lightning/commit/3c926fb679542dd998a17f1af5c41072f8effb2e)) 
+
 ### [240.0.49](https://github.com/forcedotcom/commerce-on-lightning/compare/v238.0.16...v240.0.49) (2022-10-10)
 
 
