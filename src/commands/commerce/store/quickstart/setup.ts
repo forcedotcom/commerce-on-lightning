@@ -211,6 +211,24 @@ export class StoreQuickstartSetup extends SfdxCommand {
         shell(
             `unzip -o -d "${this.storeDir}/experience-bundle-package" "${this.storeDir}/experience-bundle-package/unpackaged.zip"`
         );
+
+        // workaround for W-12277635 error, "The value for urlPathPrefix in ExperienceBundle isn't valid. Check the value and try again"
+        // remove urlPathPrefix from experiences/bundleName.site-meta.xml, assume we are not changing it in quickstart
+        const expSiteMetaFileName =
+            this.storeDir +
+            `/experience-bundle-package/unpackaged/experiences/${
+                this.varargs['communityExperienceBundleName'] as string
+            }.site-meta.xml`;
+        this.ux.log(msgs.getMessage('quickstart.setup.removeUrlPathPrefix', [expSiteMetaFileName]));
+
+        fs.writeFileSync(
+            expSiteMetaFileName,
+            fs
+                .readFileSync(expSiteMetaFileName)
+                .toString()
+                .replace(/<urlPathPrefix>.*/, '')
+        );
+
         await StoreCreate.waitForStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
         await this.statusFileManager.setValue('retrievedPackages', true);
     }
@@ -478,6 +496,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
     }
 
     private updateSelfRegProfile(): void {
+        this.ux.log(msgs.getMessage('quickstart.setup.updateSelfRegProfile'));
         const networkMetaFile = `${this.storeDir}/experience-bundle-package/unpackaged/networks/${
             this.varargs['communityNetworkName'] as string
         }.network`;
@@ -515,17 +534,21 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 this.varargs['communityExperienceBundleName'] as string
             }ToDeploy.zip" ./*`
         );
-        shellJsonSfdx(
-            appendCommonFlags(
-                `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
-                    this.storeDir
-                }/experience-bundle-package/${
-                    this.varargs['communityExperienceBundleName'] as string
-                }ToDeploy.zip" --wait 60 --verbose --singlepackage`,
-                this.flags,
-                this.logger
-            )
-        );
+
+        let deployCommand = `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
+            this.storeDir
+        }/experience-bundle-package/${
+            this.varargs['communityExperienceBundleName'] as string
+        }ToDeploy.zip" --wait 60 --verbose --singlepackage`;
+        try {
+            shellJsonSfdx(appendCommonFlags(deployCommand, this.flags, this.logger));
+        } catch (e) {
+            if (JSON.stringify(e.message).indexOf(msgs.getMessage('quickstart.setup.updateSelfRegProfileError')) >= 0) {
+                // if failed with "Error: You can only select profiles that are associated with the experience"
+                // try one more time, it seems to work after second deploy, race issue?
+                shellJsonSfdx(appendCommonFlags(deployCommand, this.flags, this.logger));
+            } else throw e;
+        }
     }
 
     private async importProducts(): Promise<void> {
