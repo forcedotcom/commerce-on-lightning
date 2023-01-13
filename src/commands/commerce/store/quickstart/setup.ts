@@ -500,29 +500,33 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const networkMetaFile = `${this.storeDir}/experience-bundle-package/unpackaged/networks/${
             this.varargs['communityNetworkName'] as string
         }.network`;
-        let data = fs
-            .readFileSync(networkMetaFile)
-            .toString()
-            .replace(/<selfRegProfile>.*<\/selfRegProfile>/g, '')
-            .replace(
-                '</Network>',
-                `    <selfRegProfile>Buyer_User_Profile_From_QuickStart${
-                    StoreQuickstartSetup.getStoreType(
-                        this.org.getUsername(),
-                        this.flags,
-                        this.ux,
-                        this.logger
-                    ).toLowerCase() === 'b2b'
-                        ? '_B2B'
-                        : ''
-                }</selfRegProfile>\n</Network>`
-            );
+
+        let data = fs.readFileSync(networkMetaFile).toString();
+
+        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2C') {
+            data = data
+                .replace(/<selfRegProfile>.*<\/selfRegProfile>/g, '')
+                .replace(
+                    '</Network>',
+                    `    <selfRegProfile>Buyer_User_Profile_From_QuickStart${
+                        StoreQuickstartSetup.getStoreType(
+                            this.org.getUsername(),
+                            this.flags,
+                            this.ux,
+                            this.logger
+                        ).toLowerCase() === 'b2b'
+                            ? '_B2B'
+                            : ''
+                    }</selfRegProfile>\n</Network>`
+                );
+        }
         const r = {
             disableReputationRecordConversations: false,
             enableDirectMessages: false,
             enableGuestChatter: true,
             enableTalkingAboutStats: false,
-            selfRegistration: true,
+            selfRegistration:
+                StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2C',
         };
         Object.keys(r).forEach(
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -991,9 +995,12 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 return await this.addContactPointAndDeploy(++cnt);
             } else throw e;
         }
+
+        // log results prior to attempting to update self registration profiles
+        this.ux.log(JSON.stringify(res));
+
         // Need to add here because: Error happens if done above, "Error: You can only select profiles that are associated with the experience."
         this.updateSelfRegProfile();
-        this.ux.log(JSON.stringify(res));
         this.ux.log(msgs.getMessage('quickstart.setup.removingXmlFilesPackageForRetrievingAndDeployingMetadata'));
         const removeFiles = ['package-retrieve.xml', 'experience-bundle-package'];
         removeFiles.forEach((f) => remove(this.storeDir + '/' + f));
