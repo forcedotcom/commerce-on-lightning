@@ -18,13 +18,22 @@ This plugin is used to create and setup either a B2B or a B2C store with data wi
 
 We always recommend using the latest version of these commands, however, you can install a specific version or tag if needed.
 
-[commerce-on-lightning-orchestration](https://github.com/forcedotcom/commerce-on-lightning-orchestration) - commerce-orchestration
+-   [commerce-on-lightning](https://github.com/forcedotcom/commerce-on-lightning) - @salesforce/commerce <---- THIS PLUGIN
+    -   create stores
+    -   install command: `sfdx plugins:install @salesforce/commerce`
+    -   install specific version:`sfdx plugins:install @salesforce/commerce@242.0.26`
 
--   scratchorgs
+#### Plugin Dependencies
 
-[commerce-on-lightning](https://github.com/forcedotcom/commerce-on-lightning) - @salesforce/commerce <---- THIS PLUGIN
-
--   store
+1. [commerce-on-lightning-orchestration](https://github.com/forcedotcom/commerce-on-lightning-orchestration) - commerce-orchestration
+    - scratchorgs
+    - install command: `sfdx plugins:install commerce-orchestration`
+2. [sfdx-1commerce-plugin](https://github.com/forcedotcom/sfdx-1commerce-plugin) - 1commerce
+    - API calls for product import and search index
+    - install command: `sfdx plugins:install 1commerce`
+3. [shane-sfdx-plugins](https://github.com/mshanemc/shane-sfdx-plugins) - shane-sfdx-plugins
+    - public plugin for imports
+    - install command: `sfdx plugins:install shane-sfdx-plugins`
 
 ==============
 
@@ -72,6 +81,11 @@ USAGE
 
 ```bash
 sfdx plugins:install @salesforce/commerce
+
+# install dependencies
+sfdx plugins:install commerce-orchestration
+sfdx plugins:install 1commerce
+sfdx plugins:install shane-sfdx-plugins
 ```
 
 <!-- installstop -->
