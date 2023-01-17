@@ -508,16 +508,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 .replace(/<selfRegProfile>.*<\/selfRegProfile>/g, '')
                 .replace(
                     '</Network>',
-                    `    <selfRegProfile>Buyer_User_Profile_From_QuickStart${
-                        StoreQuickstartSetup.getStoreType(
-                            this.org.getUsername(),
-                            this.flags,
-                            this.ux,
-                            this.logger
-                        ).toLowerCase() === 'b2b'
-                            ? '_B2B'
-                            : ''
-                    }</selfRegProfile>\n</Network>`
+                    `    <selfRegProfile>Buyer_User_Profile_From_QuickStart</selfRegProfile>\n</Network>`
                 );
         }
         const r = {
