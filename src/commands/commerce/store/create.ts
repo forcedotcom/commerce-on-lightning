@@ -446,9 +446,7 @@ export class StoreCreate extends SfdxCommand {
 
     private async createSearchIndex(): Promise<void> {
         if ((await this.statusFileManager.getValue('indexCreated')) === 'true') return;
-        this.ux.log(
-            msgs.getMessage('create.createSearchIndexInfo', ['https://github.com/forcedotcom/sfdx-1commerce-plugin'])
-        );
+        this.ux.log(msgs.getMessage('create.createSearchIndexInfo'));
         await SearchIndex.run(addAllowedArgs(this.argv, SearchIndex), this.config);
         // TODO check if index was created successfully, all i can do is assume it was
         await this.statusFileManager.setValue('indexCreated', true);
