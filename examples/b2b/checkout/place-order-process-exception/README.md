@@ -1,6 +1,6 @@
 # Place Order Process Exception Flow
 
-The implementation provided in this directory contains flow metadata files that you can deploy to any Salesforce B2B or B2B2C Commerce enabled org. Use these files to set up an end-to-end Place Order Exception Handling flow that handles `PlaceOrderFailed` ExceptionType event and creates a ProcessException record with priority `High`
+The implementation provided in this directory contains flow metadata files that you can deploy to any Salesforce B2B or B2B2C Commerce enabled org. Use these files to set up an end-to-end Place Order Exception Handling flow that handles `PlaceOrderFailed` ExceptionType event and creates a ProcessException record with priority `High`.
 
 
 ##  The advantages of using a ProcessException Event:
@@ -8,11 +8,6 @@ The implementation provided in this directory contains flow metadata files that 
 1. It has a category/severity and other attributes for handling errors by the admin
 2. ProcessExceptions can be assigned to a case.
     1. The ProcessException has a lifecycle and can be managed
-3. There is a slack integration with ProcessExceptions.
-    1. https://salesforce.quip.com/szbiObozfkiA
-    2. Process Exception Slack UI Review https://docs.google.com/document/d/15Q_VGGR0qfnDful-WzJP74_KR9dZ-JfTMRCaUTDvWUY/edit?usp=sharing
-    3. Process Exception Slack Package : https://appexchange.salesforce.com/appxListingDetail?listingId=a0N3u00000QsrnXEAR
-    4. See https://salesforce.quip.com/VYJbAWfrsGY3
 
 ## Deploy
 Note: Create through Workbench, no UI setup available
