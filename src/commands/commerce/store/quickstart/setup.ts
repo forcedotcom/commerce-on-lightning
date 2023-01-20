@@ -166,6 +166,32 @@ export class StoreQuickstartSetup extends SfdxCommand {
         return { quickstartSetup: true };
     }
 
+    private removeUrlPrefixFromBundle(): void {
+        /**
+         * W-12277635 - if error "The value for urlPathPrefix in ExperienceBundle isn't valid. Check the value and try again" occurs,
+         * remove `urlPathPrefix` from the below file
+         * ~/.commerce/devhubs/<<ORG_USERNAME>>/<<SCRATCH_ORG_USERNAME>>/<<STORE_NAME>>/experience-bundle-package/unpackaged/experiences/<<EXPERIENCE_BUNDLE>>.site-meta.xml
+         * we do not need to update the urlPathPrefix for a newly created store where the urlPathPrefix has been previously set.
+         * Removing the urlPathPrefix will NOT remove it from the site.
+         * This function will only be executed in catch blocks when an error occurs
+         */
+        const expSiteMetaFileName =
+            this.storeDir +
+            `/experience-bundle-package/unpackaged/experiences/${
+                this.varargs['communityExperienceBundleName'] as string
+            }.site-meta.xml`;
+
+        this.ux.log(msgs.getMessage('quickstart.setup.removeUrlPathPrefix', [expSiteMetaFileName]));
+
+        fs.writeFileSync(
+            expSiteMetaFileName,
+            fs
+                .readFileSync(expSiteMetaFileName)
+                .toString()
+                .replace(/<urlPathPrefix>.*/, '')
+        );
+    }
+
     private async retrievePackages(): Promise<void> {
         // TODO possible turn this into a requires
         if (await this.statusFileManager.getValue('retrievedPackages')) return;
@@ -211,24 +237,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
         shell(
             `unzip -o -d "${this.storeDir}/experience-bundle-package" "${this.storeDir}/experience-bundle-package/unpackaged.zip"`
         );
-
-        // workaround for W-12277635 error, "The value for urlPathPrefix in ExperienceBundle isn't valid. Check the value and try again"
-        // remove urlPathPrefix from experiences/bundleName.site-meta.xml, assume we are not changing it in quickstart
-        const expSiteMetaFileName =
-            this.storeDir +
-            `/experience-bundle-package/unpackaged/experiences/${
-                this.varargs['communityExperienceBundleName'] as string
-            }.site-meta.xml`;
-        this.ux.log(msgs.getMessage('quickstart.setup.removeUrlPathPrefix', [expSiteMetaFileName]));
-
-        fs.writeFileSync(
-            expSiteMetaFileName,
-            fs
-                .readFileSync(expSiteMetaFileName)
-                .toString()
-                .replace(/<urlPathPrefix>.*/, '')
-        );
-
         await StoreCreate.waitForStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
         await this.statusFileManager.setValue('retrievedPackages', true);
     }
@@ -530,20 +538,17 @@ export class StoreQuickstartSetup extends SfdxCommand {
             }ToDeploy.zip" ./*`
         );
 
-        let deployCommand = `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
-            this.storeDir
-        }/experience-bundle-package/${
-            this.varargs['communityExperienceBundleName'] as string
-        }ToDeploy.zip" --wait 60 --verbose --singlepackage`;
-        try {
-            shellJsonSfdx(appendCommonFlags(deployCommand, this.flags, this.logger));
-        } catch (e) {
-            if (JSON.stringify(e.message).indexOf(msgs.getMessage('quickstart.setup.updateSelfRegProfileError')) >= 0) {
-                // if failed with "Error: You can only select profiles that are associated with the experience"
-                // try one more time, it seems to work after second deploy, race issue?
-                shellJsonSfdx(appendCommonFlags(deployCommand, this.flags, this.logger));
-            } else throw e;
-        }
+        shellJsonSfdx(
+            appendCommonFlags(
+                `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
+                    this.storeDir
+                }/experience-bundle-package/${
+                    this.varargs['communityExperienceBundleName'] as string
+                }ToDeploy.zip" --wait 60 --verbose --singlepackage`,
+                this.flags,
+                this.logger
+            )
+        );
     }
 
     private async importProducts(): Promise<void> {
@@ -944,54 +949,50 @@ export class StoreQuickstartSetup extends SfdxCommand {
             `${this.storeDir}/experience-bundle-package/unpackaged/package.xml`,
             XML.stringify(packageDeploy)
         );
-        shell(
-            `cd "${this.storeDir}/experience-bundle-package/unpackaged" && rm -f "../${
-                this.varargs['communityExperienceBundleName'] as string
-            }ToDeploy.zip"; zip -r -X "../${this.varargs['communityExperienceBundleName'] as string}ToDeploy.zip" ./*`
-        );
-        this.ux.log(msgs.getMessage('quickstart.setup.deployNewZipWithFlowIgnoringWarningsCleanUp'));
         let res;
+        let zipCommand = `cd "${this.storeDir}/experience-bundle-package/unpackaged" && rm -f "../${
+            this.varargs['communityExperienceBundleName'] as string
+        }ToDeploy.zip"; zip -r -X "../${this.varargs['communityExperienceBundleName'] as string}ToDeploy.zip" ./*`;
+        let deployCommand = appendCommonFlags(
+            `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${this.storeDir}/experience-bundle-package/${
+                this.varargs['communityExperienceBundleName'] as string
+            }ToDeploy.zip" --wait 60 --verbose --singlepackage`,
+            this.flags,
+            this.logger
+        );
+
+        shell(zipCommand);
+        this.ux.log(msgs.getMessage('quickstart.setup.deployNewZipWithFlowIgnoringWarningsCleanUp'));
         try {
-            res = shellJsonSfdx(
-                appendCommonFlags(
-                    `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
-                        this.storeDir
-                    }/experience-bundle-package/${
-                        this.varargs['communityExperienceBundleName'] as string
-                    }ToDeploy.zip" --wait 60 --verbose --singlepackage`,
-                    this.flags,
-                    this.logger
-                )
-            );
+            res = shellJsonSfdx(deployCommand);
+
+            // Need to add here because error happens if done above: "Error: You can only select profiles that are associated with the experience."
+            // only execute this if the deployCommand finishes successfully as <networkMemberGroups> must include the buyer profile
+            // prior to <selfRegProfile> being updated to use that buyer profile
+            this.updateSelfRegProfile();
         } catch (e) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
             if (JSON.stringify(e.message).indexOf(msgs.getMessage('quickstart.setup.checkInvalidSession')) >= 0) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 this.ux.log(msgs.getMessage('quickstart.setup.openingPageToRefreshSession', [e.message]));
                 shell('sfdx force:org:open -u ' + this.org.getUsername());
-                res = shellJsonSfdx(
-                    appendCommonFlags(
-                        `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
-                            this.storeDir
-                        }/experience-bundle-package/${
-                            this.varargs['communityExperienceBundleName'] as string
-                        }ToDeploy.zip" --wait 60 --verbose --singlepackage`,
-                        this.flags,
-                        this.logger
-                    )
-                );
+                res = shellJsonSfdx(deployCommand);
             } else if (JSON.stringify(e.message).indexOf('Error parsing file') >= 0 && cnt === 0) {
                 await this.statusFileManager.setValue('retrievedPackages', false);
                 await this.retrievePackages();
                 return await this.addContactPointAndDeploy(++cnt);
+            } else if (
+                JSON.stringify(e.message).indexOf(msgs.getMessage('quickstart.setup.urlPathPrefixDeployError')) >= 0
+            ) {
+                this.removeUrlPrefixFromBundle();
+                shell(zipCommand);
+                res = shellJsonSfdx(deployCommand);
             } else throw e;
         }
 
-        // log results prior to attempting to update self registration profiles
+        // log results of updated store deployment
         this.ux.log(JSON.stringify(res));
 
-        // Need to add here because: Error happens if done above, "Error: You can only select profiles that are associated with the experience."
-        this.updateSelfRegProfile();
         this.ux.log(msgs.getMessage('quickstart.setup.removingXmlFilesPackageForRetrievingAndDeployingMetadata'));
         const removeFiles = ['package-retrieve.xml', 'experience-bundle-package'];
         removeFiles.forEach((f) => remove(this.storeDir + '/' + f));
