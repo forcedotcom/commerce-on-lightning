@@ -53,11 +53,6 @@ lib
 coverage
 test_session*
 
-# generated docs
-docs
-!/docs
-!examples/b2b/lwc/docs
-
 # node
 # -- CLEAN ALL
 node_modules

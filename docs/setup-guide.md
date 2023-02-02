@@ -10,7 +10,7 @@
 
 ## Setup
 
-1. Install SFDX CLI, see [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/) to learn more about the CLI
+1. Install SFDX CLI, see [Salesforce CLI Setup Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/) to learn more about the Salesforce CLI
     ```bash
     npm install --global sfdx-cli
     ```
@@ -96,7 +96,7 @@
 ## Useful Commands
 
 -   To see all the Orgs run `sfdx force:org:list -all`
--   If the org session has timed out, then logout and login back
+-   If the Org session has timed out, then logout and login back
 
     ```bash
     sfdx force:auth:logout -u <<ORG_USERNAME>>
@@ -104,4 +104,4 @@
     sfdx force:auth:web:login -r <<INSTANCE_URL>> -a <<ORG_ALIAS>>
     ```
 
--   For more CLI commands, see [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.214.0.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
+-   For more commands, see [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.214.0.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm)
