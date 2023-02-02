@@ -54,7 +54,6 @@ coverage
 test_session*
 
 # generated docs
-docs
 !examples/b2b/lwc/docs
 
 # node
