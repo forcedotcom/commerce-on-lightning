@@ -4,10 +4,11 @@ on:
   release:
     # the result of the onPushToMain workflow
     types: [published]
+  workflow_dispatch: # in case we need to manually publish
 
 jobs:
   npm:
-    uses: salesforcecli/github-workflows/.github/workflows/npmPublish.yml
+    uses: salesforcecli/github-workflows/.github/workflows/npmPublish.yml@main
     with:
       ctc: true
       sign: true
