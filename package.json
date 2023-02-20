@@ -10,7 +10,7 @@
         "@oclif/errors": "^1",
         "@salesforce/command": "^3.1.0",
         "@salesforce/core": "^2.36.0",
-        "fast-xml-parser": "^3.21.1",
+        "fast-xml-parser": "^4.1.2",
         "string-argv": "^0.3.1",
         "tslib": "^2.4.1",
         "yaml": "^2.1.1"
