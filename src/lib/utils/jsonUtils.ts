@@ -105,9 +105,7 @@ export const replaceErrors = (key, value) => {
  * @param flags this.flags
  * @returns definition file in object form
  */
-export const parseStoreScratchDef = (
-    flags: Record<string, unknown>,
-): StoreScratchDef => {
+export const parseStoreScratchDef = (flags: Record<string, unknown>): StoreScratchDef => {
     let defFile = getDefinitionFile(flags);
 
     const sctDef = Object.assign(
@@ -121,7 +119,7 @@ export const parseStoreScratchDef = (
         )
     );
 
-    if(flags) {
+    if (flags) {
         // add more potentially from settings to be passed in cli
         if (flags['store-name']) sctDef.storeName = flags['store-name'];
         if (flags['type']) sctDef.edition = flags['type'];
@@ -358,6 +356,19 @@ export class StoreConfig {
     public isProgressiveRenderingEnabled = false;
     public type = 'site';
     public authenticationType: string;
+}
+export class PickListValueResult {
+    public records: PickListValue[] = [];
+}
+export class PickListValue {
+    public Id: string;
+    public Label: string;
+    public Value: string;
+}
+export class Location {
+    public Id: string;
+    public Name: string;
+    public LocationType: string;
 }
 
 export class SfdxProject {
