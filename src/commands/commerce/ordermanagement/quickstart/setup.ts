@@ -41,10 +41,15 @@ export class OrderManagementQuickstartSetup extends SfdxCommand {
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
 
-        return this.setupOrderManagement();
-    }
-    public async setupOrderManagement(): Promise<AnyJson> {
         this.ux.log(msgs.getMessage('quickstart.setup.pushingOrderManagementMetadataToOrg'));
+
+        this.deployMetadata();
+        await this.addLocations();
+        return { quickstartSetupComplete: true };
+    }
+
+    private deployMetadata(): void {
+        this.ux.log(msgs.getMessage('quickstart.setup.deployFlowsToOrg'));
         let deployResult = shellJsonSfdx(
             appendCommonFlags(
                 `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${EXAMPLE_DIR}/som/ -w 1`,
@@ -53,10 +58,12 @@ export class OrderManagementQuickstartSetup extends SfdxCommand {
             )
         );
         this.ux.log(JSON.stringify(deployResult, null, 4));
+
         /*
-        Note: There is a known bug that actions and related flows can not be deployed together
+         Note: There is a known bug that actions and related flows can not be deployed together
          https://issues.salesforce.com/issue/a028c00000gAxFuAAK/deployment-of-a-flow-component-recordactiondeployment-component-together-fails
          */
+        this.ux.log(msgs.getMessage('quickstart.setup.deployActionsToOrg'));
         deployResult = shellJsonSfdx(
             appendCommonFlags(
                 `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${EXAMPLE_DIR}/som/actions/ -w 1`,
@@ -65,10 +72,10 @@ export class OrderManagementQuickstartSetup extends SfdxCommand {
             )
         );
         this.ux.log(JSON.stringify(deployResult, null, 4));
-        await this.addLocations();
-        return { quickstartSetupComplete: true };
     }
+
     private async addLocations(): Promise<void> {
+        this.ux.log(msgs.getMessage('quickstart.setup.addingLocations'));
         // get location types
         const cmd = appendCommonFlags(
             `sfdx force:data:soql:query -u "${this.org.getUsername()}" -q "${QUERY_LOCATION_TYPES}"`,
