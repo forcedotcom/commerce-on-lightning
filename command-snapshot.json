@@ -148,13 +148,11 @@
     {
         "command": "commerce:search:start",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "store-name",
-            "store-id",
-            "targetusername",
-            "apiversion",
-            "json",
-            "loglevel"
-        ]
+        "flags": ["store-name", "store-id", "targetusername", "apiversion", "json", "loglevel"]
+    },
+    {
+        "command": "commerce:ordermanagement:quickstart:setup",
+        "plugin": "@salesforce/commerce",
+        "flags": ["apiversion", "json", "loglevel", "targetusername", "prompt"]
     }
 ]
