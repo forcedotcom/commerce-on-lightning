@@ -1,0 +1,19 @@
+<?xml version ="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>OrderSummaryStatus</members>
+        <members>LocationType</members>
+        <members>OrderItemSummaryChgRsn</members>
+        <name>StandardValueSet</name>
+    </types>
+    <types>
+        <members>Approve_Order_Summary</members>
+        <members>Create_Fulfillment_Orders_Warehouse</members>
+        <members>Cancel_an_Item</members>
+        <members>Return_an_Item</members>
+        <members>Discount_an_Item</members>
+        <members>Create_Invoice_and_Ensure_Funds_Event_Triggered</members>
+        <name>Flow</name>
+    </types>
+    <version>57.0</version>
+</Package>

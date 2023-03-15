@@ -1,0 +1,14 @@
+{
+    "paymentsFlags": {
+        "paymentAdapterDescription": "Payment Adapter"
+    },
+    "quickstart": {
+        "setup": {
+            "cmdDescription": "Set up order management",
+            "pushingOrderManagementMetadataToOrg": "Pushing Order Management metadata to org...",
+            "deployFlowsToOrg": "Deploying flows to org... ",
+            "deployActionsToOrg": "Deploying actions to org... ",
+            "addingLocations": "Adding locations... "
+        }
+    }
+}
