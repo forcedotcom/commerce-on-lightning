@@ -6,7 +6,7 @@ Reference Implementation samples for Order Management.
 
 1. A flow to approve an order summary record.
 2. A flow to fulfill orders for one location, Warehouse.
-3. A flow to create invoice once the order is fulfilled.
+3. A flow to create an invoice after the order is fulfilled.
 4. A flow to support cancellation of an item in the order.
 5. A flow to support discounting an item in the order.
 6. A flow to support returning an item in the order.
