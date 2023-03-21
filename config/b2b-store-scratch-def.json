@@ -6,7 +6,8 @@
         "checkout": {
             "paymentGatewayIntegration": "Salesforce",
             "notifications": true,
-            "integrations": true
+            "integrations": true,
+            "retriggerPlaceOrder": true
         },
         "users": {
             "buyerUserProfileSetup": true,
