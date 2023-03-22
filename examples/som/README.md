@@ -4,7 +4,7 @@ Reference Implementation samples for Order Management.
 
 ## This repository includes:
 
-1. A flow to approve an order summary record.
+1. A flow to approve an order summary record. This flow is set in Draft status as approved orders does not allow cancellation of an item in the order.
 2. A flow to fulfill orders for one location, Warehouse.
 3. A flow to create an invoice after the order is fulfilled.
 4. A flow to cancel an item in the order.

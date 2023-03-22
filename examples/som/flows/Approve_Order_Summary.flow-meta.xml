@@ -53,5 +53,5 @@
         <object>OrderSummaryCreatedEvent</object>
         <triggerType>PlatformEvent</triggerType>
     </start>
-    <status>Active</status>
+    <status>Draft</status>
 </Flow>
