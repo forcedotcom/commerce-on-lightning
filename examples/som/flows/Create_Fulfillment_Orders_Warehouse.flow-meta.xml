@@ -4,8 +4,8 @@
         <description>Since we are only passing one fulfillment group, this action only creates one fulfillment order.</description>
         <name>Create_Fulfillment_Order</name>
         <label>Create Fulfillment Order</label>
-        <locationX>754</locationX>
-        <locationY>1766</locationY>
+        <locationX>1546</locationX>
+        <locationY>2186</locationY>
         <actionName>createFulfillmentOrder</actionName>
         <actionType>createFulfillmentOrder</actionType>
         <connector>
@@ -30,8 +30,8 @@
     <assignments>
         <name>Action_Fault_Assignment</name>
         <label>Action Fault Assignment</label>
-        <locationX>1018</locationX>
-        <locationY>1874</locationY>
+        <locationX>1810</locationX>
+        <locationY>2306</locationY>
         <assignmentItems>
             <assignToReference>ProcessExceptionRecord.Description</assignToReference>
             <operator>Assign</operator>
@@ -54,8 +54,8 @@
     <assignments>
         <name>Add_input_representation_to_list</name>
         <label>Add Input Representation to List</label>
-        <locationX>842</locationX>
-        <locationY>1358</locationY>
+        <locationX>1634</locationX>
+        <locationY>1634</locationY>
         <assignmentItems>
             <assignToReference>OrderItemSummaryList</assignToReference>
             <operator>Add</operator>
@@ -70,8 +70,8 @@
     <assignments>
         <name>Reset_InputRepresentation_and_temp_collections</name>
         <label>Reset Input Variables</label>
-        <locationX>754</locationX>
-        <locationY>926</locationY>
+        <locationX>1546</locationX>
+        <locationY>1034</locationY>
         <assignmentItems>
             <assignToReference>InputRepresentation.fulfillmentGroups</assignToReference>
             <operator>RemoveAll</operator>
@@ -93,8 +93,8 @@
     <assignments>
         <name>Set_Defaults_Process_Exception</name>
         <label>Set Defaults Process Exception</label>
-        <locationX>314</locationX>
-        <locationY>386</locationY>
+        <locationX>578</locationX>
+        <locationY>434</locationY>
         <assignmentItems>
             <assignToReference>ProcessExceptionRecord.AttachedToId</assignToReference>
             <operator>Assign</operator>
@@ -137,8 +137,8 @@
     <assignments>
         <name>Set_Fulfillment_Group</name>
         <label>Set Fulfillment Group</label>
-        <locationX>754</locationX>
-        <locationY>1550</locationY>
+        <locationX>1546</locationX>
+        <locationY>1946</locationY>
         <assignmentItems>
             <assignToReference>FulfillmentGroup.fulfilledFromLocationId</assignToReference>
             <operator>Assign</operator>
@@ -167,8 +167,8 @@
     <assignments>
         <name>Set_input_representation_and_add_fulfillment_group</name>
         <label>Set Input Representation and Add Fulfillment Group</label>
-        <locationX>754</locationX>
-        <locationY>1658</locationY>
+        <locationX>1546</locationX>
+        <locationY>2066</locationY>
         <assignmentItems>
             <assignToReference>InputRepresentation.orderSummaryId</assignToReference>
             <operator>Assign</operator>
@@ -197,8 +197,8 @@
     <assignments>
         <name>Set_Item_Summary_Input_Representation</name>
         <label>Set Item Summary Input Representation</label>
-        <locationX>842</locationX>
-        <locationY>1250</locationY>
+        <locationX>1634</locationX>
+        <locationY>1514</locationY>
         <assignmentItems>
             <assignToReference>OrderItemSummaryInputRepresentation.orderItemSummaryId</assignToReference>
             <operator>Assign</operator>
@@ -221,7 +221,7 @@
         <name>Unable_To_Find_Location_Assignment</name>
         <label>Unable To Find Location Assignment</label>
         <locationX>50</locationX>
-        <locationY>710</locationY>
+        <locationY>794</locationY>
         <assignmentItems>
             <assignToReference>ProcessExceptionRecord.Message</assignToReference>
             <operator>Assign</operator>
@@ -243,8 +243,8 @@
     <assignments>
         <name>Unable_To_Find_Location_Fault_Assignment</name>
         <label>Unable To Find Location Fault Assignment</label>
-        <locationX>970</locationX>
-        <locationY>602</locationY>
+        <locationX>1370</locationX>
+        <locationY>674</locationY>
         <assignmentItems>
             <assignToReference>ProcessExceptionRecord.Message</assignToReference>
             <operator>Assign</operator>
@@ -288,8 +288,8 @@
     <decisions>
         <name>Verify_Location</name>
         <label>Verify Location</label>
-        <locationX>314</locationX>
-        <locationY>602</locationY>
+        <locationX>578</locationX>
+        <locationY>674</locationY>
         <defaultConnector>
             <targetReference>Get_Order_Delivery_Group_Summaries</targetReference>
         </defaultConnector>
@@ -313,8 +313,8 @@
     <decisions>
         <name>Verify_Order_Summary_Status</name>
         <label>Verify Order Summary Status</label>
-        <locationX>774</locationX>
-        <locationY>170</locationY>
+        <locationX>1106</locationX>
+        <locationY>194</locationY>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Created_to_Activated</name>
@@ -339,6 +339,31 @@
             <label>Created to Activated</label>
         </rules>
     </decisions>
+    <decisions>
+        <name>Verify_Status_Ordered</name>
+        <label>Verify Status Ordered</label>
+        <locationX>1766</locationX>
+        <locationY>1394</locationY>
+        <defaultConnector>
+            <targetReference>Loop_Through_Order_Product_Summaries</targetReference>
+        </defaultConnector>
+        <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
+        <rules>
+            <name>Yes</name>
+            <conditionLogic>and</conditionLogic>
+            <conditions>
+                <leftValueReference>OrderProductSummaryRecord.Status</leftValueReference>
+                <operator>EqualTo</operator>
+                <rightValue>
+                    <stringValue>ORDERED</stringValue>
+                </rightValue>
+            </conditions>
+            <connector>
+                <targetReference>Set_Item_Summary_Input_Representation</targetReference>
+            </connector>
+            <label>Yes</label>
+        </rules>
+    </decisions>
     <environments>Default</environments>
     <formulas>
         <name>Five_Minutes_After</name>
@@ -350,8 +375,8 @@
     <loops>
         <name>Loop_through_Order_Delivery_Group_Summaries</name>
         <label>Order Delivery Group Summaries</label>
-        <locationX>578</locationX>
-        <locationY>818</locationY>
+        <locationX>1106</locationX>
+        <locationY>914</locationY>
         <assignNextValueToReference>OrderDeliveryGroupSummaryRecord</assignNextValueToReference>
         <collectionReference>OrderDeliveryGroupSummaries</collectionReference>
         <iterationOrder>Asc</iterationOrder>
@@ -365,13 +390,13 @@
     <loops>
         <name>Loop_Through_Order_Product_Summaries</name>
         <label>Order Product Summaries</label>
-        <locationX>754</locationX>
-        <locationY>1142</locationY>
+        <locationX>1546</locationX>
+        <locationY>1274</locationY>
         <assignNextValueToReference>OrderProductSummaryRecord</assignNextValueToReference>
         <collectionReference>OrderSummaryItems</collectionReference>
         <iterationOrder>Asc</iterationOrder>
         <nextValueConnector>
-            <targetReference>Set_Item_Summary_Input_Representation</targetReference>
+            <targetReference>Verify_Status_Ordered</targetReference>
         </nextValueConnector>
         <noMoreValuesConnector>
             <targetReference>Set_Fulfillment_Group</targetReference>
@@ -400,14 +425,14 @@
         <name>Create_Process_Exception</name>
         <label>Create Process Exception</label>
         <locationX>50</locationX>
-        <locationY>818</locationY>
+        <locationY>914</locationY>
         <inputReference>ProcessExceptionRecord</inputReference>
     </recordCreates>
     <recordLookups>
         <name>Find_Warehouse_Location</name>
         <label>A Warehouse Location</label>
-        <locationX>314</locationX>
-        <locationY>494</locationY>
+        <locationX>578</locationX>
+        <locationY>554</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Verify_Location</targetReference>
@@ -438,8 +463,8 @@
     <recordLookups>
         <name>Get_Order_Delivery_Group_Summaries</name>
         <label>Order Delivery Group Summaries</label>
-        <locationX>578</locationX>
-        <locationY>710</locationY>
+        <locationX>1106</locationX>
+        <locationY>794</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Loop_through_Order_Delivery_Group_Summaries</targetReference>
@@ -460,8 +485,8 @@
     <recordLookups>
         <name>Get_Order_Product_Summaries</name>
         <label>Order Product Summaries</label>
-        <locationX>754</locationX>
-        <locationY>1034</locationY>
+        <locationX>1546</locationX>
+        <locationY>1154</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Loop_Through_Order_Product_Summaries</targetReference>
@@ -488,12 +513,13 @@
         <queriedFields>OrderDeliveryGroupSummaryId</queriedFields>
         <queriedFields>OriginalOrderItemId</queriedFields>
         <queriedFields>Type</queriedFields>
+        <queriedFields>Status</queriedFields>
     </recordLookups>
     <recordLookups>
         <name>OrderSummary</name>
         <label>Get OrderSummary</label>
-        <locationX>314</locationX>
-        <locationY>278</locationY>
+        <locationX>578</locationX>
+        <locationY>314</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>Set_Defaults_Process_Exception</targetReference>
@@ -513,8 +539,8 @@
     <recordUpdates>
         <name>Update_Order_Summary_Status</name>
         <label>Update Order Summary Status</label>
-        <locationX>578</locationX>
-        <locationY>2156</locationY>
+        <locationX>1106</locationX>
+        <locationY>2606</locationY>
         <filterLogic>and</filterLogic>
         <filters>
             <field>Id</field>
@@ -533,7 +559,7 @@
     </recordUpdates>
     <runInMode>DefaultMode</runInMode>
     <start>
-        <locationX>648</locationX>
+        <locationX>980</locationX>
         <locationY>0</locationY>
         <connector>
             <targetReference>Verify_Order_Summary_Status</targetReference>
