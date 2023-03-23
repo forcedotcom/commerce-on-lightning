@@ -2,14 +2,13 @@
 
 The implementation provided in this directory contains flow metadata files that you can deploy to any Salesforce B2B or B2B2C Commerce enabled org. Use these files to set up an end-to-end Re-Trigger Place Order flow that will let the Commerce Admin Re-trigger the Place Order Flow once he fixes the issues with Place Order process
 
-
-##  The advantages of using a ReTrigger Place Order Flow:
+## The advantages of using a ReTrigger Place Order Flow:
 
 1. It will let the Commerce Admin Re-trigger the Reference Apex API when he fixes any errors with the Cart to Order Summary Async Process.
 
-
 ## Deploy
-Note: Create through Workbench, no UI setup available
+
+This flow will be automatically deployed when using sfdx to setup a b2b or b2c store. You may also manually deploy the flow via following:
 
 ### Deploy Using Workbench
 
@@ -20,3 +19,7 @@ Note: Create through Workbench, no UI setup available
 4.  Select **Single Package**.
 5.  Click **Next**.
 6.  Click **Deploy**.
+
+## Deploy Using sfdx
+
+Run `sfdx force:mdapi:deploy -d <path-to-this-directory> -w -1`
