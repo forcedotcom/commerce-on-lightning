@@ -46,6 +46,7 @@ describe('Json Utils parse store scratch def', () => {
                 paymentGatewayIntegration: 'Salesforce',
                 integrations: true,
                 orderConfirmationEmailFlow: true,
+                retriggerPlaceOrder: true,
             },
             users: {
                 buyerUserProfileSetup: true,
