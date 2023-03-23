@@ -8,7 +8,8 @@ The implementation provided in this directory contains flow metadata files that 
 
 ## Deploy
 
-This flow will be automatically deployed when using sfdx to setup a B2B or B2B2C store. You may also manually deploy the flow via following:
+This flow will be automatically deployed when using sfdx to set up a B2B or B2B2C store. You may also manually deploy the flow via Workbench or sfdx.
+After the flow is deployed, you may update the flow if needed and manually activate it.
 
 ### Deploy Using Workbench
 
