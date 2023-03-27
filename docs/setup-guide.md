@@ -58,6 +58,8 @@
 
 7. Create a scratch org.
 
+    **Note:** By default, new scratch orgs contain 1 administrator user with no password. To generate a password, see [Generate or Change a Password for a Scratch Org User](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_scratch_orgs_passwd.htm).
+
     ```bash
     sfdx commerce:scratchorg:create -u <<ORG_USERNAME>> -a <<ORG_ALIAS>> -v <<DEVHUB_USERNAME>> -w 15 --json
 
@@ -106,5 +108,4 @@
     ```
 
 -   To see the information of an org, run `sfdx force:org:display -u "<<ORG_USERNAME>>"`.
--   [Generate or Change a Password for a Scratch Org User](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_scratch_orgs_passwd.htm).
 -   For more commands, see the [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm).
