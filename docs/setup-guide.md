@@ -105,4 +105,6 @@
     sfdx force:auth:web:login -r <<INSTANCE_URL>> -a <<ORG_ALIAS>>
     ```
 
+-   To see the information of an org, run `sfdx force:org:display -u "<<ORG_USERNAME>>"`.
+-   [Generate or Change a Password for a Scratch Org User](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_scratch_orgs_passwd.htm).
 -   For more commands, see the [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/cli_reference.htm).
