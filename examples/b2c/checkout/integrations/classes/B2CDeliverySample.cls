@@ -1,6 +1,6 @@
 // This must implement the sfdc_checkout.CartShippingCharges interface
 // in order to be processed by the checkout flow for the "Shipping" integration
-global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
+global with sharing class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -247,49 +247,12 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
     }
 
     private List<Id> getOrderDeliveryMethods(List<ShippingOptionsAndRatesFromExternalService> shippingOptions) {
-        String defaultDeliveryMethodName = 'Order Delivery Method';
-        Id product2IdForThisDeliveryMethod = getDefaultShippingChargeProduct2Id();
-
-        // Check to see if a default OrderDeliveryMethod already exists.
-        // If it doesn't exist, create one.
         List<Id> orderDeliveryMethodIds = new List<Id>();
-        List<OrderDeliveryMethod> orderDeliveryMethods = new List<OrderDeliveryMethod>();
-        Integer i = 1;
-        for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptions) {
-            String shippingOptionNumber = String.valueOf(i);
-            String name = defaultDeliveryMethodName + shippingOptionNumber;
-            List<OrderDeliveryMethod> odms = [SELECT Id, ProductId, Carrier, ClassOfService FROM OrderDeliveryMethod WHERE Name = :name];
-            // This is the case in which an Order Delivery method does not exist.
-            if (odms.isEmpty()) {
-                OrderDeliveryMethod defaultOrderDeliveryMethod = new OrderDeliveryMethod(
-                    Name = name,
-                    Carrier = shippingOption.serviceName,
-                    isActive = true,
-                    ProductId = product2IdForThisDeliveryMethod,
-                    ClassOfService = shippingOption.provider
-                );
-                insert(defaultOrderDeliveryMethod);
-                orderDeliveryMethodIds.add(defaultOrderDeliveryMethod.Id);
-            }
-            else {
-                // This is the case in which an Order Delivery method exists.
-                // If the OrderDeliveryMethod doesn't have a Product2 associated with it, assign one
-                // We can always pick the 0th orderDeliveryMethod since we queried based off the name.
-                OrderDeliveryMethod existingodm = odms[0];
-                // This is for reference implementation purposes only.
-                // This is the if statement that checks to make sure that there is a product carrier and class of service
-                // associated to the order delivery method.
-                if (existingodm.ProductId == null || existingodm.Carrier == null || existingodm.ClassOfService == null) {
-                    existingodm.ProductId = product2IdForThisDeliveryMethod;
-                    existingodm.Carrier = shippingOption.serviceName;
-                    existingodm.ClassOfService = shippingOption.provider;
-                    update(existingodm);
-                }
-                orderDeliveryMethodIds.add(existingodm.Id);
-            }
-            i+=1;
+        List<OrderDeliveryMethod> odms = [SELECT Id, ProductId, Carrier, ClassOfService, IsActive FROM OrderDeliveryMethod Limit 2 ];
+        for(OrderDeliveryMethod odm :odms){
+            orderDeliveryMethodIds.add(odm.id);
         }
-        return orderDeliveryMethodIds;
+	return orderDeliveryMethodIds;
     }
 
     private Id getDefaultShippingChargeProduct2Id() {
