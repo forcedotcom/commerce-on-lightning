@@ -1,6 +1,6 @@
 // This must implement the sfdc_checkout.CartTaxCalculations interface
 // in order to be processed by the checkout flow and used for your Taxes integration.
-global with sharing class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
+global with sharing class  B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
