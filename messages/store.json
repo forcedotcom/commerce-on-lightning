@@ -6,7 +6,7 @@
     "setup": {
         "scratchOrgBuyerUsernameDescription": "buyer's username",
         "cmdDescription": "Setup a store",
-        "templateNameDescription": "Template to use to create a site. If none specified, it will get the template from the corresponding store scratch file based on the store type (b2b or b2c).",
+        "templateNameDescription": "Template to use to create a site. If not specified, the template is retrieved from the store config file based on the store type (b2b or b2c).",
         "buyerAliasDescription": "Buyer's alias",
         "buyerEmailDescription": "Buyer's email address",
         "storeNameDescription": "name of the site to create"
