@@ -1,11 +1,12 @@
 {
     "name": "@salesforce/commerce",
-    "version": "244.0.21",
+    "version": "244.0.22",
     "author": "Jonathan Arndt",
     "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
     "dependencies": {
         "@mshanemc/plugin-helpers": "^2.1.0",
-        "@oclif/command": "^1.8.16",
+        "@oclif/command": "^1.8.22",
+        "@oclif/config": "^1.18.2",
         "@oclif/errors": "^1",
         "@salesforce/command": "^3.1.0",
         "@salesforce/core": "^2.36.0",

@@ -540,7 +540,7 @@
     debug "^4.1.1"
     semver "^7.3.7"
 
-"@oclif/command@^1.8.16":
+"@oclif/command@^1.8.22":
   version "1.8.22"
   resolved "https://registry.yarnpkg.com/@oclif/command/-/command-1.8.22.tgz#b7ea268393277606bb5e0e557c39536ff4e883f2"
   integrity sha512-lystv7IKsWRmCv6K68jSvHrO/DILUPBDb5GZ3absTA5XTnNXTaMrcwVzTcMPfTf+gCrgIaPPD1bmbRStwfQxFw==
