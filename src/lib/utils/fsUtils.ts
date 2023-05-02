@@ -159,22 +159,7 @@ export class XML {
     public static parse(text: string, options?: {}): any {
         if (!options)
             options = {
-                // attributeNamePrefix: "@_",
-                // attrNodeName: "attr", //default is 'false'
-                // textNodeName: "#text",
                 ignoreAttributes: false,
-                // ignoreNameSpace: false,
-                // allowBooleanAttributes: false,
-                // parseNodeValue: true,
-                // parseAttributeValue: false,
-                // trimValues: true,
-                // cdataTagName: "__cdata", //default is 'false'
-                // cdataPositionChar: "\\c",
-                // parseTrueNumberOnly: false,
-                // arrayMode: false, //"strict"
-                // attrValueProcessor: (val, attrName) => he.decode(val, {isAttributeValue: true}),//default is a=>a
-                // tagValueProcessor: (val, tagName) => he.decode(val), //default is a=>a
-                // stopNodes: ["parse-me-as-string"]
             };
         const parser = new XMLParser(options);
         return parser.parse(text);
@@ -187,17 +172,9 @@ export class XML {
     public static stringify(value: any, defaultOptions?: {}): string {
         if (!defaultOptions)
             defaultOptions = {
-                // attributeNamePrefix : "@_",
-                // attrNodeName: "@", //default is false
-                // textNodeName : "#text",
                 ignoreAttributes: false,
-                // cdataTagName: "__cdata", //default is false
-                // cdataPositionChar: "\\c",
                 format: true,
                 indentBy: '  ',
-                // supressEmptyNode: false,
-                // tagValueProcessor: a=> he.encode(a, { useNamedReferences: true}),// default is a=>a
-                // attrValueProcessor: a=> he.encode(a, {isAttributeValue: isAttribute, useNamedReferences: true})// default is a=>a
             };
         const builder = new XMLBuilder(defaultOptions);
         return builder.build(value);
