@@ -259,7 +259,7 @@ global  class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptions) {
             String shippingOptionNumber = String.valueOf(i);
             String name = defaultDeliveryMethodName + shippingOptionNumber;
-            List<OrderDeliveryMethod> odms = [SELECT Id, ProductId, Carrier, ClassOfService FROM OrderDeliveryMethod WHERE Name = :name WITH SECURITY_ENFORCED];
+            List<OrderDeliveryMethod> odms = [SELECT Id, ProductId, Carrier, ClassOfService FROM OrderDeliveryMethod WHERE Name = :name ];
             // This is the case in which an Order Delivery method does not exist.
             if (odms.isEmpty()) {
                 OrderDeliveryMethod defaultOrderDeliveryMethod = new OrderDeliveryMethod(
