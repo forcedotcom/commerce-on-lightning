@@ -250,6 +250,8 @@ global  class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
 
 
     private List<Id> getOrderDeliveryMethods(List<ShippingOptionsAndRatesFromExternalService> shippingOptions) {
+	String defaultDeliveryMethodName = 'Order Delivery Method';
+        Id product2IdForThisDeliveryMethod = getDefaultShippingChargeProduct2Id();
         List<Id> orderDeliveryMethodIds = new List<Id>();
        
         Integer i = 1;
