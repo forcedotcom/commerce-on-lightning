@@ -21,7 +21,7 @@ describe('fsUtils xml', () => {
         const res = XML.parse('<hi r="m"><bye>a</bye><hello z="w" m="5">q</hello></hi>');
         assert.equal(
             JSON.stringify(res),
-            '{"hi":{"@_r":"m","bye":"a","hello":{"#text":"q","@_z":"w","@_m":"5"}}}'.replace(
+            '{"hi":{"bye":"a","hello":{"#text":"q","@_z":"w","@_m":"5"},"@_r":"m"}}'.replace(
                 /[\r\n\t]+(.+[\r\n\t]+.+)[\t\r\n]+/,
                 ''
             )
@@ -37,7 +37,8 @@ describe('fsUtils xml', () => {
         const out = XML.stringify(res);
         assert.equal(
             out,
-            '<Package xmlns="http://soap.sforce.com/2006/04/metadata">\n' +
+            '<?xml version="1.0" encoding="UTF-8"?>\n' +
+                '<Package xmlns="http://soap.sforce.com/2006/04/metadata">\n' +
                 '  <types>\n' +
                 '    <members>*</members>\n' +
                 '    <name>CustomSite</name>\n' +

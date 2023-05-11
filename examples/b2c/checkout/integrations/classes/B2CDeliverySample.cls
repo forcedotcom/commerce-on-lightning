@@ -1,6 +1,8 @@
 // This must implement the sfdc_checkout.CartShippingCharges interface
 // in order to be processed by the checkout flow for the "Shipping" integration
+
 global  class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
+
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -248,13 +250,8 @@ global  class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
 
 
     private List<Id> getOrderDeliveryMethods(List<ShippingOptionsAndRatesFromExternalService> shippingOptions) {
-        String defaultDeliveryMethodName = 'Order Delivery Method';
-        Id product2IdForThisDeliveryMethod = getDefaultShippingChargeProduct2Id();
-
-        // Check to see if a default OrderDeliveryMethod already exists.
-        // If it doesn't exist, create one.
         List<Id> orderDeliveryMethodIds = new List<Id>();
-        List<OrderDeliveryMethod> orderDeliveryMethods = new List<OrderDeliveryMethod>();
+       
         Integer i = 1;
         for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptions) {
             String shippingOptionNumber = String.valueOf(i);
@@ -289,7 +286,9 @@ global  class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                 orderDeliveryMethodIds.add(existingodm.Id);
             }
             i+=1;
+
         }
+       
         return orderDeliveryMethodIds;
     }
 

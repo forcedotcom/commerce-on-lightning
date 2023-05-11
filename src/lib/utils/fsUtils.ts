@@ -8,7 +8,7 @@ import os from 'os';
 import path, { resolve } from 'path';
 import { promisify } from 'util';
 import { fs, Messages } from '@salesforce/core';
-import parser from 'fast-xml-parser';
+import { XMLBuilder, XMLParser } from 'fast-xml-parser';
 import chalk from 'chalk';
 import { ux } from 'cli-ux';
 import { BASE_DIR } from './constants/properties';
@@ -159,53 +159,24 @@ export class XML {
     public static parse(text: string, options?: {}): any {
         if (!options)
             options = {
-                // attributeNamePrefix: "@_",
-                // attrNodeName: "attr", //default is 'false'
-                // textNodeName: "#text",
                 ignoreAttributes: false,
-                // ignoreNameSpace: false,
-                // allowBooleanAttributes: false,
-                // parseNodeValue: true,
-                // parseAttributeValue: false,
-                // trimValues: true,
-                // cdataTagName: "__cdata", //default is 'false'
-                // cdataPositionChar: "\\c",
-                // parseTrueNumberOnly: false,
-                // arrayMode: false, //"strict"
-                // attrValueProcessor: (val, attrName) => he.decode(val, {isAttributeValue: true}),//default is a=>a
-                // tagValueProcessor: (val, tagName) => he.decode(val), //default is a=>a
-                // stopNodes: ["parse-me-as-string"]
             };
-        if (parser.validate(text) === true) {
-            //optional (it'll return an object in case it's not valid)
-            return parser.parse(text, options);
-        }
-
-        // Intermediate obj
-        const tObj = parser.getTraversalObj(text, options);
-        return parser.convertToJson(tObj, options);
+        const parser = new XMLParser(options);
+        return parser.parse(text);
     }
     /**
      * Converts a JavaScript value to a Extensible Markup Language (XML) string.
      * @param value A JavaScript value, usually an object or array, to be converted.
-     * @param replacer A function that transforms the results.
-     * @param space Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.
+     * @param defaultOptions The options for the conversion.
      */
     public static stringify(value: any, defaultOptions?: {}): string {
         if (!defaultOptions)
             defaultOptions = {
-                // attributeNamePrefix : "@_",
-                // attrNodeName: "@", //default is false
-                // textNodeName : "#text",
                 ignoreAttributes: false,
-                // cdataTagName: "__cdata", //default is false
-                // cdataPositionChar: "\\c",
                 format: true,
                 indentBy: '  ',
-                // supressEmptyNode: false,
-                // tagValueProcessor: a=> he.encode(a, { useNamedReferences: true}),// default is a=>a
-                // attrValueProcessor: a=> he.encode(a, {isAttributeValue: isAttribute, useNamedReferences: true})// default is a=>a
             };
-        return new parser.j2xParser(defaultOptions).parse(value);
+        const builder = new XMLBuilder(defaultOptions);
+        return builder.build(value);
     }
 }
