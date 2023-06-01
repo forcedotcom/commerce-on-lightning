@@ -49,6 +49,18 @@ export class RegisterExtension extends SfdxCommand {
             char: 'm',
             description: msgs.getMessage('extension.register.apexNameSpaceFlagDescription'),
         }),
+        description: flags.string({
+            char: 'd',
+            description: msgs.getMessage('extension.register.apexClassDescriptionFieldMessage'),
+            default: '',
+        }),
+        'icon-uri': flags.string({
+            description: msgs.getMessage('extension.register.apexClassIconURIDescription'),
+        }),
+        'is-application': flags.boolean({
+            description: msgs.getMessage('extension.register.apexClassisApplicationDescription'),
+            default: false,
+        }),
     };
 
     public org: Org;
@@ -96,10 +108,32 @@ export class RegisterExtension extends SfdxCommand {
         if (storeRegisteredName === undefined) {
             throw new SfdxError(msgs.getMessage('extension.register.undefinedName'));
         }
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const apexDescription: string = this.flags['description'];
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const iconURI: URL = this.flags['icon-uri'];
+
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        const isApplication: boolean = this.flags['is-application'];
+
+        const recordValues = [
+            `DeveloperName=${storeRegisteredName}`,
+            `MasterLabel=${storeRegisteredName}`,
+            `ExtensionPointName=${storeEPN}`,
+            `ExternalServiceProviderId=${apexClassId}`,
+            "ExternalServiceProviderType='Extension'",
+            `Description='${apexDescription}'`,
+            `isApplication=${isApplication.toString()}`,
+        ];
+
+        if (iconURI) recordValues.push(`IconURI=${iconURI.toString()}`);
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
             'RegisteredExternalService',
-            `DeveloperName=${storeRegisteredName} MasterLabel=${storeRegisteredName} ExtensionPointName=${storeEPN} ExternalServiceProviderId=${apexClassId} ExternalServiceProviderType='Extension'`,
+            recordValues.join(' '),
             storeUserName,
             this.flags,
             this.logger
@@ -134,7 +168,7 @@ export class RegisterExtension extends SfdxCommand {
     // returns entire record from RegisteredExternalService in JSON format
     private getInsertedRecord(storeRegisteredName: string, storeApexClass: string, storeUserName: string): string {
         const RegisteredTable = forceDataSoql(
-            `SELECT Id,ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${storeRegisteredName}'`,
+            `SELECT FIELDS(ALL) from RegisteredExternalService WHERE DeveloperName='${storeRegisteredName}' LIMIT 1`,
             storeUserName,
             this.flags,
             this.logger
@@ -147,6 +181,9 @@ export class RegisterExtension extends SfdxCommand {
                 RegisteredExtensionName: element['DeveloperName'] as string,
                 ExtensionPointName: element['ExtensionPointName'] as string,
                 ExternalServiceProviderType: element['ExternalServiceProviderType'] as string,
+                Description: element['Description'] as string,
+                IconURI: element['IconUri'] as string,
+                IsApplication: element['IsApplication'] as string,
             };
             const returnResult = `${JSON.stringify(finalTable, null, 4)}\n`;
             this.ux.log(`${returnResult}`);
