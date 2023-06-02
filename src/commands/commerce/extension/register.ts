@@ -123,7 +123,7 @@ export class RegisterExtension extends SfdxCommand {
 
         // In 246 (59.0) build, iconURI, isApplication and Description fields have been added.
         // This check is to keep the backwards compatibility.
-        if (parseFloat(this.flags['apiversion']) >= 59.0) {
+        if (parseInt(this.flags['apiversion'], 10) >= 59) {
             recordValues.push(`Description='${apexDescription}'`);
             recordValues.push(`isApplication=${isApplication.toString()}`);
             if (iconURI) recordValues.push(`IconURI=${iconURI}`);
