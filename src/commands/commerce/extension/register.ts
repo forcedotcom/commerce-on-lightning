@@ -52,7 +52,6 @@ export class RegisterExtension extends SfdxCommand {
         description: flags.string({
             char: 'd',
             description: msgs.getMessage('extension.register.apexClassDescriptionFieldMessage'),
-            default: '',
         }),
         'icon-uri': flags.string({
             description: msgs.getMessage('extension.register.apexClassIconURIDescription'),
@@ -80,7 +79,10 @@ export class RegisterExtension extends SfdxCommand {
                 this.flags['registered-extension-name'],
                 this.flags['extension-point-name'],
                 this.flags['apex-class-name'],
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags['description'],
+                this.flags['icon-uri'],
+                this.flags['is-application']
             ),
         };
     }
@@ -90,7 +92,10 @@ export class RegisterExtension extends SfdxCommand {
         storeRegisteredName: string,
         storeEPN: string,
         storeApexClass: string,
-        storeUserName: string
+        storeUserName: string,
+        apexDescription?: string,
+        iconURI?: string,
+        isApplication?: boolean
     ): string {
         // get apexClass id from table
         const apexClassId = this.getApexClass(storeApexClass, storeUserName);
@@ -109,15 +114,6 @@ export class RegisterExtension extends SfdxCommand {
             throw new SfdxError(msgs.getMessage('extension.register.undefinedName'));
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const apexDescription: string = this.flags['description'];
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const iconURI: URL = this.flags['icon-uri'];
-
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const isApplication: boolean = this.flags['is-application'];
-
         const recordValues = [
             `DeveloperName=${storeRegisteredName}`,
             `MasterLabel=${storeRegisteredName}`,
@@ -128,7 +124,7 @@ export class RegisterExtension extends SfdxCommand {
             `isApplication=${isApplication.toString()}`,
         ];
 
-        if (iconURI) recordValues.push(`IconURI=${iconURI.toString()}`);
+        if (iconURI) recordValues.push(`IconURI=${iconURI}`);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
