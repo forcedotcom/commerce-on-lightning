@@ -58,7 +58,6 @@ export class RegisterExtension extends SfdxCommand {
         }),
         'is-application': flags.boolean({
             description: msgs.getMessage('extension.register.apexClassisApplicationDescription'),
-            default: false,
         }),
     };
 
@@ -120,11 +119,15 @@ export class RegisterExtension extends SfdxCommand {
             `ExtensionPointName=${storeEPN}`,
             `ExternalServiceProviderId=${apexClassId}`,
             "ExternalServiceProviderType='Extension'",
-            `Description='${apexDescription}'`,
-            `isApplication=${isApplication.toString()}`,
         ];
 
-        if (iconURI) recordValues.push(`IconURI=${iconURI}`);
+        // In 246 (59.0) build, iconURI, isApplication and Description fields have been added.
+        // This check is to keep the backwards compatibility.
+        if (parseFloat(this.flags['apiversion']) >= 59.0) {
+            recordValues.push(`Description='${apexDescription}'`);
+            recordValues.push(`isApplication=${isApplication.toString()}`);
+            if (iconURI) recordValues.push(`IconURI=${iconURI}`);
+        }
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
