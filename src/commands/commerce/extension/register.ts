@@ -94,7 +94,7 @@ export class RegisterExtension extends SfdxCommand {
         storeUserName: string,
         apexDescription?: string,
         iconURI?: string,
-        isApplication?: boolean
+        isApplication = false
     ): string {
         // get apexClass id from table
         const apexClassId = this.getApexClass(storeApexClass, storeUserName);
