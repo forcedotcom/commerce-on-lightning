@@ -148,6 +148,7 @@ describe('Test extension register function', () => {
             'This is a test I am making',
             '--icon-uri',
             '/static/icon.png',
+            '--is-application'
         ];
 
         const commandVersion59: string[] = Array.from(command);
