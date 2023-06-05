@@ -180,10 +180,13 @@ export class RegisterExtension extends SfdxCommand {
                 RegisteredExtensionName: element['DeveloperName'] as string,
                 ExtensionPointName: element['ExtensionPointName'] as string,
                 ExternalServiceProviderType: element['ExternalServiceProviderType'] as string,
-                Description: element['Description'] as string,
-                IconURI: element['IconUri'] as string,
-                IsApplication: element['IsApplication'] as string,
             };
+
+            if (parseInt(this.flags['apiversion'], 10) >= 59) {
+                finalTable['Description'] = element['Description'] as string;
+                finalTable['IconURI'] = element['IconUri'] as string;
+                finalTable['IsApplication'] = element['IsApplication'] as string;
+            }
             const returnResult = `${JSON.stringify(finalTable, null, 4)}\n`;
             this.ux.log(`${returnResult}`);
             this.ux.log(msgs.getMessage('extension.register.savingConfigIntoConfig'));
