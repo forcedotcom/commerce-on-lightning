@@ -15,7 +15,10 @@
             "json",
             "targetusername",
             "apiversion",
-            "apex-namespace"
+            "apex-namespace",
+            "description",
+            "icon-uri",
+            "is-application"
         ]
     },
     {

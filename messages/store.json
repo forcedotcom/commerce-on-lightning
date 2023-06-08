@@ -135,7 +135,10 @@
             "errEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
             "savingConfigIntoConfig": "Successfully registered the extension. Use command [commerce:extension:map] to link the extension to a webstore.",
             "apexNameSpaceFlagDescription": "Optional namespace for apex class",
-            "undefinedName": "Undefined registered extension name. Enter '-r <name>'"
+            "undefinedName": "Undefined registered extension name. Enter '-r <name>'",
+            "apexClassDescriptionFieldMessage": "A brief description of the extension",
+            "apexClassIconURIDescription": "Where to find the icon representing the extension in URI form.",
+            "apexClassisApplicationDescription": "A boolean that indicates if the extension provider is contained within a managed package"
         },
         "getEPN": {
             "cmdDescription": "Lists all EPN values"
