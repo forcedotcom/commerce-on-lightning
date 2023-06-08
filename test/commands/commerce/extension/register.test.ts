@@ -219,25 +219,13 @@ describe('Test extension register function', () => {
 
         test.stdout()
             .command(commandVersion59)
-            .it('Description, icon-uri, and isApplication works with API version 59', () => {
+            .it('Description, icon-uri, and isApplication works with API', () => {
                 expect(
                     forceDataRecordStub.calledWith(
                         sinon.match.string,
                         sinon.match('Description') && sinon.match('IconURI') && sinon.match('isApplication')
                     )
                 );
-            });
-
-        test.stdout()
-            .command(commandOldVersion)
-            .it('Description, icon-uri, and isApplication is not added if used by older API version than 59', () => {
-                expect(forceDataRecordStub.calledWith(sinon.match.string, sinon.match.string));
-                expect(
-                    forceDataRecordStub.calledWith(
-                        sinon.match.string,
-                        sinon.match('Description') && sinon.match('IconURI') && sinon.match('isApplication')
-                    )
-                ).to.be.false;
             });
     });
 });

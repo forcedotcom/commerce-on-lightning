@@ -17,7 +17,6 @@ import { Messages, Org, SfdxError } from '@salesforce/core';
 import { forceDataRecordCreate, forceDataSoql } from '../../../lib/utils/sfdx/forceDataSoql';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { setApiVersion } from '../../../lib/utils/args/flagsUtils';
-import { registerTableNewFieldsToggle } from '../../../lib/utils/compatibilityUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -95,7 +94,7 @@ export class RegisterExtension extends SfdxCommand {
         storeUserName: string,
         apexDescription?: string,
         iconURI?: string,
-        isApplication = false
+        isApplication?: boolean
     ): string {
         // get apexClass id from table
         const apexClassId = this.getApexClass(storeApexClass, storeUserName);
@@ -122,13 +121,11 @@ export class RegisterExtension extends SfdxCommand {
             "ExternalServiceProviderType='Extension'",
         ];
 
-        // In 246 (59.0) build, iconURI, isApplication and Description fields have been added.
-        // This check is to keep the backwards compatibility.
-        if (registerTableNewFieldsToggle(this.flags['apiversion'])) {
-            recordValues.push(`Description='${apexDescription}'`);
-            recordValues.push(`isApplication=${isApplication.toString()}`);
-            if (iconURI) recordValues.push(`IconURI=${iconURI}`);
-        }
+        if (apexDescription !== undefined) recordValues.push(`Description='${apexDescription}'`);
+
+        if (iconURI !== undefined) recordValues.push(`IconURI=${iconURI}`);
+
+        if (isApplication !== undefined) recordValues.push(`isApplication=${isApplication.toString()}`);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
@@ -182,12 +179,12 @@ export class RegisterExtension extends SfdxCommand {
                 ExtensionPointName: element['ExtensionPointName'] as string,
                 ExternalServiceProviderType: element['ExternalServiceProviderType'] as string,
             };
+            if ('Description' in element) finalTable['Description'] = element['Description'] as string;
 
-            if (registerTableNewFieldsToggle(this.flags['apiversion'])) {
-                finalTable['Description'] = element['Description'] as string;
-                finalTable['IconURI'] = element['IconUri'] as string;
-                finalTable['IsApplication'] = element['IsApplication'] as string;
-            }
+            if ('IconUri' in element) finalTable['IconURI'] = element['IconUri'] as string;
+
+            if ('IsApplication' in element) finalTable['IsApplication'] = element['IsApplication'] as string;
+
             const returnResult = `${JSON.stringify(finalTable, null, 4)}\n`;
             this.ux.log(`${returnResult}`);
             this.ux.log(msgs.getMessage('extension.register.savingConfigIntoConfig'));
