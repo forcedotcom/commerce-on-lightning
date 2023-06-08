@@ -17,6 +17,7 @@ import { Messages, Org, SfdxError } from '@salesforce/core';
 import { forceDataRecordCreate, forceDataSoql } from '../../../lib/utils/sfdx/forceDataSoql';
 import { StatusFileManager } from '../../../lib/utils/statusFileManager';
 import { setApiVersion } from '../../../lib/utils/args/flagsUtils';
+import { registerTableNewFieldsToggle } from '../../../lib/utils/compatibilityUtils';
 
 Messages.importMessagesDirectory(__dirname);
 
@@ -123,7 +124,7 @@ export class RegisterExtension extends SfdxCommand {
 
         // In 246 (59.0) build, iconURI, isApplication and Description fields have been added.
         // This check is to keep the backwards compatibility.
-        if (parseInt(this.flags['apiversion'], 10) >= 59) {
+        if (registerTableNewFieldsToggle(this.flags['apiversion'])) {
             recordValues.push(`Description='${apexDescription}'`);
             recordValues.push(`isApplication=${isApplication.toString()}`);
             if (iconURI) recordValues.push(`IconURI=${iconURI}`);
@@ -182,7 +183,7 @@ export class RegisterExtension extends SfdxCommand {
                 ExternalServiceProviderType: element['ExternalServiceProviderType'] as string,
             };
 
-            if (parseInt(this.flags['apiversion'], 10) >= 59) {
+            if (registerTableNewFieldsToggle(this.flags['apiversion'])) {
                 finalTable['Description'] = element['Description'] as string;
                 finalTable['IconURI'] = element['IconUri'] as string;
                 finalTable['IsApplication'] = element['IsApplication'] as string;
