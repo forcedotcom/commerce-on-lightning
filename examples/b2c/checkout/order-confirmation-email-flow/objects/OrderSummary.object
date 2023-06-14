@@ -6,7 +6,6 @@
         <label>OCE Account First Name</label>
         <length>255</length>
         <required>false</required>
-        <trackFeedHistory>false</trackFeedHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -16,7 +15,6 @@
         <label>OCE Account Last Name</label>
         <length>255</length>
         <required>false</required>
-        <trackFeedHistory>false</trackFeedHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -25,9 +23,17 @@
         <externalId>false</externalId>
         <label>OCE Order Items</label>
         <length>131072</length>
-        <trackFeedHistory>false</trackFeedHistory>
         <type>Html</type>
         <visibleLines>25</visibleLines>
+    </fields>
+    <fields>
+        <fullName>OCE_Order_Url__c</fullName>
+        <externalId>false</externalId>
+        <label>OCE Summary Url</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
     </fields>
     <fields>
         <fullName>OCE_Order_Total__c</fullName>
@@ -46,7 +52,6 @@
         <label>OCE Payment Method</label>
         <length>255</length>
         <required>false</required>
-        <trackFeedHistory>false</trackFeedHistory>
         <type>Text</type>
         <unique>false</unique>
     </fields>
@@ -55,7 +60,6 @@
         <externalId>false</externalId>
         <label>OCE Shipping Address</label>
         <length>32768</length>
-        <trackFeedHistory>false</trackFeedHistory>
         <type>Html</type>
         <visibleLines>25</visibleLines>
     </fields>
@@ -63,6 +67,15 @@
         <fullName>OCE_Shipping_Method__c</fullName>
         <externalId>false</externalId>
         <label>OCE Shipping Method</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>OCE_Order_Url__c</fullName>
+        <externalId>false</externalId>
+        <label>OCE Summary Url</label>
         <length>255</length>
         <required>false</required>
         <trackFeedHistory>false</trackFeedHistory>

@@ -4,7 +4,7 @@
         <name>B2B2C_Order_Confirmation_Email_Alert</name>
         <label>B2B2C Order Confirmation Email Alert</label>
         <locationX>50</locationX>
-        <locationY>1706</locationY>
+        <locationY>1742</locationY>
         <actionName>OrderSummary.B2B2C_Order_Confirmation_Email_Alert</actionName>
         <actionType>emailAlert</actionType>
         <flowTransactionModel>CurrentTransaction</flowTransactionModel>
@@ -15,17 +15,43 @@
             </value>
         </inputParameters>
     </actionCalls>
-    <apiVersion>52.0</apiVersion>
+    <actionCalls>
+        <description>Generate Order Summary Url</description>
+        <name>Generate_Order_Summary_Url</name>
+        <label>Generate Order Summary Url</label>
+        <locationX>50</locationX>
+        <locationY>1118</locationY>
+        <actionName>generateOrderSummaryUrl</actionName>
+        <actionType>generateOrderSummaryUrl</actionType>
+        <connector>
+            <targetReference>setOrderItemsHeaderLabels</targetReference>
+        </connector>
+        <flowTransactionModel>CurrentTransaction</flowTransactionModel>
+        <inputParameters>
+            <name>orderSummaryRefNumber</name>
+            <value>
+                <elementReference>$Record.OrderSummary.OrderNumber</elementReference>
+            </value>
+        </inputParameters>
+        <inputParameters>
+            <name>webStoreId</name>
+            <value>
+                <elementReference>$Record.OrderSummary.SalesStore.Id</elementReference>
+            </value>
+        </inputParameters>
+        <storeOutputAutomatically>true</storeOutputAutomatically>
+    </actionCalls>
+    <apiVersion>59.0</apiVersion>
     <assignments>
         <name>CreateOrderItems</name>
         <label>CreateOrderItems</label>
         <locationX>138</locationX>
-        <locationY>1370</locationY>
+        <locationY>1442</locationY>
         <assignmentItems>
             <assignToReference>orderItems</assignToReference>
             <operator>Add</operator>
             <value>
-                <stringValue>&lt;tr&gt;&lt;td&gt;</stringValue>
+                <stringValue>&lt;tr&gt;&lt;td style=&quot;font-size:16px&quot; width=&quot;70%&quot;&gt;</stringValue>
             </value>
         </assignmentItems>
         <assignmentItems>
@@ -46,14 +72,7 @@
             <assignToReference>orderItems</assignToReference>
             <operator>Add</operator>
             <value>
-                <stringValue>&lt;td&gt;Qty:</stringValue>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>orderItems</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <elementReference>spacer</elementReference>
+                <stringValue>&lt;td style=&quot;font-size:16px;padding:0px 5px&quot;&gt;</stringValue>
             </value>
         </assignmentItems>
         <assignmentItems>
@@ -67,14 +86,7 @@
             <assignToReference>orderItems</assignToReference>
             <operator>Add</operator>
             <value>
-                <stringValue>&lt;/td&gt;&lt;td&gt;each:</stringValue>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>orderItems</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <elementReference>spacer</elementReference>
+                <stringValue>&lt;/td&gt;&lt;td style=&quot;font-size:16px;text-align: right;&quot;&gt;</stringValue>
             </value>
         </assignmentItems>
         <assignmentItems>
@@ -95,21 +107,23 @@
             <assignToReference>orderItems</assignToReference>
             <operator>Add</operator>
             <value>
-                <stringValue>&lt;/td&gt;&lt;td&gt;$</stringValue>
+                <stringValue>&lt;/td&gt;&lt;tr&gt;</stringValue>
             </value>
         </assignmentItems>
+        <connector>
+            <targetReference>IterateOrderItems</targetReference>
+        </connector>
+    </assignments>
+    <assignments>
+        <name>setOrderItemsHeaderLabels</name>
+        <label>setOrderItemsHeaderLabels</label>
+        <locationX>50</locationX>
+        <locationY>1226</locationY>
         <assignmentItems>
             <assignToReference>orderItems</assignToReference>
             <operator>Add</operator>
             <value>
-                <elementReference>IterateOrderItems.TotalLineAmount</elementReference>
-            </value>
-        </assignmentItems>
-        <assignmentItems>
-            <assignToReference>orderItems</assignToReference>
-            <operator>Add</operator>
-            <value>
-                <stringValue>&lt;/td&gt;&lt;/tr&gt;</stringValue>
+                <stringValue>&lt;tr&gt;&lt;td style=&quot;font-size:13px&quot; width=&quot;70%&quot;&gt;Item&lt;/td&gt;&lt;td style=&quot;font-size:13px; padding:0px 5px;&quot; width=&quot;10%&quot;&gt;#&lt;/td&gt;&lt;td style=&quot;font-size:13px;text-align: right;&quot; width=&quot;20%&quot;&gt;Unit Price&lt;/td&gt;&lt;/tr&gt;</stringValue>
             </value>
         </assignmentItems>
         <connector>
@@ -120,7 +134,7 @@
         <name>setShippingAddress</name>
         <label>setShippingAddress</label>
         <locationX>50</locationX>
-        <locationY>770</locationY>
+        <locationY>686</locationY>
         <assignmentItems>
             <assignToReference>shippingAddress</assignToReference>
             <operator>Add</operator>
@@ -213,7 +227,7 @@
         <name>IsB2B2CStore</name>
         <label>IsB2B2CStore</label>
         <locationX>226</locationX>
-        <locationY>194</locationY>
+        <locationY>170</locationY>
         <defaultConnectorLabel>Default Outcome</defaultConnectorLabel>
         <rules>
             <name>Yes</name>
@@ -235,7 +249,7 @@
         <name>isBillingEmailAddressExist</name>
         <label>isBillingEmailAddressExist</label>
         <locationX>50</locationX>
-        <locationY>314</locationY>
+        <locationY>278</locationY>
         <defaultConnector>
             <targetReference>UpdateBillingEmailAddress</targetReference>
         </defaultConnector>
@@ -279,7 +293,7 @@
         <name>IterateOrderItems</name>
         <label>IterateOrderItems</label>
         <locationX>50</locationX>
-        <locationY>1250</locationY>
+        <locationY>1334</locationY>
         <collectionReference>GetOrderItems</collectionReference>
         <iterationOrder>Asc</iterationOrder>
         <nextValueConnector>
@@ -312,10 +326,10 @@
         <name>GetOrderItems</name>
         <label>GetOrderItems</label>
         <locationX>50</locationX>
-        <locationY>1130</locationY>
+        <locationY>1010</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
-            <targetReference>IterateOrderItems</targetReference>
+            <targetReference>Generate_Order_Summary_Url</targetReference>
         </connector>
         <filterLogic>and</filterLogic>
         <filters>
@@ -347,7 +361,7 @@
         <name>GetPaymentInfo</name>
         <label>GetPaymentInfo</label>
         <locationX>50</locationX>
-        <locationY>1010</locationY>
+        <locationY>902</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>GetOrderItems</targetReference>
@@ -370,7 +384,7 @@
         <name>GetShippingAddress</name>
         <label>GetShippingAddress</label>
         <locationX>50</locationX>
-        <locationY>650</locationY>
+        <locationY>578</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>setShippingAddress</targetReference>
@@ -419,7 +433,7 @@
         <name>GetShippingMethod</name>
         <label>GetShippingMethod</label>
         <locationX>50</locationX>
-        <locationY>890</locationY>
+        <locationY>794</locationY>
         <assignNullValuesIfNoRecordsFound>false</assignNullValuesIfNoRecordsFound>
         <connector>
             <targetReference>GetPaymentInfo</targetReference>
@@ -442,7 +456,7 @@
         <name>Update_Order_Summary_Info</name>
         <label>Update Order Summary Info</label>
         <locationX>50</locationX>
-        <locationY>1586</locationY>
+        <locationY>1634</locationY>
         <connector>
             <targetReference>B2B2C_Order_Confirmation_Email_Alert</targetReference>
         </connector>
@@ -473,6 +487,12 @@
             </value>
         </inputAssignments>
         <inputAssignments>
+            <field>OCE_Order_Url__c</field>
+            <value>
+                <elementReference>Generate_Order_Summary_Url.url</elementReference>
+            </value>
+        </inputAssignments>
+        <inputAssignments>
             <field>OCE_Payment_Method__c</field>
             <value>
                 <elementReference>paymentMethod</elementReference>
@@ -496,7 +516,7 @@
         <name>UpdateBillingEmailAddress</name>
         <label>UpdateBillingEmailAddress</label>
         <locationX>138</locationX>
-        <locationY>434</locationY>
+        <locationY>386</locationY>
         <connector>
             <targetReference>GetShippingAddress</targetReference>
         </connector>
@@ -525,7 +545,7 @@
         <object>OrderSummaryCreatedEvent</object>
         <triggerType>PlatformEvent</triggerType>
     </start>
-    <status>Draft</status>
+    <status>Active</status>
     <variables>
         <name>orderDeliverMethodId</name>
         <dataType>String</dataType>
