@@ -30,7 +30,7 @@ _Warning_: After you install the examples, you must manually complete the follow
 -   **OCE_Payment_Method\_\_c**
 -   **OCE_Shipping_Address\_\_c**
 -   **OCE_Shipping_Method\_\_c**
--   **OCE_Order_Url\_\_c**
+-   **OCE_Order_Url\_\_c** 
 
 ### Update Store ID in the Flow
 
