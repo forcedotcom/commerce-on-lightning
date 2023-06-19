@@ -52,7 +52,8 @@ _Warning_: After you install the examples, you must manually complete the follow
 8.  From the **From Email Address** dropdown menu, select the organization-wide email address you entered.
 
 ### New Email Template UI 
+![ezgif com-video-to-gif](https://github.com/saikrishna9541/commerce-on-lightning/assets/136420476/c009c6fc-5318-472f-9de5-6adf84ed194b)
 
-https://github.com/saikrishna9541/commerce-on-lightning/assets/136420476/45d7a348-56d0-4b82-b941-65b224de0db4
+
 
 
