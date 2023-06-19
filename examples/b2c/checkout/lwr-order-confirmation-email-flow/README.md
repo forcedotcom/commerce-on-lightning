@@ -50,3 +50,9 @@ _Warning_: After you install the examples, you must manually complete the follow
 6.  Go to **Setup** -> **Email Alerts**.
 7.  Click **Edit** for the **B2B2C Order Confirmation Email Alert**.
 8.  From the **From Email Address** dropdown menu, select the organization-wide email address you entered.
+
+### New Email Template UI 
+
+https://github.com/saikrishna9541/commerce-on-lightning/assets/136420476/45d7a348-56d0-4b82-b941-65b224de0db4
+
+
