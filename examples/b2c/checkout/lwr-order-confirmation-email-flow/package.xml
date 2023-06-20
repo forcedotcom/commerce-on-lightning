@@ -4,7 +4,6 @@
         <members>OrderSummary.OCE_Account_First_Name__c</members>
         <members>OrderSummary.OCE_Account_Last_Name__c</members>
         <members>OrderSummary.OCE_Order_Items__c</members>
-        <members>OrderSummary.OCE_Order_Url__c</members>
         <members>OrderSummary.OCE_Order_Total__c</members>
         <members>OrderSummary.OCE_Payment_Method__c</members>
         <members>OrderSummary.OCE_Shipping_Address__c</members>

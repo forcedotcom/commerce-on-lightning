@@ -27,15 +27,6 @@
         <visibleLines>25</visibleLines>
     </fields>
     <fields>
-        <fullName>OCE_Order_Url__c</fullName>
-        <externalId>false</externalId>
-        <label>OCE Summary Url</label>
-        <length>255</length>
-        <required>false</required>
-        <type>Text</type>
-        <unique>false</unique>
-    </fields>
-    <fields>
         <fullName>OCE_Order_Total__c</fullName>
         <externalId>false</externalId>
         <formula>TotalAdjustedProductAmount +  TotalAdjustedDeliveryAmount  +  TotalTaxAmount</formula>
