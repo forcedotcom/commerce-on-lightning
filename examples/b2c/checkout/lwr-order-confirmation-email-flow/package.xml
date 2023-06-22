@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>OrderSummary.OCE_Account_First_Name__c</members>
+        <members>OrderSummary.OCE_Account_Last_Name__c</members>
+        <members>OrderSummary.OCE_Order_Items__c</members>
+        <members>OrderSummary.OCE_Order_Total__c</members>
+        <members>OrderSummary.OCE_Payment_Method__c</members>
+        <members>OrderSummary.OCE_Shipping_Address__c</members>
+        <members>OrderSummary.OCE_Shipping_Method__c</members>
+        <members>OrderSummary.OCE_Order_Url__c</members>
+        <name>CustomField</name>
+    </types>
+    <types>
+        <members>unfiled$public/B2B2C_Order_Confirmation_Email</members>
+        <name>EmailTemplate</name>
+    </types>
+    <types>
+        <members>B2B2C_Order_Confirmation_Email_Notification_Flow</members>
+        <name>Flow</name>
+    </types>
+    <types>
+        <members>OrderSummary.B2B2C_Order_Confirmation_Email_Alert</members>
+        <name>WorkflowAlert</name>
+    </types>
+    <version>59.0</version>
+</Package>

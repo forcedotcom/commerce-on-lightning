@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html style="overflow-y: hidden;">
+<head>
+	<title>We&#39;ve Got Your Order!</title>
+</head>
+<body style="background: #CDCDCD; height: auto; min-height: auto; font-family:Arial; font-size:14px; padding: 5px 0px;">
+      <div style="max-width: 500px; margin: auto; background: white; padding: 0px;">
+         <div style="padding: 0px;">
+         <img style="display: block; border: none; max-width: 50%; width: 50%; margin-left: auto; margin-right: auto;" src="https://akashmar25.stmpa.stm.force.com/s/sfsites/c/cms/delivery/media/MCPHJLRYCNWJFDNMUOUB27ZI7QZY" />
+        </div>
+         <div style="padding: 0px 20px 20px;">
+            <h1  style="font-size: 20px; font-weight: bold; padding: 0px; margin: 0px;">Thank you for your order, {{{OrderSummary.OCE_Account_First_Name__c}}}!</h1>
+            <p style="font-size: 16px; padding: 10px 0px; margin: 0px;">Please find your order details below.</p>
+            <h2 style="font-size: 16px; font-weight: bold; padding: 0px; margin: 0px;">Confirmation Number: {{{OrderSummary.OrderNumber}}}</h2>
+            <a style="display: block; background-color: #000; color: #ffffff; font-size: 13px; font-weight: 400; line-height: 20px; padding: 6px; text-align: center; text-decoration: none; margin-top: 10px;" href={{{OrderSummary.OCE_Order_Url__c}}} title="View Order Status">View Order Status</a>
+         </div>
+         <hr style="border: 1px solid #CDCDCD; margin:0px;"/>
+         <div style="padding: 20px 10px 0px;">
+            <table width="100%">
+                <tr style="vertical-align:top;">
+                    <td width="50%">
+                        <div style="padding: 0px 10px;">
+                        <h2 style="font-size: 16px; font-weight: bold; padding: 0px; margin: 0px;">Shipping Address</h2>
+                        <p style="font-size: 16px; padding: 10px 0px; margin: 0px;">{{{OrderSummary.OCE_Shipping_Address__c}}}</p>
+                        </div>
+                    </td>
+                    <td width="50%">
+                        <div style="padding: 0px 10px;">
+                        <h2 style="font-size: 16px; font-weight: bold; padding: 0px; margin: 0px;">Billing Address</h2>
+                        <p style="font-size: 16px; padding-top: 10px; margin: 0px;">{{{OrderSummary.OCE_Account_First_Name__c}}}&nbsp;{{{OrderSummary.OCE_Account_Last_Name__c}}}</p>
+                        <p style="font-size: 16px; padding-bottom: 10px; margin: 0px;">{{{OrderSummary.BillingAddress}}}</p>
+                     </div>
+                    </td>
+                </tr>
+            </table>
+         </div>
+         <div style="padding: 10px 10px;">
+            <table width="100%">
+                <tr style="vertical-align: top;">
+                    <td width="50%">
+                        <div style="padding: 0px 10px;">
+                        <h2 style="font-size: 16px; font-weight: bold; padding:0px; margin: 0px;">Shipping Method</h2>
+                        <p style="font-size: 16px; padding:10px 0px; margin: 0px;">{{{OrderSummary.OCE_Shipping_Method__c}}}</p>
+                        </div>
+                    </td>
+                    <td width="50%">
+                        <div style="padding: 0px 10px;">
+                        <h2 style="font-size: 16px; font-weight: bold; padding: 0px; margin: 0px;">Payment Method</h2>
+                        <p style="font-size: 16px; padding: 10px 0px; margin: 0px;">{{{OrderSummary.OCE_Payment_Method__c}}}</p>
+                     </div>
+                    </td>
+                </tr>
+            </table>
+         </div>
+         <hr style="border: 1px solid #CDCDCD; margin: 0px 20px;"/>
+         <div style="padding: 20px 20px; display: inline-block; width: -webkit-fill-available;">
+            <h2 style="font-size: 16px; font-weight: bold; padding: 0px; margin: 0px">Order Summary</h2>
+            <div style="padding-top: 10px; margin: 0px;">{{{OrderSummary.OCE_Order_Items__c}}}</div>
+            <hr style="border: 1px solid #CDCDCD; margin-top:10px;">
+            <div style="font-size: 16px; float: right; padding-top: 5px; margin: 0px">
+                <p style="padding-top: 10px; margin: 0px;font-weight:bold;">SubTotal: {{{OrderSummary.TotalAdjustedProductAmount}}}</p>
+                <p style="padding-top: 10px; margin: 0px;">Shipping: {{{OrderSummary.TotalAdjustedDeliveryAmount}}}</p>
+                <p style="padding-top: 10px;; margin: 0px;">Tax: {{{OrderSummary.TotalTaxAmount}}}</p>
+                <p style="padding-top: 10px; margin: 0px; font-weight: bold;">Total: {{{OrderSummary.OCE_Order_Total__c}}}</p>
+            </div>
+         </div>
+         <hr style="border: 1px solid #CDCDCD; margin:0px 20px;"/>
+         <div style="font-size: 16px; padding: 10px 20px 20px;">
+            <p style="padding-top: 10px; margin: 0px;">Thanks again for shopping with us.</p>
+            <p style="padding-top: 10px; margin: 0px;">Sincerely,</p>
+            <p style="padding-top: 10px; margin: 0px;">Alpine Group.</p>
+         </div>
+         <div style="background-color: #000; padding: 10px 10px">
+            <div style="padding: 10px 10px; color:#fff;">
+                <table width="100%">
+                    <tr style="vertical-align:top;">
+                      <td width="25%"><a style="color:#fff;" href="" target="_blank">Return Policy</a></td>
+                      <td width="25%"><a style="color:#fff;" href="" target="_blank">Contact Us</a></td>
+                      <td width="50%"><a style="color:#fff;" href="" target="_blank">Terms &amp; Conditions</a></td>
+                    </tr>
+                </table>
+            </div>
+            <div style="padding:10px 10px;">
+                <span style="color:#fff; display: block;">Alpine Group</span> 
+                <span style="color:#fff; display: block;">800-111-1111</span> 
+                <span style="color:#fff; display: block;">AlpineGroup@Xmail.com</span>
+            </div>
+         </div>
+      </div>
+   </body>
+</html>

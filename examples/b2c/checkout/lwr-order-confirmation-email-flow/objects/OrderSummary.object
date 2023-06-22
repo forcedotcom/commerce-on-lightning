@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fields>
+        <fullName>OCE_Account_First_Name__c</fullName>
+        <externalId>false</externalId>
+        <label>OCE Account First Name</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>OCE_Account_Last_Name__c</fullName>
+        <externalId>false</externalId>
+        <label>OCE Account Last Name</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>OCE_Order_Items__c</fullName>
+        <externalId>false</externalId>
+        <label>OCE Order Items</label>
+        <length>131072</length>
+        <type>Html</type>
+        <visibleLines>25</visibleLines>
+    </fields>
+    <fields>
+        <fullName>OCE_Order_Total__c</fullName>
+        <externalId>false</externalId>
+        <formula>TotalAdjustedProductAmount +  TotalAdjustedDeliveryAmount  +  TotalTaxAmount</formula>
+        <formulaTreatBlanksAs>BlankAsZero</formulaTreatBlanksAs>
+        <label>OCE Order Total</label>
+        <precision>18</precision>
+        <required>false</required>
+        <scale>2</scale>
+        <type>Currency</type>
+    </fields>
+    <fields>
+        <fullName>OCE_Payment_Method__c</fullName>
+        <externalId>false</externalId>
+        <label>OCE Payment Method</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>OCE_Shipping_Address__c</fullName>
+        <externalId>false</externalId>
+        <label>OCE Shipping Address</label>
+        <length>32768</length>
+        <type>Html</type>
+        <visibleLines>25</visibleLines>
+    </fields>
+    <fields>
+        <fullName>OCE_Shipping_Method__c</fullName>
+        <externalId>false</externalId>
+        <label>OCE Shipping Method</label>
+        <length>255</length>
+        <required>false</required>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+    <fields>
+        <fullName>OCE_Order_Url__c</fullName>
+        <externalId>false</externalId>
+        <label>OCE Summary Url</label>
+        <length>255</length>
+        <required>false</required>
+        <trackFeedHistory>false</trackFeedHistory>
+        <type>Text</type>
+        <unique>false</unique>
+    </fields>
+</CustomObject>
