@@ -3,6 +3,10 @@
 // This must implement the sfdc_checkout.CartPriceCalculations interface
 // in order to be processed by the checkout flow and used for your Price Calculations integration.
 global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
+    // To access the service below, you may need to add https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
+    private static String httpHost = 'https://b2b-commerce-test.herokuapp.com';
+    private static Boolean useHTTPService = false;
+    private class ApplicationException extends Exception {}
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -28,16 +32,22 @@ global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
                 salesPricesFromSalesforce.put(cartItem.Sku, cartItem.SalesPrice);
             }
 
-            // Get all sale prices for the products in the cart (cart items) from an external service
-            // for the customer who owns the cart.
-            Map<String, Object> salesPricesFromExternalService = getSalesPricesFromExternalService(salesPricesFromSalesforce.keySet(), Id.valueOf(customerId));
-
+            // Following snippet of code fetches a mocked static json response from getSalesPricesFromStaticResponse.
+            // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
+            // response is implemented in getSalesPricesFromExternalService method.
+            Map<String, Object> salesPricesFromService = null;
+            if(useHTTPService) {
+                salesPricesFromService = getSalesPricesFromExternalService(salesPricesFromSalesforce.keySet(), Id.valueOf(customerId));
+            } else {
+                salesPricesFromService = getSalesPricesFromStaticResponse(salesPricesFromSalesforce.keySet(), Id.valueOf(customerId));
+            }
+            
             // For each cart item SKU, check that the price from the external service
             // is the same as the sale price in the cart.
             // If that is not true, set the integration status to "Failed".
             for (String sku : salesPricesFromSalesforce.keySet()) {
                 Decimal salesPriceFromSalesforce = salesPricesFromSalesforce.get(sku);
-                Decimal salesPriceFromExternalService = (Decimal)salesPricesFromExternalService.get(sku);
+                Decimal salesPriceFromExternalService = (Decimal)salesPricesFromService.get(sku);
                 if (salesPriceFromExternalService == null){
                    String errorMessage = 'The product with sku ' + sku + ' could not be found in the external system';
                    return integrationStatusFailedWithCartValidationOutputError(
@@ -93,7 +103,27 @@ global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
         return integStatus;
     }
 
-    private Map<String, Object> getSalesPricesFromExternalService (Set<String> skus, String customerId) {
+    private Map<String, Object> getSalesPricesFromStaticResponse(Set<String> skus, String customerId) {
+        if (skus.isEmpty()) {
+            throw new ApplicationException('Input SKUs list is empty or undefined.');
+        }
+        
+        String responseJson = '{';
+        for(String sku : skus) {
+            Double price = 0.00;
+            if (sku == 'SKU_FOR_TEST') {
+                price = 100.00;
+            }
+            responseJson = responseJson + '"'+sku+'"';
+            responseJson = responseJson + ':';
+            responseJson = responseJson + price;
+            responseJson = responseJson + ',';
+        }
+        responseJson = responseJson.removeEnd(',') + '}';
+        return (Map<String, Object>) JSON.deserializeUntyped(responseJson);
+    }
+
+    private Map<String, Object> getSalesPricesFromExternalService(Set<String> skus, String customerId) {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
         Integer SuccessfulHttpRequest = 200;
@@ -104,9 +134,7 @@ global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
             encodedSkus.add(EncodingUtil.urlEncode(sku, 'UTF-8'));
         }
 
-        // To access the service below you may need to add endpoint = https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
-        request.setEndpoint('https://b2b-commerce-test.herokuapp.com/get-sales-prices?customerId='
-                            + customerId + '&skus=' + JSON.serialize(encodedSkus));
+        request.setEndpoint(httpHost + '/get-sales-prices?customerId=' + customerId + '&skus=' + JSON.serialize(encodedSkus));
         request.setMethod('GET');
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
