@@ -1,8 +1,8 @@
 // This must implement the sfdc_checkout.CartInventoryValidation interface
 // in order to be processed by the checkout flow and used for your Check Inventory integration.
 global class B2CCheckInventorySample implements sfdc_checkout.CartInventoryValidation {
-    // To access the service below, you may need to add https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
-    private static String httpHost = 'https://b2b-commerce-test.herokuapp.com';
+    // To access the service below, you may need to add https://example.com in Setup | Security | Remote site settings.
+    private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
     private class ApplicationException extends Exception {}
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, ID cartId) {

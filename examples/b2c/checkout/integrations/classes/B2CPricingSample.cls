@@ -3,8 +3,8 @@
 // This must implement the sfdc_checkout.CartPriceCalculations interface
 // in order to be processed by the checkout flow and used for your Price Calculations integration.
 global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
-    // To access the service below, you may need to add https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
-    private static String httpHost = 'https://b2b-commerce-test.herokuapp.com';
+    // To access the service below, you may need to add https://example.com in Setup | Security | Remote site settings.
+    private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
     private class ApplicationException extends Exception {}
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {

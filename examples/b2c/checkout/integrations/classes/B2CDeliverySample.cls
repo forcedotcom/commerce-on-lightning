@@ -2,8 +2,8 @@
 // in order to be processed by the checkout flow for the "Shipping" integration
 
 global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
-    // To access the service below, you may need to add https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
-    private static String httpHost = 'https://b2b-commerce-test.herokuapp.com';
+    // To access the service below, you may need to add https://example.com in Setup | Security | Remote site settings.
+    private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
