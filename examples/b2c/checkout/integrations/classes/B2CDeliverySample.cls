@@ -2,7 +2,8 @@
 // in order to be processed by the checkout flow for the "Shipping" integration
 
 global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
-    // To access the service below, you may need to add https://example.com in Setup | Security | Remote site settings.
+    // You MUST change this to be your service or you must launch your own Heroku Service
+    // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
@@ -103,9 +104,12 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                 ));
             }
             return shippingOptions;
-        }
-        else {
-            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+        } else {
+            if(response.getStatusCode() == 404) {
+                throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
+            } else {
+                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+            }
         }
     }
 

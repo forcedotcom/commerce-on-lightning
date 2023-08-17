@@ -1,7 +1,8 @@
 // This must implement the sfdc_checkout.CartInventoryValidation interface
 // in order to be processed by the checkout flow and used for your Check Inventory integration.
 global class B2CCheckInventorySample implements sfdc_checkout.CartInventoryValidation {
-    // To access the service below, you may need to add https://example.com in Setup | Security | Remote site settings.
+    // You MUST change this to be your service or you must launch your own Heroku Service
+    // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
     private class ApplicationException extends Exception {}
@@ -109,7 +110,7 @@ global class B2CCheckInventorySample implements sfdc_checkout.CartInventoryValid
     private Map<String, Object> getQuantitiesFromExternalService (Set<String> skus) {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
-        Integer SuccessfulHttpRequest = 200;
+        Integer successfulHttpRequest = 200;
 
         // Encode the product SKUs to avoid any invalid characters in the request URL.
         Set<String> encodedSkus = new Set<String>();
@@ -127,11 +128,15 @@ global class B2CCheckInventorySample implements sfdc_checkout.CartInventoryValid
         // The external service returns the exact list of SKUs it receives
         // and an available quantity of 9999 for each SKU.
         // If the cart has an item with a quantity higher than 9999, the integration returns an error.
-        if (response.getStatusCode() == SuccessfulHttpRequest) {
+        if (response.getStatusCode() == successfulHttpRequest) {
             Map<String, Object> quantitiesFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             return quantitiesFromExternalService;
         } else {
-            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+            if(response.getStatusCode() == 404) {
+                throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
+            } else {
+                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+            }
         }
     }
 

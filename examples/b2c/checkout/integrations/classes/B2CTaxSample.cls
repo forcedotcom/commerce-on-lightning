@@ -2,7 +2,8 @@
 // in order to be processed by the checkout flow and used for your Taxes integration.
 
 global  class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
-    // To access the service below, you may need to add https://example.com in Setup | Security | Remote site settings.
+    // You MUST change this to be your service or you must launch your own Heroku Service
+    // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
     private class ApplicationException extends Exception {}
@@ -200,9 +201,12 @@ global  class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
         if (response.getStatusCode() == 200) {
             Map<String, Object> resultsFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             return resultsFromExternalService;
-        }
-        else {
-            throw new CalloutException (String.format(System.Label.ERROR_CALLOUT_EXCEPTION, new List<String>{ String.valueOf(response.getStatusCode()) }));
+        } else {
+            if(response.getStatusCode() == 404) {
+                throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
+            } else {
+                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+            }
         }
     }
 

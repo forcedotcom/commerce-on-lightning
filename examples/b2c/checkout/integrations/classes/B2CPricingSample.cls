@@ -3,7 +3,8 @@
 // This must implement the sfdc_checkout.CartPriceCalculations interface
 // in order to be processed by the checkout flow and used for your Price Calculations integration.
 global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
-    // To access the service below, you may need to add https://example.com in Setup | Security | Remote site settings.
+    // You MUST change this to be your service or you must launch your own Heroku Service
+    // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
     private class ApplicationException extends Exception {}
@@ -126,7 +127,7 @@ global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
     private Map<String, Object> getSalesPricesFromExternalService(Set<String> skus, String customerId) {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
-        Integer SuccessfulHttpRequest = 200;
+        Integer successfulHttpRequest = 200;
 
         // Encode the product SKUs to avoid any invalid characters in the request URL.
         Set<String> encodedSkus = new Set<String>();
@@ -143,7 +144,7 @@ global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
         // Because this is a sample only and we want this integration to return success in order to allow the checkout to pass,
         // the external service created for this sample returns the exact list of SKUs it receives,
         // and the same sale price 0.00 for each SKU.
-        if (response.getStatusCode() == SuccessfulHttpRequest) {
+        if (response.getStatusCode() == successfulHttpRequest) {
             Map<String, Object> salesPricesFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             return salesPricesFromExternalService;
         }
