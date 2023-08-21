@@ -1,7 +1,7 @@
 // This must implement the sfdc_checkout.CartTaxCalculations interface
 // in order to be processed by the checkout flow and used for your Taxes integration.
 
-global  class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
+global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
     // You MUST change this to be your service or you must launch your own Heroku Service
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';

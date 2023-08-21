@@ -1,6 +1,7 @@
 // This must implement the sfdc_checkout.CartShippingCharges interface
 // in order to be processed by the checkout flow for the "Shipping" integration
-global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
+
+global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
     // You MUST change this to be your service or you must launch your own Heroku Service
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
@@ -8,29 +9,33 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
+            // In the Winter '21 release there should be two delivery groups per cart.
             // We need to get the ID of the cart delivery group in order to create the cart delivery group methods.
-            Id cartDeliveryGroupId = [SELECT Id FROM CartDeliveryGroup WHERE CartId = :cartId WITH SECURITY_ENFORCED][0].Id;
+            Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId][0].CartDeliveryGroupId;
+
+            // Get the shipping options from an external service.
+            // We're getting information like rates and carriers from this external service.
+            String siteLanguage = jobInfo.siteLanguage;
 
             // Following snippet of code fetches a static json response with 2 mocked sample shipping methods.
             // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired response is implemented
             // in getShippingOptionsAndRatesFromExternalService method.
 
             // Both implementations are just samples returning hardcoded Shipping options and MUST not be used in production systems.
-            ShippingOptionsAndRatesFromExternalService[] shippingOptionsAndRatesFromService = null;
+            ShippingOptionsAndRatesFromExternalService[] shippingOptionsAndRatesFromExternalService = null;
             if(useHTTPService) {
-                shippingOptionsAndRatesFromService = getShippingOptionsAndRatesFromExternalService();
+                shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService(siteLanguage);
             } else {
-                shippingOptionsAndRatesFromService = getShippingOptionsAndRatesFromMockedService();
+                shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromMockedService(siteLanguage);
             }
 
-            // On re-entry of the checkout flow delete all previous CartDeliveryGroupMethods for the given cartDeliveryGroupId
-            delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId WITH SECURITY_ENFORCED];
+            // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
+            delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId];
 
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
-            for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromService) {
-                populateCartDeliveryGroupMethodWithShippingOptions(shippingOption, cartDeliveryGroupId, cartId);
-             }
-            
+            for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromExternalService) {
+               populateCartDeliveryGroupMethodWithShippingOptions(shippingOption, cartDeliveryGroupId, cartId);
+            }
             // If everything works well, the charge is added to the cart and our integration has been successfully completed.
             integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
 
@@ -47,7 +52,6 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
                 errorMessage += 'Message = ' + de.getDmlMessage(errorIdx);
                 errorMessage += ' , ';
             }
-
             return integrationStatusFailedWithCartValidationOutputError(
                 integStatus,
                 errorMessage,
@@ -57,7 +61,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         } catch(Exception e) {
             return integrationStatusFailedWithCartValidationOutputError(
                 integStatus,
-                'An exception of type ' + e.getTypeName() + ' has occurred: ' + e.getMessage(),
+                'An exception occurred during Shipping Calculation.',
                 jobInfo,
                 cartId
             );
@@ -65,16 +69,19 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         return integStatus;
     }
 
-    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (Integer numberOfUniqueItems) {
+    /**
+        This method provides a sample of how to call an external service to retrieve Shipping Options.
+        The heroku servie called in this method is just a reference implementation that responds back with
+        a sample response and MUST not be used in production systems.
+     */
+    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (String siteLanguage) {
         ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
-
         Http http = new Http();
         HttpRequest request = new HttpRequest();
         Integer successfulHttpRequest = 200;
-        request.setEndpoint(httpHost + '/calculate-shipping-rates-winter-21');
+        request.setEndpoint(httpHost + '/calculate-shipping-rates-winter-21-with-lang?lang=' + siteLanguage);
         request.setMethod('GET');
         HttpResponse response = http.send(request);
-
         // If the request is successful, parse the JSON response.
         // The response looks like this:
         // [{"status":"calculated","rate":{"name":"Delivery Method 1","serviceName":"Test Carrier 1","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},
@@ -110,9 +117,9 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         This method provides an alternative to retrieve Shipping Options if http call needs to be bypassed.
         This method uses a hardcoded sample response and MUST not be used in production systems.
      */
-    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService () {
+    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (String siteLanguage) {
         ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
-        String responseBody = getShippingOptionsResponse();
+        String responseBody = getShippingOptionsResponse(siteLanguage);
         List<Object> results = (List<Object>) JSON.deserializeUntyped(responseBody);
         for (Object result: results) {
             Map<String, Object> subresult = (Map<String, Object>) result;
@@ -139,14 +146,27 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         Integer idx = Math.mod(Math.abs(Crypto.getRandomInteger()), chars.length());
         randStr += chars.substring(idx, idx+1);
         }
-        return randStr;
+        return randStr; 
     }
 
-    private String getShippingOptionsResponse() {
-        String name1 = 'Delivery Method 1';
-        String name2 = 'Delivery Method 2';
-        String serviceName1 = 'Test Carrier 1';
-        String serviceName2 = 'Test Carrier 2';
+    private String getShippingOptionsResponse(String siteLanguage) {
+        String name1, name2, serviceName1, serviceName2;
+        if(siteLanguage == 'de') {
+            name1 = 'Liefermethode 1';
+            name2 = 'Liefermethode 2';
+            serviceName1 = 'Testträger 1';
+            serviceName2 = 'Testträger 2';
+        } else if(siteLanguage == 'ja') {
+            name1 = '配送方法1';
+            name2 = '配送方法2';
+            serviceName1 = 'テストキャリア1';
+            serviceName2 = 'テストキャリア2';
+        } else {
+            name1 = 'Delivery Method 1';
+            name2 = 'Delivery Method 2';
+            serviceName1 = 'Test Carrier 1';
+            serviceName2 = 'Test Carrier 2';
+        }
         return '[{"status":"calculated","rate":{"name":"'+name1+'","serviceName":"'+serviceName1+'","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},{"status":"calculated","rate":{"name":"'+name2+'","serviceName":"'+serviceName2+'","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99}}]';
     }
 
@@ -214,9 +234,10 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         // ReferenceNumber: Reference Number from External Service
         // IsActive: If this Option is Active
         Id productId = getDefaultShippingChargeProduct2Id();
-        
+        String cartCurrency = [SELECT CurrencyIsoCode FROM WebCart WHERE Id = :webCartId][0].CurrencyIsoCode;
         CartDeliveryGroupMethod cartDeliveryGroupMethod = new CartDeliveryGroupMethod(
             CartDeliveryGroupId = cartDeliveryGroupId,
+            CurrencyIsoCode = cartCurrency,
             ExternalProvider = shippingOption.getProvider(),
             Name = shippingOption.getName(),
             ShippingFee = shippingOption.getRate(),
@@ -260,7 +281,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         // Check to see if a Product2 with that name already exists.
         // If it doesn't exist, create one.
         String shippingChargeProduct2Name = 'Shipping Charge';
-        List<Product2> shippingChargeProducts = [SELECT Id FROM Product2 WHERE Name = :shippingChargeProduct2Name WITH SECURITY_ENFORCED];
+        List<Product2> shippingChargeProducts = [SELECT Id FROM Product2 WHERE Name = :shippingChargeProduct2Name];
         if (shippingChargeProducts.isEmpty()) {
             Product2 shippingChargeProduct = new Product2(
                 isActive = true,
@@ -270,6 +291,6 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
             return shippingChargeProduct.Id;
         } else {
             return shippingChargeProducts[0].Id;
-        }	
+        }
     }
 }
