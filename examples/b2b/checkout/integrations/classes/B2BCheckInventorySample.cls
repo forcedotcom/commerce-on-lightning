@@ -38,14 +38,12 @@ global with sharing class B2BCheckInventorySample implements sfdc_checkout.CartI
             // Following snippet of code fetches a mocked static json response from getQuantitiesFromStaticResponse.
             // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
             // response is implemented in getQuantitiesFromExternalService method.
-
-            // Get all available quantities for products in the cart (cart items) from an external service.
             Map<String, Object> quantitiesFromExternalService = null;
             if(useHTTPService) {
                 quantitiesFromExternalService = getQuantitiesFromExternalService(quantitiesFromSalesforce.keySet());
             } else {
                 quantitiesFromExternalService = getQuantitiesFromStaticResponse(quantitiesFromSalesforce.keySet());
-            }          
+            }
             
             // For each cart item SKU, check that the quantity from the external service
             // is greater or equal to the quantity in the cart.

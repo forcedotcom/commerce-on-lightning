@@ -41,7 +41,7 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
                 salesPricesFromExternalService = getSalesPricesFromExternalService(salesPricesFromSalesforce.keySet(), Id.valueOf(customerId));
             } else {
                 salesPricesFromExternalService = getSalesPricesFromStaticResponse(salesPricesFromSalesforce.keySet(), Id.valueOf(customerId));
-            }         
+            }
             
             // For each cart item SKU, check that the price from the external service
             // is the same as the sale price in the cart.
