@@ -1,6 +1,11 @@
 // This must implement the sfdc_checkout.CartTaxCalculations interface
 // in order to be processed by the checkout flow and used for your Taxes integration.
 global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
+    // You MUST change this to be your service or you must launch your own Heroku Service
+    // and add the host in Setup | Security | Remote site settings.
+    private static String httpHost = 'https://example.com';
+    private static Boolean useHTTPService = false;
+    private class ApplicationException extends Exception {}
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -27,11 +32,16 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
 
             Map<ID, CartItem> cartItemsMap = new Map<ID, CartItem>([SELECT Id, Sku, Quantity, TotalLineAmount, AdjustmentAmount, (Select Id, TotalAmount from CartItemPriceAdjustments) FROM CartItem  WHERE CartId = :cartId]);
 
-            // Get the tax rates and tax amounts from an external service
-            // Other parameters will be passed here, like ship_from, bill_to, more details about the ship_to, etc.
-            Map<String, Object> dataFromExternalService = getDataFromExternalService(
-                cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType
-            );
+            // Following snippet of code fetches a mocked static json response from getDataFromStaticResponse.
+            // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
+            // response is implemented in getDataFromExternalService method.
+
+            Map<String, Object> dataFromExternalService = null;
+            if(useHTTPService) {
+                dataFromExternalService = getDataFromExternalService(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
+            } else {
+                dataFromExternalService = getDataFromStaticResponse(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
+            }
 
             // If there are taxes from a previously cancelled checkout, delete them.
             delete [SELECT Id FROM CartTax WHERE CartItemId IN (Select Id FROM CartItem WHERE CartId = :cartId)];
@@ -93,10 +103,91 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
         return integStatus;
     }
 
+    private Map<String, Object> getDataFromStaticResponse(Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
+        if (cartItemsMap == null) {
+            throw new ApplicationException('Input SKUs list is empty or undefined.');
+        }
+        Double taxRate = 0.15;
+        String responseJson = '{';
+        for (ID key : cartItemsMap.keySet()) {
+            CartItem cartItem = cartItemsMap.get(key);
+            Id cartItemId = cartItem.Id;
+
+            Double amount = cartItem.TotalLineAmount==null ? 0.00 : cartItem.TotalLineAmount;
+            Double tierAdjustment = cartItem.AdjustmentAmount==null ? 0.00 : cartItem.AdjustmentAmount;
+            Double quantity = cartItem.Quantity==null ? 0.00 : cartItem.Quantity;
+
+            if(country == 'US') {
+                taxRate = 0.08;
+                String [] noSalesTaxUSStates = new String [] {'AK', 'DE', 'MT', 'NH', 'OR'};
+                if (noSalesTaxUSStates.contains(state)) {
+                    taxRate = 0.00;
+                }
+            }
+
+            Double itemizedPromotionTax = 0.00;
+            Double [] itemizedPromotionTaxArr = new Double [] {};
+            Double netUnitPrice = 0.00;
+            Double grossUnitPrice = 0.00;
+
+            Double multiplier = 0.00;
+
+            if(taxType == 'Gross') {
+                multiplier = taxRate / (1 + taxRate);
+            } else {
+                multiplier = taxRate;
+            }
+
+            Double cartItemTax = amount * multiplier;
+            Double tierAdjustmentTax = (tierAdjustment!=null ? tierAdjustment : 0.00) * multiplier;
+
+            CartItemPriceAdjustment [] itemizedPromotions = cartItem.CartItemPriceAdjustments;
+
+            String itemizedPromotionTaxResp = '[';
+            for(CartItemPriceAdjustment itemAdj : itemizedPromotions) {
+                Double itemTaxAmount = (itemAdj.TotalAmount!=null ? itemAdj.TotalAmount : 0.00) * multiplier;
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '{';
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '"id": "' + itemAdj.Id + '",';
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '"taxAmount": ' + itemTaxAmount;
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '},';
+                itemizedPromotionTax = itemizedPromotionTax + itemTaxAmount;
+            }
+            itemizedPromotionTaxResp = itemizedPromotionTaxResp.removeEnd(',') + ']';
+
+            if(taxType == 'Gross') {
+                grossUnitPrice = amount / quantity;
+                netUnitPrice = (amount - cartItemTax) / quantity;
+            } else {
+                grossUnitPrice = (amount + cartItemTax) / quantity;
+                netUnitPrice = amount / quantity;
+            }
+
+            responseJson = responseJson + '"'+cartItemId+'":';
+            responseJson = responseJson + '{';
+            responseJson = responseJson + '"cartItemId": "' + cartItemId + '",';
+            responseJson = responseJson + '"taxAmount": ' + cartItemTax + ',';
+            responseJson = responseJson + '"adjustmentTaxAmount": ' + tierAdjustmentTax + ',';
+
+            responseJson = responseJson + '"itemizedPromotionTaxAmounts": ';
+            responseJson = responseJson + itemizedPromotionTaxResp;
+            responseJson = responseJson + ',';
+
+            responseJson = responseJson + '"totalItemizedPromotionTaxAmount": ' + itemizedPromotionTax + ',';
+            responseJson = responseJson + '"grossUnitPrice": ' + grossUnitPrice + ',';
+            responseJson = responseJson + '"netUnitPrice": ' + netUnitPrice + ',';
+            responseJson = responseJson + '"taxRate": ' + taxRate + ',';
+            responseJson = responseJson + '"taxName": "GST"';
+            responseJson = responseJson + '},';
+        }
+
+        responseJson = responseJson.removeEnd(',') + '}';        
+        return (Map<String, Object>) JSON.deserializeUntyped(responseJson);
+    }
+
     private Map<String, Object> getDataFromExternalService (
         Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
 
-        String requestURL = 'https://b2b-commerce-test.herokuapp.com/get-tax-rates-with-adjustments-post';
+        String requestURL = httpHost + '/get-tax-rates-with-adjustments-post';
         String requestBody = '{"state":"'+state+'", "country":"'+country+'", "taxType":"'+taxType+'", '+'"amountsBySKU":'+JSON.serialize(cartItemsMap)+'}';
         Http http = new Http();
         HttpRequest request = new HttpRequest();
@@ -110,9 +201,10 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
         if (response.getStatusCode() == 200) {
             Map<String, Object> resultsFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             return resultsFromExternalService;
-        }
-        else {
-            throw new CalloutException (String.format(System.Label.ERROR_CALLOUT_EXCEPTION, new List<String>{ String.valueOf(response.getStatusCode()) }));
+        } else if(response.getStatusCode() == 404) {
+            throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
+        } else {
+            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
     }
 
