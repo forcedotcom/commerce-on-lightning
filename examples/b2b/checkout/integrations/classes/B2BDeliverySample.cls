@@ -1,7 +1,7 @@
 // This must implement the sfdc_checkout.CartShippingCharges interface
 // in order to be processed by the checkout flow for the "Shipping" integration
 
-global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
+global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
     // You MUST change this to be your service or you must launch your own Heroku Service
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
@@ -11,7 +11,7 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
         try {
             // In the Winter '21 release there should be two delivery groups per cart.
             // We need to get the ID of the cart delivery group in order to create the cart delivery group methods.
-            Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId][0].CartDeliveryGroupId;
+            Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId WITH SECURITY_ENFORCED][0].CartDeliveryGroupId;
 
             // Get the shipping options from an external service.
             // We're getting information like rates and carriers from this external service.
@@ -30,7 +30,7 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
             }
 
             // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
-            delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId];
+            delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId WITH SECURITY_ENFORCED];
 
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
             for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromExternalService) {
@@ -234,10 +234,10 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
         // ReferenceNumber: Reference Number from External Service
         // IsActive: If this Option is Active
         Id productId = getDefaultShippingChargeProduct2Id();
-        String cartCurrency = [SELECT CurrencyIsoCode FROM WebCart WHERE Id = :webCartId][0].CurrencyIsoCode;
+        //String cartCurrency = [SELECT CurrencyIsoCode FROM WebCart WHERE Id = :webCartId WITH SECURITY_ENFORCED][0].CurrencyIsoCode;
         CartDeliveryGroupMethod cartDeliveryGroupMethod = new CartDeliveryGroupMethod(
             CartDeliveryGroupId = cartDeliveryGroupId,
-            CurrencyIsoCode = cartCurrency,
+            //CurrencyIsoCode = cartCurrency,
             ExternalProvider = shippingOption.getProvider(),
             Name = shippingOption.getName(),
             ShippingFee = shippingOption.getRate(),
@@ -281,7 +281,7 @@ global class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
         // Check to see if a Product2 with that name already exists.
         // If it doesn't exist, create one.
         String shippingChargeProduct2Name = 'Shipping Charge';
-        List<Product2> shippingChargeProducts = [SELECT Id FROM Product2 WHERE Name = :shippingChargeProduct2Name];
+        List<Product2> shippingChargeProducts = [SELECT Id FROM Product2 WHERE Name = :shippingChargeProduct2Name WITH SECURITY_ENFORCED];
         if (shippingChargeProducts.isEmpty()) {
             Product2 shippingChargeProduct = new Product2(
                 isActive = true,

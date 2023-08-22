@@ -1,7 +1,7 @@
 // This must implement the sfdc_checkout.CartTaxCalculations interface
 // in order to be processed by the checkout flow and used for your Taxes integration.
 
-global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
+global with sharing class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
     // You MUST change this to be your service or you must launch your own Heroku Service
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
@@ -11,7 +11,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
             // If there are any Products with null SKU throw exception.
-            CartItem[] nullSKUs = [SELECT Id FROM CartItem WHERE CartId=:cartId AND Type='Product' AND Sku=null];
+            CartItem[] nullSKUs = [SELECT Id FROM CartItem WHERE CartId=:cartId AND Type='Product' AND Sku=null WITH SECURITY_ENFORCED];
             if (!nullSKUs.isEmpty()) {
                 String errorMessage = 'The SKUs for all products in your cart must be defined.';
                 return integrationStatusFailedWithCartValidationOutputError(
@@ -26,11 +26,11 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             // In the future, when multiple delivery groups can be created,
             // this sample should be updated to loop through all delivery groups.
             // We need to get the ID of the delivery group in order to get the DeliverTo info.
-            Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId][0].CartDeliveryGroupId;
-            CartDeliveryGroup deliveryGroup = [SELECT DeliverToState, DeliverToCountry FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId][0];
-            String taxType = [SELECT TaxType FROM WebCart WHERE Id = :cartId][0].TaxType;
+            Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId WITH SECURITY_ENFORCED][0].CartDeliveryGroupId;
+            CartDeliveryGroup deliveryGroup = [SELECT DeliverToState, DeliverToCountry FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId WITH SECURITY_ENFORCED][0];
+            String taxType = [SELECT TaxType FROM WebCart WHERE Id = :cartId WITH SECURITY_ENFORCED][0].TaxType;
 
-            Map<ID, CartItem> cartItemsMap = new Map<ID, CartItem>([SELECT Id, Sku, Quantity, TotalLineAmount, AdjustmentAmount, (Select Id, TotalAmount from CartItemPriceAdjustments) FROM CartItem  WHERE CartId = :cartId]);
+            Map<ID, CartItem> cartItemsMap = new Map<ID, CartItem>([SELECT Id, Sku, Quantity, TotalLineAmount, AdjustmentAmount, (Select Id, TotalAmount from CartItemPriceAdjustments) FROM CartItem  WHERE CartId = :cartId WITH SECURITY_ENFORCED]);
 
             // Following snippet of code fetches a mocked static json response from getDataFromStaticResponse.
             // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
@@ -95,7 +95,7 @@ global class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
             // See the readme section about error handling for details about how to create that notification.
             return integrationStatusFailedWithCartValidationOutputError(
                 integStatus,
-                String.format('System.Label.ERROR_EXCEPTION_OCCURRED', new List<String>{ e.getTypeName(), e.getMessage() }),
+                'An exception of type ' + e.getTypeName() + ' has occurred: ' + e.getMessage(),
                 jobInfo,
                 cartId
             );

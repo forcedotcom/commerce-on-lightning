@@ -2,7 +2,7 @@
 
 // This must implement the sfdc_checkout.CartPriceCalculations interface
 // in order to be processed by the checkout flow and used for your Price Calculations integration.
-global class B2BPricingSample implements sfdc_checkout.CartPriceCalculations {
+global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCalculations {
     // You MUST change this to be your service or you must launch your own Heroku Service
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
@@ -16,11 +16,11 @@ global class B2BPricingSample implements sfdc_checkout.CartPriceCalculations {
             // In the real-life scenario, the ID will probably be an external ID
             // that identifies the customer in the external system,
             // but for simplicity we are using the Salesforce ID in this sample.
-            Id customerId = [SELECT OwnerId FROM WebCart WHERE id = :cartId][0].OwnerId;
+            Id customerId = [SELECT OwnerId FROM WebCart WHERE id = :cartId WITH SECURITY_ENFORCED][0].OwnerId;
 
             // Get all SKUs and their sale prices (customer-specific prices) from the cart items.
             Map<String, Decimal> salesPricesFromSalesforce = new Map<String, Decimal>();
-            for (CartItem cartItem : [SELECT Sku, SalesPrice FROM CartItem WHERE CartId = :cartId AND Type = 'Product']) {
+            for (CartItem cartItem : [SELECT Sku, SalesPrice FROM CartItem WHERE CartId = :cartId AND Type = 'Product' WITH SECURITY_ENFORCED]) {
                 if (String.isBlank(cartItem.Sku)) {
                     String errorMessage = 'The SKUs for all products in your cart must be defined.';
                     return integrationStatusFailedWithCartValidationOutputError(

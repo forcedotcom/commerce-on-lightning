@@ -1,6 +1,6 @@
 // This must implement the sfdc_checkout.CartInventoryValidation interface
 // in order to be processed by the checkout flow and used for your Check Inventory integration.
-global class B2BCheckInventorySample implements sfdc_checkout.CartInventoryValidation {
+global with sharing class B2BCheckInventorySample implements sfdc_checkout.CartInventoryValidation {
     // You MUST change this to be your service or you must launch your own Heroku Service
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
@@ -11,7 +11,7 @@ global class B2BCheckInventorySample implements sfdc_checkout.CartInventoryValid
         try {
             // Get all SKUs and their quantities from cart items.
             Map<String, Decimal> quantitiesFromSalesforce = new Map<String, Decimal>();
-            for (CartItem cartItem : [SELECT Sku, Quantity FROM CartItem WHERE CartId = :cartId AND Type = 'Product']) {
+            for (CartItem cartItem : [SELECT Sku, Quantity FROM CartItem WHERE CartId = :cartId AND Type = 'Product' WITH SECURITY_ENFORCED]) {
                 if (String.isBlank(cartItem.Sku)) {
                     String errorMessage = 'The SKUs for all products in your cart must be defined.';
                     return integrationStatusFailedWithCartValidationOutputError(
