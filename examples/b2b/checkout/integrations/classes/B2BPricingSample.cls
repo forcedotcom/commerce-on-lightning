@@ -146,8 +146,9 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
         if (response.getStatusCode() == successfulHttpRequest) {
             Map<String, Object> salesPricesFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             return salesPricesFromExternalService;
-        }
-        else {
+        } else if(response.getStatusCode() == 404) {
+            throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
+        } else {
             throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
     }
