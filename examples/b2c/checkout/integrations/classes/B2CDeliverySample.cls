@@ -107,12 +107,10 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                 ));
             }
             return shippingOptions;
+        } else if(response.getStatusCode() == 404) {
+            throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
         } else {
-            if(response.getStatusCode() == 404) {
-                throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
-            } else {
-                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
-            }
+            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
     }
 

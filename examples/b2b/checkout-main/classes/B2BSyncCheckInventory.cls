@@ -4,7 +4,6 @@ global with sharing class B2BSyncCheckInventory {
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
-    private class ApplicationException extends Exception {}
     // This invocable method only expects one ID
     @InvocableMethod(callout=true label='Ensure sufficient inventory' description='Runs a synchronous version of check inventory' category='B2B Commerce')
     public static void syncCheckInventory(List<ID> cartIds) {
@@ -72,7 +71,7 @@ global with sharing class B2BSyncCheckInventory {
 
     private Map<String, Object> getQuantitiesFromStaticResponse(ID cartId, Set<String> skus) {
         if (skus.isEmpty()) {
-            throw new ApplicationException('Input SKUs list is empty or undefined.');
+            return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
         String responseJson = '{';
         for (String sku : skus) {

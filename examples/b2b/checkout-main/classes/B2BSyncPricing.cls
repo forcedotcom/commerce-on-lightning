@@ -5,7 +5,6 @@ public  with sharing class B2BSyncPricing {
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
-    private class ApplicationException extends Exception {}
     // This invocable method only expects one ID
     @InvocableMethod(callout=true label='Price the cart' description='Runs a synchronous version of pricing' category='B2B Commerce')
     public static void syncPricing(List<ID> cartIds) {
@@ -89,7 +88,7 @@ public  with sharing class B2BSyncPricing {
 
     private Map<String, Object> getSalesPricesFromStaticResponse(String cartId, Set<String> skus, String customerId) {
         if (skus.isEmpty()) {
-            throw new ApplicationException('Input SKUs list is empty or undefined.');
+            return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
 
         String responseJson = '{';
@@ -110,7 +109,7 @@ public  with sharing class B2BSyncPricing {
     private static Map<String, Object> getSalesPricesFromExternalService(String cartId, Set<String> skus, String customerId) {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
-        Integer SuccessfulHttpRequest = 200;
+        Integer successfulHttpRequest = 200;
 
         // Encode the product SKUs to avoid any invalid characters in the request URL.
         Set<String> encodedSkus = new Set<String>();
@@ -128,7 +127,7 @@ public  with sharing class B2BSyncPricing {
         // Because this is a sample only and we want this integration to return success in order to allow the checkout to pass,
         // the external service created for this sample returns the exact list of SKUs it receives,
         // and the same sale price 0.00 for each SKU.
-        if (response.getStatusCode() == SuccessfulHttpRequest) {
+        if (response.getStatusCode() == successfulHttpRequest) {
             Map<String, Object> salesPricesFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             return salesPricesFromExternalService;
         } else if(response.getStatusCode() == 404) {

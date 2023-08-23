@@ -135,7 +135,7 @@ public class B2BSyncTax {
         insert(cartTaxestoInsert);
     }
 
-    private Map<String, Object> getDataFromStaticResponse(Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
+    private static Map<String, TaxDataFromExternalService> getDataFromStaticResponse(Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
         if (cartItemsMap == null) {
             throw new ApplicationException('Input SKUs list is empty or undefined.');
         }
@@ -211,6 +211,15 @@ public class B2BSyncTax {
             responseJson = responseJson + '"taxName": "GST"';
             responseJson = responseJson + '},';
         }
+
+        responseJson = responseJson.removeEnd(',') + '}';
+
+        Map<String, Object> resultsFromExternalServiceBySKU = (Map<String, Object>) JSON.deserializeUntyped(responseJson);
+        Map<String, TaxDataFromExternalService> taxDataFromExternalServiceBySKU = new Map<String, TaxDataFromExternalService>();
+        for (String sku : resultsFromExternalServiceBySKU.keySet()) {
+            taxDataFromExternalServiceBySKU.put(sku, new TaxDataFromExternalService((Map<String, Object>) resultsFromExternalServiceBySKU.get(sku)));
+        }
+        return taxDataFromExternalServiceBySKU;
     }
     
     private static Map<String, TaxDataFromExternalService> getTaxRatesAndAmountsFromExternalService (
