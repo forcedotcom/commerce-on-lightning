@@ -5,7 +5,6 @@ global class B2CCheckInventorySample implements sfdc_checkout.CartInventoryValid
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
-    private class ApplicationException extends Exception {}
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, ID cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -94,7 +93,7 @@ global class B2CCheckInventorySample implements sfdc_checkout.CartInventoryValid
 
     private Map<String, Object> getQuantitiesFromStaticResponse(Set<String> skus) {
         if (skus.isEmpty()) {
-            throw new ApplicationException('Input SKUs list is empty or undefined.');
+            return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
         String responseJson = '{';
         for (String sku : skus) {
@@ -131,12 +130,10 @@ global class B2CCheckInventorySample implements sfdc_checkout.CartInventoryValid
         if (response.getStatusCode() == successfulHttpRequest) {
             Map<String, Object> quantitiesFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             return quantitiesFromExternalService;
+        } else if(response.getStatusCode() == 404) {
+            throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
         } else {
-            if(response.getStatusCode() == 404) {
-                throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
-            } else {
-                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
-            }
+            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
     }
 

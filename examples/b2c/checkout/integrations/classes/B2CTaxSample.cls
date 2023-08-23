@@ -6,7 +6,6 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
-    private class ApplicationException extends Exception {}
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -105,8 +104,9 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
 
     private Map<String, Object> getDataFromStaticResponse(Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
         if (cartItemsMap == null) {
-            throw new ApplicationException('Input SKUs list is empty or undefined.');
+            return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
+
         Double taxRate = 0.15;
         String responseJson = '{';
         for (ID key : cartItemsMap.keySet()) {
