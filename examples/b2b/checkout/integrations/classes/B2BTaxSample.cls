@@ -6,7 +6,6 @@ global with sharing class B2BTaxSample implements sfdc_checkout.CartTaxCalculati
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
-    private class ApplicationException extends Exception {}
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -105,7 +104,7 @@ global with sharing class B2BTaxSample implements sfdc_checkout.CartTaxCalculati
 
     private Map<String, Object> getDataFromStaticResponse(Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
         if (cartItemsMap == null) {
-            throw new ApplicationException('Input SKUs list is empty or undefined.');
+            return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
         Double taxRate = 0.15;
         String responseJson = '{';
@@ -201,12 +200,10 @@ global with sharing class B2BTaxSample implements sfdc_checkout.CartTaxCalculati
         if (response.getStatusCode() == 200) {
             Map<String, Object> resultsFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             return resultsFromExternalService;
+        } else if(response.getStatusCode() == 404) {
+            throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
         } else {
-            if(response.getStatusCode() == 404) {
-                throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
-            } else {
-                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
-            }
+            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
     }
 

@@ -7,7 +7,6 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
-    private class ApplicationException extends Exception {}
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -106,7 +105,7 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
 
     private Map<String, Object> getSalesPricesFromStaticResponse(Set<String> skus, String customerId) {
         if (skus.isEmpty()) {
-            throw new ApplicationException('Input SKUs list is empty or undefined.');
+            return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
         
         String responseJson = '{';
