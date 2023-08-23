@@ -1,5 +1,9 @@
 // Determines the taxes for the cart
 public class B2BSyncTax {
+    // You MUST change this to be your service or you must launch your own Heroku Service
+    // and add the host in Setup | Security | Remote site settings.
+    private static String httpHost = 'https://example.com';
+    private static Boolean useHTTPService = false;
     // This invocable method only expects one ID
     @InvocableMethod(callout=true label='Prepare the taxes' description='Runs a synchronous version of taxes' category='B2B Commerce')
     public static void syncTax(List<ID> cartIds) {
@@ -57,13 +61,18 @@ public class B2BSyncTax {
             DataToExternalService data = new DataToExternalService(cartItem.Id, cartItemSKU, cartItem.Quantity, cartItem.TotalLineAmount, cartItem.AdjustmentAmount, cipaList);
 
             cartItemTotalPriceBySKU.put(cartItemSKU, data);
-        }      
-        
-        // Get the tax rates and tax amounts from an external service
-        // Other parameters will be passed here, like ship_from, bill_to, more details about the ship_to, etc.
-        Map<String, TaxDataFromExternalService> rateAndAmountFromExternalServicePerSku = getTaxRatesAndAmountsFromExternalService(
-            cartItemTotalPriceBySKU, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType
-        );
+        }
+
+        // Following snippet of code fetches a mocked static json response from getDataFromStaticResponse.
+        // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
+        // response is implemented in getDataFromExternalService method.
+
+        Map<String, TaxDataFromExternalService> rateAndAmountFromExternalServicePerSku = null;
+        if(useHTTPService) {
+            rateAndAmountFromExternalServicePerSku = getTaxRatesAndAmountsFromExternalService(cartItemTotalPriceBySKU, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
+        } else {
+            rateAndAmountFromExternalServicePerSku = getDataFromStaticResponse(cartItemTotalPriceBySKU, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
+        }
         
         // If there are taxes from a previously cancelled checkout, delete them.
         List<Id> cartItemIds = cartItemIdsBySKU.values();
@@ -124,12 +133,99 @@ public class B2BSyncTax {
         }
         insert(cartTaxestoInsert);
     }
+
+    private static Map<String, TaxDataFromExternalService> getDataFromStaticResponse(Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
+        if (cartItemsMap == null) {
+            return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
+        }
+        Double taxRate = 0.15;
+        String responseJson = '{';
+        for (ID key : cartItemsMap.keySet()) {
+            CartItem cartItem = cartItemsMap.get(key);
+            Id cartItemId = cartItem.Id;
+
+            Double amount = cartItem.TotalLineAmount==null ? 0.00 : cartItem.TotalLineAmount;
+            Double tierAdjustment = cartItem.AdjustmentAmount==null ? 0.00 : cartItem.AdjustmentAmount;
+            Double quantity = cartItem.Quantity==null ? 0.00 : cartItem.Quantity;
+
+            if(country == 'US') {
+                taxRate = 0.08;
+                String [] noSalesTaxUSStates = new String [] {'AK', 'DE', 'MT', 'NH', 'OR'};
+                if (noSalesTaxUSStates.contains(state)) {
+                    taxRate = 0.00;
+                }
+            }
+
+            Double itemizedPromotionTax = 0.00;
+            Double [] itemizedPromotionTaxArr = new Double [] {};
+            Double netUnitPrice = 0.00;
+            Double grossUnitPrice = 0.00;
+
+            Double multiplier = 0.00;
+
+            if(taxType == 'Gross') {
+                multiplier = taxRate / (1 + taxRate);
+            } else {
+                multiplier = taxRate;
+            }
+
+            Double cartItemTax = amount * multiplier;
+            Double tierAdjustmentTax = (tierAdjustment!=null ? tierAdjustment : 0.00) * multiplier;
+
+            CartItemPriceAdjustment [] itemizedPromotions = cartItem.CartItemPriceAdjustments;
+
+            String itemizedPromotionTaxResp = '[';
+            for(CartItemPriceAdjustment itemAdj : itemizedPromotions) {
+                Double itemTaxAmount = (itemAdj.TotalAmount!=null ? itemAdj.TotalAmount : 0.00) * multiplier;
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '{';
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '"id": "' + itemAdj.Id + '",';
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '"taxAmount": ' + itemTaxAmount;
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '},';
+                itemizedPromotionTax = itemizedPromotionTax + itemTaxAmount;
+            }
+            itemizedPromotionTaxResp = itemizedPromotionTaxResp.removeEnd(',') + ']';
+
+            if(taxType == 'Gross') {
+                grossUnitPrice = amount / quantity;
+                netUnitPrice = (amount - cartItemTax) / quantity;
+            } else {
+                grossUnitPrice = (amount + cartItemTax) / quantity;
+                netUnitPrice = amount / quantity;
+            }
+
+            responseJson = responseJson + '"'+cartItemId+'":';
+            responseJson = responseJson + '{';
+            responseJson = responseJson + '"cartItemId": "' + cartItemId + '",';
+            responseJson = responseJson + '"taxAmount": ' + cartItemTax + ',';
+            responseJson = responseJson + '"adjustmentTaxAmount": ' + tierAdjustmentTax + ',';
+
+            responseJson = responseJson + '"itemizedPromotionTaxAmounts": ';
+            responseJson = responseJson + itemizedPromotionTaxResp;
+            responseJson = responseJson + ',';
+
+            responseJson = responseJson + '"totalItemizedPromotionTaxAmount": ' + itemizedPromotionTax + ',';
+            responseJson = responseJson + '"grossUnitPrice": ' + grossUnitPrice + ',';
+            responseJson = responseJson + '"netUnitPrice": ' + netUnitPrice + ',';
+            responseJson = responseJson + '"taxRate": ' + taxRate + ',';
+            responseJson = responseJson + '"taxName": "GST"';
+            responseJson = responseJson + '},';
+        }
+
+        responseJson = responseJson.removeEnd(',') + '}';
+
+        Map<String, Object> resultsFromExternalServiceBySKU = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+        Map<String, TaxDataFromExternalService> taxDataFromExternalServiceBySKU = new Map<String, TaxDataFromExternalService>();
+        for (String sku : resultsFromExternalServiceBySKU.keySet()) {
+            taxDataFromExternalServiceBySKU.put(sku, new TaxDataFromExternalService((Map<String, Object>) resultsFromExternalServiceBySKU.get(sku)));
+        }
+        return taxDataFromExternalServiceBySKU;
+    }
     
     private static Map<String, TaxDataFromExternalService> getTaxRatesAndAmountsFromExternalService (
         Map<String, DataToExternalService> cartItemTotalAmountBySKU, String state, String country, String taxType) {
             Http http = new Http();
             HttpRequest request = new HttpRequest();
-            Integer SuccessfulHttpRequest = 200;
+            Integer successfulHttpRequest = 200;
             String encodedState = (state == null) ? '' : EncodingUtil.urlEncode(state, 'UTF-8').replace('+', '%20');
             String encodedCountry = (country == null) ? '' : EncodingUtil.urlEncode(country, 'UTF-8').replace('+', '%20');
             String encodedTaxType = (taxType == null) ? '' : EncodingUtil.urlEncode(taxType, 'UTF-8').replace('+', '%20');
@@ -139,10 +235,8 @@ public class B2BSyncTax {
                 encodedCartItemTotalAmountBySKU.put(EncodingUtil.urlEncode(sku, 'UTF-8'), cartItemTotalAmountBySKU.get(sku));
             }
             
-            // To access the service below, you may need to add endpoint = https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
-            String requestURL = 'https://b2b-commerce-test.herokuapp.com/get-tax-rates-with-adjustments?state=' + encodedState
+            String requestURL = httpHost + '/get-tax-rates-with-adjustments?state=' + encodedState
                             + '&country=' + encodedCountry + '&taxType=' + encodedTaxType
-                            //+ '&country=' + encodedCountry + '&taxType=' + 'Gross'  
                             + '&amountsBySKU=' + JSON.serialize(encodedCartItemTotalAmountBySKU);
             request.setEndpoint(requestURL);
             request.setMethod('GET');
@@ -158,11 +252,10 @@ public class B2BSyncTax {
                     taxDataFromExternalServiceBySKU.put(sku, new TaxDataFromExternalService((Map<String, Object>) resultsFromExternalServiceBySKU.get(sku)));
                 }
                 return taxDataFromExternalServiceBySKU;
-            }
-            else {
-                String errorMessage = 'There was a problem with the request. Error: ' + response.getStatusCode();
-                // Sync non-user errors skip saveCartValidationOutputError
-                throw new CalloutException (errorMessage);
+            } else if(response.getStatusCode() == 404) {
+                throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
+            } else {
+                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
             }
     }
 
