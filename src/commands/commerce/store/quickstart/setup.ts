@@ -220,9 +220,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
             .replace('YourCommunityNetworkNameHere', this.varargs['communityNetworkName'] as string)
             .replace('ApiVersionHere', this.flags.apiversion as string);
 
-        const storeType = StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger);
-        const storeTemplate = this.getTemplateName();
-
         if (!this.isUsingDigitalExperienceBundle) {
             packageRetrieve = packageRetrieve.replace(
                 'YourCommunityExperienceBundleNameHere',
