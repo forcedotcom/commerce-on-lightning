@@ -117,6 +117,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
+
         this.devHubUsername = (await this.org.getDevHubOrg()).getUsername();
         this.statusFileManager = new StatusFileManager(
             this.devHubUsername,
@@ -124,6 +125,11 @@ export class StoreQuickstartSetup extends SfdxCommand {
             this.flags['store-name'] as string
         );
         const storeType = StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger);
+        const storeTemplate = this.getTemplateName();
+
+        // LWR uses DigitalExperienceBundle, B2B Aura uses ExperienceBundle.
+        this.isUsingDigitalExperienceBundle = storeType !== 'B2B' || storeTemplate !== 'B2B Commerce (Aura)';
+
         // TODO this is only in store create so makes sense to key off of store
         await new Requires()
             .examplesConverted(
@@ -216,13 +222,12 @@ export class StoreQuickstartSetup extends SfdxCommand {
 
         const storeType = StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger);
         const storeTemplate = this.getTemplateName();
-        // DigitalExperienceBundle should be used to LWR stores, ExperienceBundle is used for Aura support.
-        if (storeType === 'B2B' && storeTemplate === 'B2B Commerce (Aura)') {
+
+        if (!this.isUsingDigitalExperienceBundle) {
             packageRetrieve = packageRetrieve.replace(
                 'YourCommunityExperienceBundleNameHere',
                 this.varargs['communityExperienceBundleName'] as string
             );
-            this.isUsingDigitalExperienceBundle = false;
         } else {
             // Digital Experience Bundle needs 'site/' prepended to the community name.
             packageRetrieve = packageRetrieve
@@ -1063,23 +1068,30 @@ export class StoreQuickstartSetup extends SfdxCommand {
     private async updateFlowAssociatedToCheckout(): Promise<void> {
         if (await this.statusFileManager.getValue('updatedFlowAssociatedToCheckout')) return;
         this.ux.log('Updating flow associated to checkout.');
-        const checkoutMetaFolder = `${this.storeDir}/experience-bundle-package/unpackaged/experiences/${
-            this.varargs['communityExperienceBundleName'] as string
-        }/views/`;
-        // Do a case insensitive grep and capture file
-        const greppedFile = fs.readdirSync(checkoutMetaFolder).filter((f) => f.toLowerCase() === 'checkout.json')[0];
-        // This determines the name of the main flow as it will always be the only flow to terminate in "Checkout.flow"
-        const flowDir = this.storeDir + '/../force-app/main/default/flows';
-        const mainFlowName = path
-            .basename(fs.readdirSync(flowDir).filter((f) => f.endsWith('Checkout.flow-meta.xml'))[0])
-            .split('.')[0];
-        fs.writeFileSync(
-            checkoutMetaFolder + '/' + greppedFile,
-            fs
-                .readFileSync(checkoutMetaFolder + '/' + greppedFile)
-                .toString()
-                .replace('sfdc_checkout__CheckoutTemplate', mainFlowName.toString())
-        );
+        if (!this.isUsingDigitalExperienceBundle) {
+            const checkoutMetaFolder = `${this.storeDir}/experience-bundle-package/unpackaged/experiences/${
+                this.varargs['communityExperienceBundleName'] as string
+            }/views/`;
+            // Do a case insensitive grep and capture file
+            const greppedFile = fs
+                .readdirSync(checkoutMetaFolder)
+                .filter((f) => f.toLowerCase() === 'checkout.json')[0];
+            // This determines the name of the main flow as it will always be the only flow to terminate in "Checkout.flow"
+            const flowDir = this.storeDir + '/../force-app/main/default/flows';
+            const mainFlowName = path
+                .basename(fs.readdirSync(flowDir).filter((f) => f.endsWith('Checkout.flow-meta.xml'))[0])
+                .split('.')[0];
+            fs.writeFileSync(
+                checkoutMetaFolder + '/' + greppedFile,
+                fs
+                    .readFileSync(checkoutMetaFolder + '/' + greppedFile)
+                    .toString()
+                    .replace('sfdc_checkout__CheckoutTemplate', mainFlowName.toString())
+            );
+        } else {
+            this.ux.log('Skipping updating flow associated to checkout because of DigitalExperienceBundle (LWR).');
+        }
+
         await this.statusFileManager.setValue('updatedFlowAssociatedToCheckout', true);
     }
 
