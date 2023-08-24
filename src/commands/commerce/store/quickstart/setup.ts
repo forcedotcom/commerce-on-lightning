@@ -71,7 +71,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
     public static examples = [`sfdx ${CMD} --definitionfile store-scratch-def.json`];
 
     protected static flagsConfig = {
-        ...filterFlags(['store-name', 'definitionfile', 'prompt'], allFlags),
+        ...filterFlags(['store-name', 'definitionfile', 'prompt', 'templatename'], allFlags),
     };
 
     private static storeType: string;
@@ -79,6 +79,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
     public statusFileManager: StatusFileManager;
     private devHubUsername: string;
     private storeDir: string;
+    private isUsingDigitalExperienceBundle = true;
 
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-explicit-any
     public static getStoreType(username: string, flags: OutputFlags<any>, ux, logger: Logger): string {
@@ -210,9 +211,27 @@ export class StoreQuickstartSetup extends SfdxCommand {
             )
             .toString()
             .replace('YourCommunitySiteNameHere', this.varargs['communitySiteName'] as string)
-            .replace('YourCommunityExperienceBundleNameHere', this.varargs['communityExperienceBundleName'] as string)
             .replace('YourCommunityNetworkNameHere', this.varargs['communityNetworkName'] as string)
             .replace('ApiVersionHere', this.flags.apiversion as string);
+
+        const storeType = StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger);
+        const storeTemplate = this.getTemplateName();
+        // DigitalExperienceBundle should be used to LWR stores, ExperienceBundle is used for Aura support.
+        if (storeType === 'B2B' && storeTemplate === 'B2B Commerce (Aura)') {
+            packageRetrieve = packageRetrieve.replace(
+                'YourCommunityExperienceBundleNameHere',
+                this.varargs['communityExperienceBundleName'] as string
+            );
+            this.isUsingDigitalExperienceBundle = false;
+        } else {
+            // Digital Experience Bundle needs 'site/' prepended to the community name.
+            packageRetrieve = packageRetrieve
+                .replace(
+                    'YourCommunityExperienceBundleNameHere',
+                    `site/${this.varargs['communityExperienceBundleName'] as string}`
+                )
+                .replace('ExperienceBundle', 'DigitalExperienceBundle');
+        }
         // turn sharing rule metadata off by default
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
             /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
@@ -477,7 +496,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const networkMetaFile = `${this.storeDir}/experience-bundle-package/unpackaged/networks/${
             this.varargs['communityNetworkName'] as string
         }.network`;
-        const data = fs
+        let data = fs
             .readFileSync(networkMetaFile)
             .toString()
             .replace(
@@ -495,7 +514,8 @@ export class StoreQuickstartSetup extends SfdxCommand {
             )
             .replace(/<status>.*/, '<status>Live</status>');
         if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2C')
-            data.replace(/<enableGuestChatter>.*/, '<enableGuestChatter>true</enableGuestChatter>')
+            data = data
+                .replace(/<enableGuestChatter>.*/, '<enableGuestChatter>true</enableGuestChatter>')
                 .replace(/<enableGuestFileAccess>.*/, '<enableGuestFileAccess>true</enableGuestFileAccess>')
                 .replace(/<selfRegistration>.*/, '<selfRegistration>true</selfRegistration>');
         // .replace('</Network>', '    <selfRegProfile>Buyer_User_Profile_From_QuickStart</selfRegProfile>\n</Network>'); // "Error: You can only select profiles that are associated with the experience."
@@ -766,35 +786,58 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 )
             );
         }
-        if (!fs.existsSync(`${this.storeDir}/experience-bundle-package/unpackaged/experiences`)) {
+        if (!fs.existsSync(`${this.storeDir}/experience-bundle-package/unpackaged`)) {
             await this.statusFileManager.setValue('retrievedPackages', false);
             await this.retrievePackages();
         }
         this.ux.log(msgs.getMessage('quickstart.setup.makeSiteAndNavMenuItemPublic'));
-        const siteConfigMetaFileName =
-            this.storeDir +
-            `/experience-bundle-package/unpackaged/experiences/${
-                this.varargs['communityExperienceBundleName'] as string
-            }/config/${configName}.json`;
-        const siteConfigMetaFile = Object.assign(new StoreConfig(), await fs.readJson(siteConfigMetaFileName));
-        siteConfigMetaFile.isAvailableToGuests = true;
-        siteConfigMetaFile.authenticationType = 'AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED';
-        fs.writeFileSync(siteConfigMetaFileName, JSON.stringify(siteConfigMetaFile, null, 4));
-        const def = parseStoreScratchDef(this.flags);
-        const relaxedLevel = def.settings.isRelaxedCSPLevel;
-        const siteConfigMainAppPageFileName =
-            this.storeDir +
-            `/experience-bundle-package/unpackaged/experiences/${
-                this.varargs['communityExperienceBundleName'] as string
-            }/config/mainAppPage.json`;
-        if (relaxedLevel) {
-            fs.writeFileSync(
-                siteConfigMainAppPageFileName,
-                fs
-                    .readFileSync(siteConfigMainAppPageFileName)
-                    .toString()
-                    .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
-            );
+        let siteConfigMetaFileName = null;
+        let bundleName = this.varargs['communityExperienceBundleName'] as string;
+        if (this.isUsingDigitalExperienceBundle) {
+            siteConfigMetaFileName =
+                this.storeDir +
+                `/experience-bundle-package/unpackaged/digitalExperiences/site/${bundleName}/sfdc_cms__site/${bundleName}/content.json`;
+            let siteConfigJsonData = fs.readFileSync(siteConfigMetaFileName, { encoding: 'utf-8' });
+            let siteConfig = JSON.parse(siteConfigJsonData);
+            siteConfig.contentBody.authenticationType = 'AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED';
+            fs.writeFileSync(siteConfigMetaFileName, JSON.stringify(siteConfig, null, 4));
+            const def = parseStoreScratchDef(this.flags);
+            const relaxedLevel = def.settings.isRelaxedCSPLevel;
+            const siteConfigMainAppPageFileName =
+                this.storeDir +
+                `/experience-bundle-package/unpackaged/digitalExperiences/site/${bundleName}/sfdc_cms__appPage/mainAppPage/content.json`;
+            if (relaxedLevel) {
+                let appConfigJsonData = fs.readFileSync(siteConfigMainAppPageFileName, { encoding: 'utf-8' });
+                let appConfig = JSON.parse(appConfigJsonData);
+                appConfig.isRelaxedCSPLevel = true;
+                fs.writeFileSync(siteConfigMetaFileName, JSON.stringify(siteConfig, null, 4));
+            }
+        } else {
+            siteConfigMetaFileName =
+                this.storeDir +
+                `/experience-bundle-package/unpackaged/experiences/${
+                    this.varargs['communityExperienceBundleName'] as string
+                }/config/${configName}.json`;
+            const siteConfigMetaFile = Object.assign(new StoreConfig(), await fs.readJson(siteConfigMetaFileName));
+            siteConfigMetaFile.isAvailableToGuests = true;
+            siteConfigMetaFile.authenticationType = 'AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED';
+            fs.writeFileSync(siteConfigMetaFileName, JSON.stringify(siteConfigMetaFile, null, 4));
+            const def = parseStoreScratchDef(this.flags);
+            const relaxedLevel = def.settings.isRelaxedCSPLevel;
+            const siteConfigMainAppPageFileName =
+                this.storeDir +
+                `/experience-bundle-package/unpackaged/experiences/${
+                    this.varargs['communityExperienceBundleName'] as string
+                }/config/mainAppPage.json`;
+            if (relaxedLevel) {
+                fs.writeFileSync(
+                    siteConfigMainAppPageFileName,
+                    fs
+                        .readFileSync(siteConfigMainAppPageFileName)
+                        .toString()
+                        .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
+                );
+            }
         }
 
         this.ux.log(msgs.getMessage('quickstart.setup.enableGuestBrowsingForWebStoreAndCreateGuestBuyerProfile'));
@@ -936,6 +979,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
             fs.readFileSync(`${this.storeDir}/experience-bundle-package/unpackaged/package.xml`).toString()
         );
         packageDeploy['Package']['version'] = this.flags.apiversion;
+        if (this.isUsingDigitalExperienceBundle) {
+            packageDeploy['Package']['types'][1]['name'] = 'DigitalExperienceBundle';
+        }
         // turn sharing rule metadata off by default
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
             packageDeploy['Package']['types'] = packageDeploy['Package']['types'].filter(
@@ -1035,5 +1081,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 .replace('sfdc_checkout__CheckoutTemplate', mainFlowName.toString())
         );
         await this.statusFileManager.setValue('updatedFlowAssociatedToCheckout', true);
+    }
+
+    private getTemplateName(): string {
+        return this.flags['templatename'] as string;
     }
 }
