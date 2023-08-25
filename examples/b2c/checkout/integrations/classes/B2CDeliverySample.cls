@@ -232,10 +232,10 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         // ReferenceNumber: Reference Number from External Service
         // IsActive: If this Option is Active
         Id productId = getDefaultShippingChargeProduct2Id();
-        String cartCurrency = [SELECT CurrencyIsoCode FROM WebCart WHERE Id = :webCartId][0].CurrencyIsoCode;
+        //String cartCurrency = [SELECT CurrencyIsoCode FROM WebCart WHERE Id = :webCartId][0].CurrencyIsoCode;
         CartDeliveryGroupMethod cartDeliveryGroupMethod = new CartDeliveryGroupMethod(
             CartDeliveryGroupId = cartDeliveryGroupId,
-            CurrencyIsoCode = cartCurrency,
+            //CurrencyIsoCode = cartCurrency,
             ExternalProvider = shippingOption.getProvider(),
             Name = shippingOption.getName(),
             ShippingFee = shippingOption.getRate(),

@@ -43,7 +43,7 @@ global with sharing class B2BTaxSample implements sfdc_checkout.CartTaxCalculati
             }
 
             // If there are taxes from a previously cancelled checkout, delete them.
-            delete [SELECT Id FROM CartTax WHERE CartItemId IN (Select Id FROM CartItem WHERE CartId = :cartId)];
+            delete [SELECT Id FROM CartTax WHERE CartItemId IN (Select Id FROM CartItem WHERE CartId = :cartId) WITH SECURITY_ENFORCED];
 
             // For each cart item, insert a new tax line in the CartTax entity.
             // The total tax is automatically rolled up to TotalLineTaxAmount in the corresponding CartItem line.

@@ -86,7 +86,7 @@ public  with sharing class B2BSyncPricing {
         }
     }
 
-    private Map<String, Object> getSalesPricesFromStaticResponse(String cartId, Set<String> skus, String customerId) {
+    private static Map<String, Object> getSalesPricesFromStaticResponse(String cartId, Set<String> skus, String customerId) {
         if (skus.isEmpty()) {
             return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
