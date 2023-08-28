@@ -1077,8 +1077,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
                     .toString()
                     .replace('sfdc_checkout__CheckoutTemplate', mainFlowName.toString())
             );
-        } else {
-            this.ux.log('Skipping updating flow associated to checkout because of DigitalExperienceBundle (LWR).');
         }
 
         await this.statusFileManager.setValue('updatedFlowAssociatedToCheckout', true);
