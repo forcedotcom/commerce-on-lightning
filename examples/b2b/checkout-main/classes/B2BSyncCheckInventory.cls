@@ -69,7 +69,7 @@ global with sharing class B2BSyncCheckInventory {
         }
     }
 
-    private Map<String, Object> getQuantitiesFromStaticResponse(ID cartId, Set<String> skus) {
+    private static Map<String, Object> getQuantitiesFromStaticResponse(ID cartId, Set<String> skus) {
         if (skus.isEmpty()) {
             return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
