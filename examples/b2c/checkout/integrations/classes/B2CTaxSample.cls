@@ -12,7 +12,9 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
             // If there are any Products with null SKU throw exception.
             CartItem[] nullSKUs = [SELECT Id FROM CartItem WHERE CartId=:cartId AND Type='Product' AND Sku=null];
             if (!nullSKUs.isEmpty()) {
-                String errorMessage = System.Label.ERROR_SKU_NOT_DEFINED;
+                // Following line of code requires org to setup translations and have custom labels created.
+                // String errorMessage = System.Label.ERROR_SKU_NOT_DEFINED;
+                String errorMessage = 'The SKUs for all products in your cart must be defined.';
                 return integrationStatusFailedWithCartValidationOutputError(
                     integStatus,
                     errorMessage,
@@ -94,7 +96,9 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
             // See the readme section about error handling for details about how to create that notification.
             return integrationStatusFailedWithCartValidationOutputError(
                 integStatus,
-                String.format(System.Label.ERROR_EXCEPTION_OCCURRED, new List<String>{ e.getTypeName(), e.getMessage() }),
+                // Following line of code requires org to setup translations and have custom labels created.
+                // String.format(System.Label.ERROR_EXCEPTION_OCCURRED, new List<String>{ e.getTypeName(), e.getMessage() }),
+                String.format('An exception of type {0} has occurred: {1}', new List<String>{ e.getTypeName(), e.getMessage() }),
                 jobInfo,
                 cartId
             );
