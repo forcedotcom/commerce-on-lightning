@@ -568,36 +568,40 @@ USAGE
   trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
-  -b, --buyer-username=buyer-username                                               [default: buyer@1commerce.com]
-                                                                                    buyer's username
+  -b, --buyer-username=buyer-username
+      [default: buyer@1commerce.com] buyer's username
 
-  -f, --definitionfile=definitionfile                                               Store config file
+  -f, --definitionfile=definitionfile
+      The store config file. By default it will be either of ~/.commerce/config/b2c-store-scratch-def or
+      ~/.commerce/config/b2b-store-scratch-def based on store type. Default store type is b2c.]
 
-  -n, --store-name=store-name                                                       (required) [default: 1commerce] name
-                                                                                    of the site to create
+  -n, --store-name=store-name
+      (required) [default: 1commerce] name of the site to create
 
-  -o, --type=b2c|b2b                                                                [default: b2c] The type of store you
-                                                                                    want to create
+  -o, --type=b2c|b2b
+      [default: b2c] The type of store you want to create
 
-  -t, --templatename=templatename                                                   template to use to create a site
+  -t, --templatename=templatename
+      Template to use to create a site. If not specified, the template is retrieved from the store config file based on
+      the store type (b2b or b2c).
 
-  -u, --targetusername=targetusername                                               username or alias for the target
-                                                                                    org; overrides default target org
+  -u, --targetusername=targetusername
+      username or alias for the target org; overrides default target org
 
-  -v, --targetdevhubusername=targetdevhubusername                                   username or alias for the dev hub
-                                                                                    org; overrides default dev hub org
+  -v, --targetdevhubusername=targetdevhubusername
+      username or alias for the dev hub org; overrides default dev hub org
 
-  -y, --prompt                                                                      If there is a file difference
-                                                                                    detected, prompt before overwriting
-                                                                                    file
+  -y, --prompt
+      If there is a file difference detected, prompt before overwriting file
 
-  --apiversion=apiversion                                                           override the api version used for
-                                                                                    api requests made by this command
+  --apiversion=apiversion
+      override the api version used for api requests made by this command
 
-  --json                                                                            format output as json
+  --json
+      format output as json
 
-  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)  [default: warn] logging level for
-                                                                                    this command invocation
+  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)
+      [default: warn] logging level for this command invocation
 
 EXAMPLE
   sfdx commerce:store:create --store-name test-store
@@ -695,22 +699,24 @@ USAGE
   <string>] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]
 
 OPTIONS
-  -n, --store-name=store-name                                                       (required) [default: 1commerce] name
-                                                                                    of the site to create
+  -n, --store-name=store-name
+      (required) [default: 1commerce] name of the site to create
 
-  -t, --templatename=templatename                                                   [default: b2c-lite-storefront]
-                                                                                    template to use to create a site
+  -t, --templatename=templatename
+      [default: b2c-lite-storefront] Template to use to create a site. If not specified, the template is retrieved from
+      the store config file based on the store type (b2b or b2c).
 
-  -u, --targetusername=targetusername                                               username or alias for the target
-                                                                                    org; overrides default target org
+  -u, --targetusername=targetusername
+      username or alias for the target org; overrides default target org
 
-  --apiversion=apiversion                                                           override the api version used for
-                                                                                    api requests made by this command
+  --apiversion=apiversion
+      override the api version used for api requests made by this command
 
-  --json                                                                            format output as json
+  --json
+      format output as json
 
-  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)  [default: warn] logging level for
-                                                                                    this command invocation
+  --loglevel=(trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL)
+      [default: warn] logging level for this command invocation
 
 EXAMPLE
   sfdx commerce:store:quickstart:create --templatename 'b2c-lite-storefront'
