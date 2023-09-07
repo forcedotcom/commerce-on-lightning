@@ -1,6 +1,9 @@
-import { LightningElement, api, track } from 'lwc';
+import { LightningElement, api } from 'lwc';
 import { loadScript } from 'lightning/platformResourceLoader';
-import { executePayment } from './executePayment';
+
+import { paymentClientRequest } from 'commerce/checkoutApi';
+
+import locale from '@salesforce/i18n/locale';
 
 const cardStyle = {
     base: {
@@ -10,26 +13,6 @@ const cardStyle = {
 
 const IS_PRODUCTION = true; // TODO: detect mode
 const NO_ERROR = '\u200b';
-
-export function buildSalesforceGatewayLog(request, response, interactionType) {
-    if (request && request.payment_method && request.payment_method.card) {
-        delete request.payment_method.card;
-    }
-
-    const { paymentIntent, error } = response;
-    const interactionStatus = error ? 'Failed' : 'Success';
-    const description = error ? error.message : paymentIntent ? paymentIntent.message : '';
-
-    return {
-        description,
-        ...(paymentIntent && { authorizationCode: paymentIntent.id }),
-        ...(paymentIntent && { refNumber: paymentIntent.id }),
-        interactionType: interactionType,
-        interactionStatus,
-        request,
-        response,
-    };
-}
 
 /**
  * Sample Stripe client-side component, copy of the sfdx-stripe component, included here for:
@@ -41,7 +24,7 @@ export default class StripeCardElement extends LightningElement {
     card;
     _billingAddress;
 
-    @track error = NO_ERROR;
+    error = NO_ERROR;
 
     _initialized;
     _isValid = false;
@@ -52,14 +35,18 @@ export default class StripeCardElement extends LightningElement {
         this.webstoreId = webstoreId;
         // webstoreId is not set in renderedCallback, get clientConfig here instead
         this.clientConfiguration = clientConfiguration;
+
         await loadScript(this, 'https://js.stripe.com/v3/');
+
         // eslint-disable-next-line no-undef
-        this.stripe = Stripe(this.clientConfiguration.publishableAPIKey);
+        this.stripe = Stripe(this.clientConfiguration.publishableAPIKey, {
+            locale,
+        });
         await this.setupCardElement();
         this._initialized = true;
     }
 
-    async setupCardElement() {
+    setupCardElement() {
         const elements = this.stripe.elements();
 
         // create+mount card element
@@ -70,20 +57,17 @@ export default class StripeCardElement extends LightningElement {
         // show card validation errors
         this.card.on('change', (event) => {
             this.error = event.error ? event.error.message : NO_ERROR;
-            this._isValid = !event.error && event.complete;
+            this._isValid = !event.error;
         });
     }
 
     @api
     async completePayment(billingAddress) {
-        const params = {};
-        const paymentIntent = await executePayment(params);
+        const paymentIntent = await paymentClientRequest();
 
-        const gatewaylogs = [buildSalesforceGatewayLog(params, paymentIntent, 'PaymentIntent')];
         if (this._card_confirmed_status.includes(paymentIntent.paymentData.status)) {
             return {
                 responseCode: paymentIntent.paymentData.id,
-                logs: gatewaylogs,
             };
         }
 
@@ -108,8 +92,6 @@ export default class StripeCardElement extends LightningElement {
 
         const result = await this.stripe.confirmCardPayment(paymentIntent.paymentData.client_secret, request);
 
-        gatewaylogs.push(buildSalesforceGatewayLog(request, result, 'ConfirmIntent'));
-
         if (result.error) {
             console.error('payment failed', result.error);
             return {
@@ -117,13 +99,11 @@ export default class StripeCardElement extends LightningElement {
                     code: result.error.decline_code ? result.error.decline_code : result.error.code,
                     message: result.error.message,
                 },
-                logs: gatewaylogs,
             };
         }
 
         return {
             responseCode: result.paymentIntent.id,
-            logs: gatewaylogs,
         };
     }
 

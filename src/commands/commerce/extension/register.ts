@@ -49,6 +49,16 @@ export class RegisterExtension extends SfdxCommand {
             char: 'm',
             description: msgs.getMessage('extension.register.apexNameSpaceFlagDescription'),
         }),
+        description: flags.string({
+            char: 'd',
+            description: msgs.getMessage('extension.register.apexClassDescriptionFieldMessage'),
+        }),
+        'icon-uri': flags.string({
+            description: msgs.getMessage('extension.register.apexClassIconURIDescription'),
+        }),
+        'is-application': flags.boolean({
+            description: msgs.getMessage('extension.register.apexClassisApplicationDescription'),
+        }),
     };
 
     public org: Org;
@@ -68,7 +78,10 @@ export class RegisterExtension extends SfdxCommand {
                 this.flags['registered-extension-name'],
                 this.flags['extension-point-name'],
                 this.flags['apex-class-name'],
-                this.org.getUsername()
+                this.org.getUsername(),
+                this.flags['description'],
+                this.flags['icon-uri'],
+                this.flags['is-application']
             ),
         };
     }
@@ -78,7 +91,10 @@ export class RegisterExtension extends SfdxCommand {
         storeRegisteredName: string,
         storeEPN: string,
         storeApexClass: string,
-        storeUserName: string
+        storeUserName: string,
+        apexDescription?: string,
+        iconURI?: string,
+        isApplication?: boolean
     ): string {
         // get apexClass id from table
         const apexClassId = this.getApexClass(storeApexClass, storeUserName);
@@ -96,10 +112,25 @@ export class RegisterExtension extends SfdxCommand {
         if (storeRegisteredName === undefined) {
             throw new SfdxError(msgs.getMessage('extension.register.undefinedName'));
         }
+
+        const recordValues = [
+            `DeveloperName=${storeRegisteredName}`,
+            `MasterLabel=${storeRegisteredName}`,
+            `ExtensionPointName=${storeEPN}`,
+            `ExternalServiceProviderId=${apexClassId}`,
+            "ExternalServiceProviderType='Extension'",
+        ];
+
+        if (apexDescription !== undefined) recordValues.push(`Description='${apexDescription}'`);
+
+        if (iconURI !== undefined) recordValues.push(`IconURI=${iconURI}`);
+
+        if (isApplication !== undefined) recordValues.push(`isApplication=${isApplication.toString()}`);
+
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         const results = forceDataRecordCreate(
             'RegisteredExternalService',
-            `DeveloperName=${storeRegisteredName} MasterLabel=${storeRegisteredName} ExtensionPointName=${storeEPN} ExternalServiceProviderId=${apexClassId} ExternalServiceProviderType='Extension'`,
+            recordValues.join(' '),
             storeUserName,
             this.flags,
             this.logger
@@ -134,7 +165,7 @@ export class RegisterExtension extends SfdxCommand {
     // returns entire record from RegisteredExternalService in JSON format
     private getInsertedRecord(storeRegisteredName: string, storeApexClass: string, storeUserName: string): string {
         const RegisteredTable = forceDataSoql(
-            `SELECT Id,ConfigUrl,DeveloperName,DocumentationUrl,ExtensionPointName,ExternalServiceProviderId,ExternalServiceProviderType,Language,MasterLabel,NamespacePrefix from RegisteredExternalService WHERE DeveloperName='${storeRegisteredName}'`,
+            `SELECT FIELDS(ALL) from RegisteredExternalService WHERE DeveloperName='${storeRegisteredName}' LIMIT 1`,
             storeUserName,
             this.flags,
             this.logger
@@ -148,6 +179,12 @@ export class RegisterExtension extends SfdxCommand {
                 ExtensionPointName: element['ExtensionPointName'] as string,
                 ExternalServiceProviderType: element['ExternalServiceProviderType'] as string,
             };
+            if ('Description' in element) finalTable['Description'] = element['Description'] as string;
+
+            if ('IconUri' in element) finalTable['IconURI'] = element['IconUri'] as string;
+
+            if ('IsApplication' in element) finalTable['IsApplication'] = element['IsApplication'] as string;
+
             const returnResult = `${JSON.stringify(finalTable, null, 4)}\n`;
             this.ux.log(`${returnResult}`);
             this.ux.log(msgs.getMessage('extension.register.savingConfigIntoConfig'));

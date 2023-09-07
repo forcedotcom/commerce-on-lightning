@@ -71,11 +71,11 @@
 8. Create a B2B Aura store.
 
     ```bash
-    sfdx commerce:store:create -t 'B2B Commerce' -n <<STORE_NAME>> -o b2b -b <<BUYER_USER_EMAIL>> -u <<ORG_USERNAME>> -v <<DEVHUB_USERNAME>> --apiversion=<<API_VERSION>>
+    sfdx commerce:store:create -t '<<TEMPLATE_NAME>>' -n <<STORE_NAME>> -o b2b -b <<BUYER_USER_EMAIL>> -u <<ORG_USERNAME>> -v <<DEVHUB_USERNAME>> --apiversion=<<API_VERSION>>
 
     #####example#####
-    # Note: On completion the command outputs the buyer user name and password
-    # sfdx commerce:store:create -t 'B2B Commerce' -n b2bstore01 -o b2b -b b2b_aura_buyer@1commerce.com -u demo_org_1@1commerce.com -v devhubtest1sdb3@mydevhub.com --apiversion=57.0
+    # Note: The template name for Aura store is 'B2B Commerce (Aura)'. To see the available templates run force:community:template:list.
+    # sfdx commerce:store:create -t 'B2B Commerce (Aura)' -n b2bstore01 -o b2b -b b2b_aura_buyer@1commerce.com -u demo_org_1@1commerce.com -v devhubtest1sdb3@mydevhub.com --apiversion=57.0
     ```
 
 9. Create a B2B LWR store.
@@ -99,6 +99,7 @@
 ## Useful Commands
 
 -   To see all the orgs that you previously authorized, run `sfdx force:org:list -all`.
+-   To see all the available templates run `sfdx force:community:template:list -u <<ORG_USERNAME>>`
 -   If the org session times out, then logout and log back in again.
 
     ```bash

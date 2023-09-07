@@ -1,85 +1,90 @@
 // This must implement the sfdc_checkout.CartTaxCalculations interface
 // in order to be processed by the checkout flow and used for your Taxes integration.
+
 global with sharing class B2BTaxSample implements sfdc_checkout.CartTaxCalculations {
+    // You MUST change this to be your service or you must launch your own Heroku Service
+    // and add the host in Setup | Security | Remote site settings.
+    private static String httpHost = 'https://example.com';
+    private static Boolean useHTTPService = false;
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
+            // If there are any Products with null SKU throw exception.
+            CartItem[] nullSKUs = [SELECT Id FROM CartItem WHERE CartId=:cartId AND Type='Product' AND Sku=null WITH SECURITY_ENFORCED];
+            if (!nullSKUs.isEmpty()) {
+                String errorMessage = 'The SKUs for all products in your cart must be defined.';
+                return integrationStatusFailedWithCartValidationOutputError(
+                    integStatus,
+                    errorMessage,
+                    jobInfo,
+                    cartId
+                );
+            }
+
             // In the Spring '20 release, there should be one delivery group per cart.
             // In the future, when multiple delivery groups can be created,
             // this sample should be updated to loop through all delivery groups.
-
             // We need to get the ID of the delivery group in order to get the DeliverTo info.
             Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId WITH SECURITY_ENFORCED][0].CartDeliveryGroupId;
             CartDeliveryGroup deliveryGroup = [SELECT DeliverToState, DeliverToCountry FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId WITH SECURITY_ENFORCED][0];
+            String taxType = [SELECT TaxType FROM WebCart WHERE Id = :cartId WITH SECURITY_ENFORCED][0].TaxType;
+
+            Map<ID, CartItem> cartItemsMap = new Map<ID, CartItem>([SELECT Id, Sku, Quantity, TotalLineAmount, AdjustmentAmount, (Select Id, TotalAmount from CartItemPriceAdjustments) FROM CartItem  WHERE CartId = :cartId WITH SECURITY_ENFORCED]);
+
+            // Following snippet of code fetches a mocked static json response from getDataFromStaticResponse.
+            // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
+            // response is implemented in getDataFromExternalService method.
             
-            // Get all SKUs, the cart item IDs, and the total prices from the cart items.
-            Map<String, Id> cartItemIdsBySKU = new Map<String, Id>();
-            Map<String, Decimal> cartItemTotalPriceBySKU = new Map<String, Decimal>();
-            for (CartItem cartItem : [SELECT Sku, TotalPrice, Type FROM CartItem WHERE CartId = :cartId WITH SECURITY_ENFORCED]) {
-                String cartItemSKU = '';
-                if (cartItem.Type == 'Product') {
-                    if (String.isBlank(cartItem.Sku)) {
-                        String errorMessage = 'The SKUs for all products in your cart must be defined.';
-                        return integrationStatusFailedWithCartValidationOutputError(
-                            integStatus,
-                            errorMessage,
-                            jobInfo,
-                            cartId
-                        );
-                    }
-                    cartItemSKU = cartItem.Sku;
-                }
-                else if (cartItem.Type == 'Charge') {
-                    // This is an example for a Cart Item of type shipping charge.
-                    // For simplicity and testing purposes, we just assign some SKU to this charge so that the taxation external service returns some value.
-                    cartItemSKU = 'ChargeSKU';
-                }
-                cartItemIdsBySKU.put(cartItemSKU, cartItem.Id);
-                cartItemTotalPriceBySKU.put(cartItemSKU, cartItem.TotalPrice);
-            }      
-            
-            // Get the tax rates and tax amounts from an external service
-            // Other parameters will be passed here, like ship_from, bill_to, more details about the ship_to, etc.
-            Map<String, TaxDataFromExternalService> rateAndAmountFromExternalServicePerSku = getTaxRatesAndAmountsFromExternalService(
-                cartItemTotalPriceBySKU, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry
-            );
-            
+            Map<String, Object> dataFromService = null;
+            if(useHTTPService) {
+                dataFromService = getDataFromExternalService(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
+            } else {
+                dataFromService = getDataFromStaticResponse(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
+            }
+
             // If there are taxes from a previously cancelled checkout, delete them.
-            List<Id> cartItemIds = cartItemIdsBySKU.values();
-            delete [SELECT Id FROM CartTax WHERE CartItemId IN :cartItemIds WITH SECURITY_ENFORCED];
-            
+            delete [SELECT Id FROM CartTax WHERE CartItemId IN (Select Id FROM CartItem WHERE CartId = :cartId) WITH SECURITY_ENFORCED];
+
             // For each cart item, insert a new tax line in the CartTax entity.
             // The total tax is automatically rolled up to TotalLineTaxAmount in the corresponding CartItem line.
             CartTax[] cartTaxestoInsert = new CartTax[]{};
-            for (String sku : cartItemIdsBySKU.keySet()) {
-                TaxDataFromExternalService rateAndAmountFromExternalService = rateAndAmountFromExternalServicePerSku.get(sku);
-                if (rateAndAmountFromExternalService == null){
-                    return integrationStatusFailedWithCartValidationOutputError(
-                        integStatus,
-                        'The product with sku ' + sku + ' could not be found in the external system',
-                        jobInfo,
-                        cartId
-                    );
-                }
-                // If the sku was found in the external system, add a new CartTax line for that sku
-                // The following fields from CartTax can be filled in:
-                // Amount (required): Calculated tax amount.
-                // CartItemId (required): ID of the cart item.
-                // Description (optional): Description of CartTax.
-                // Name (required): Name of the tax.
-                // TaxCalculationDate (required): Calculation date for this tax line.
-                // TaxRate (optional): The percentage value of the tax. Null if the tax is a flat amount.
-                // TaxType (required): The type of tax, e.g. Actual or Estimated.
-                CartTax tax = new CartTax( 
-                    Amount = rateAndAmountFromExternalService.getAmount(),
-                    CartItemId = cartItemIdsBySKU.get(sku),
-                    Name = rateAndAmountFromExternalService.getTaxName(),
+
+            List<CartItem> cartItemsList = new List<CartItem>(cartItemsMap.values());
+
+            for (CartItem cartItemToUpdate : cartItemsList) {
+                // Update CartItem with taxes
+                String cartItemId = cartItemToUpdate.id;
+                Map<String, Object> cartItemsMapFromService = (Map<String, Object>) dataFromService.get(cartItemId);
+                cartItemToUpdate.AdjustmentTaxAmount = (Decimal)cartItemsMapFromService.get('adjustmentTaxAmount');
+                cartItemToUpdate.NetUnitPrice = (Decimal)cartItemsMapFromService.get('netUnitPrice');
+                cartItemToUpdate.GrossUnitPrice = (Decimal)cartItemsMapFromService.get('grossUnitPrice');
+
+                CartTax tax = new CartTax(
+                    Amount = (Decimal)cartItemsMapFromService.get('taxAmount'),
+                    CartItemId = cartItemId,
+                    Name = (String)cartItemsMapFromService.get('taxName'),
                     TaxCalculationDate = Date.today(),
-                    TaxRate = rateAndAmountFromExternalService.getRate(),
+                    TaxRate = (Decimal)cartItemsMapFromService.get('taxRate'),
                     TaxType = 'Actual'
                 );
                 cartTaxestoInsert.add(tax);
+
+                List<Object> itemTaxList = (List<Object>)cartItemsMapFromService.get('itemizedPromotionTaxAmounts');
+                for (Object cipaTax : itemTaxList) {
+                    CartTax promoTax = new CartTax(
+                        Amount = (Decimal)((Map<String, Object>) cipaTax).get('taxAmount'),
+                        CartItemId = cartItemId,
+                        Name = (String)cartItemsMapFromService.get('taxName'),
+                        TaxCalculationDate = Date.today(),
+                        TaxRate = (Decimal)cartItemsMapFromService.get('taxRate'),
+                        TaxType = 'Actual',
+                        CartItemPriceAdjustmentId = (String)((Map<String, Object>) cipaTax).get('id')
+                    );
+                    cartTaxestoInsert.add(promoTax);
+                }
             }
+
+            update(cartItemsList);
             insert(cartTaxestoInsert);
             integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
         } catch(Exception e) {
@@ -96,81 +101,112 @@ global with sharing class B2BTaxSample implements sfdc_checkout.CartTaxCalculati
         }
         return integStatus;
     }
-    
-    private Map<String, TaxDataFromExternalService> getTaxRatesAndAmountsFromExternalService (
-        Map<String, Decimal> cartItemTotalAmountBySKU, String state, String country) {
-            Http http = new Http();
-            HttpRequest request = new HttpRequest();
-            Integer SuccessfulHttpRequest = 200;
-            String encodedState = (state == null) ? '' : EncodingUtil.urlEncode(state, 'UTF-8').replace('+', '%20');
-            String encodedCountry = (country == null) ? '' : EncodingUtil.urlEncode(country, 'UTF-8').replace('+', '%20');
+
+    private Map<String, Object> getDataFromStaticResponse(Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
+        if (cartItemsMap == null) {
+            return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
+        }
+        Double taxRate = 0.15;
+        String responseJson = '{';
+        for (ID key : cartItemsMap.keySet()) {
+            CartItem cartItem = cartItemsMap.get(key);
+            Id cartItemId = cartItem.Id;
             
-            Map<String, Decimal> encodedCartItemTotalAmountBySKU = new Map<String, Decimal>();
-            for(String sku: cartItemTotalAmountBySKU.keySet()) {
-                encodedCartItemTotalAmountBySKU.put(EncodingUtil.urlEncode(sku, 'UTF-8'), cartItemTotalAmountBySKU.get(sku));
-            }
+            Double amount = cartItem.TotalLineAmount==null ? 0.00 : cartItem.TotalLineAmount;
+            Double tierAdjustment = cartItem.AdjustmentAmount==null ? 0.00 : cartItem.AdjustmentAmount;
+            Double quantity = cartItem.Quantity==null ? 0.00 : cartItem.Quantity;
             
-            // To access the service below, you may need to add endpoint = https://b2b-commerce-test.herokuapp.com in Setup | Security | Remote site settings.
-            String requestURL = 'https://b2b-commerce-test.herokuapp.com/get-tax-rates?state=' + encodedState
-                            + '&country=' + encodedCountry
-                            + '&amountsBySKU=' + JSON.serialize(encodedCartItemTotalAmountBySKU);
-            request.setEndpoint(requestURL);
-            request.setMethod('GET');
-            HttpResponse response = http.send(request);
-        
-            // If the request is successful, parse the JSON response;
-            // The response includes the tax amount, rate, and name for each SKU. It looks something like this:
-            // {"SKU_1_september10-1568355297":{"taxAmount":2.8229012971048855,"taxRate":0.08,"taxName":"GST"},"SKU_0_september10-1568355296":{"taxAmount":5.0479003481482385,"taxRate":0.08,"taxName":"GST"}}
-            if (response.getStatusCode() == SuccessfulHttpRequest) {
-                Map<String, Object> resultsFromExternalServiceBySKU = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
-                Map<String, TaxDataFromExternalService> taxDataFromExternalServiceBySKU = new Map<String, TaxDataFromExternalService>();
-                for (String sku : resultsFromExternalServiceBySKU.keySet()) {
-                    Map<String, Object> rateAndAmountFromExternalService = (Map<String, Object>) resultsFromExternalServiceBySKU.get(sku);
-                    taxDataFromExternalServiceBySKU.put(sku, new TaxDataFromExternalService(
-                        (Decimal)rateAndAmountFromExternalService.get('taxRate'),
-                        (Decimal)rateAndAmountFromExternalService.get('taxAmount'),
-                        (String)rateAndAmountFromExternalService.get('taxName')
-                    ));
+            if(country == 'US') {
+                taxRate = 0.08;
+                String [] noSalesTaxUSStates = new String [] {'AK', 'DE', 'MT', 'NH', 'OR'};
+                if (noSalesTaxUSStates.contains(state)) {
+                    taxRate = 0.00;
                 }
-                return taxDataFromExternalServiceBySKU;
             }
-            else {
-                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+            
+            Double itemizedPromotionTax = 0.00;
+            Double [] itemizedPromotionTaxArr = new Double [] {};
+            Double netUnitPrice = 0.00;
+            Double grossUnitPrice = 0.00;
+            
+            Double multiplier = 0.00;
+        
+            if(taxType == 'Gross') {
+                multiplier = taxRate / (1 + taxRate);
+            } else {
+                multiplier = taxRate;
             }
+            
+            Double cartItemTax = amount * multiplier;
+            Double tierAdjustmentTax = (tierAdjustment!=null ? tierAdjustment : 0.00) * multiplier;
+            
+            CartItemPriceAdjustment [] itemizedPromotions = cartItem.CartItemPriceAdjustments;
+            
+            String itemizedPromotionTaxResp = '[';
+            for(CartItemPriceAdjustment itemAdj : itemizedPromotions) {
+                Double itemTaxAmount = (itemAdj.TotalAmount!=null ? itemAdj.TotalAmount : 0.00) * multiplier;
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '{';
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '"id": "' + itemAdj.Id + '",';
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '"taxAmount": ' + itemTaxAmount;
+                itemizedPromotionTaxResp = itemizedPromotionTaxResp + '},';
+                itemizedPromotionTax = itemizedPromotionTax + itemTaxAmount;
+            }
+            itemizedPromotionTaxResp = itemizedPromotionTaxResp.removeEnd(',') + ']';
+            
+            if(taxType == 'Gross') {
+                grossUnitPrice = amount / quantity;
+                netUnitPrice = (amount - cartItemTax) / quantity;
+            } else {
+                grossUnitPrice = (amount + cartItemTax) / quantity;
+                netUnitPrice = amount / quantity;
+            }
+            
+            responseJson = responseJson + '"'+cartItemId+'":';
+            responseJson = responseJson + '{';
+            responseJson = responseJson + '"cartItemId": "' + cartItemId + '",';
+            responseJson = responseJson + '"taxAmount": ' + cartItemTax + ',';
+            responseJson = responseJson + '"adjustmentTaxAmount": ' + tierAdjustmentTax + ',';
+            
+            responseJson = responseJson + '"itemizedPromotionTaxAmounts": ';
+            responseJson = responseJson + itemizedPromotionTaxResp;
+            responseJson = responseJson + ',';
+            
+            responseJson = responseJson + '"totalItemizedPromotionTaxAmount": ' + itemizedPromotionTax + ',';
+            responseJson = responseJson + '"grossUnitPrice": ' + grossUnitPrice + ',';
+            responseJson = responseJson + '"netUnitPrice": ' + netUnitPrice + ',';
+            responseJson = responseJson + '"taxRate": ' + taxRate + ',';
+            responseJson = responseJson + '"taxName": "GST"';
+            responseJson = responseJson + '},';
+        }
+        
+        responseJson = responseJson.removeEnd(',') + '}';        
+        return (Map<String, Object>) JSON.deserializeUntyped(responseJson);
     }
-    
-    // Structure to store the tax data retrieved from external service
-    // This simplifies our ability to access it when storing it in Salesforce's CartTax entity
-    Class TaxDataFromExternalService {
-        private Decimal rate;
-        private Decimal amount;
-        private String taxName;
-        
-        public TaxDataFromExternalService () {
-            rate = 0.0;
-            amount = 0.0;
-            taxName = '';
-        }
-        
-        public TaxDataFromExternalService (Decimal someRate, Decimal someAmount, String someTaxName) {
-            rate = someRate;
-            amount = someAmount;
-            taxName = someTaxName;
-        }
-        
-        public Decimal getRate() {
-            return rate;
-        }
-        
-        public Decimal getAmount() {
-            return amount;
-        }
-        
-        public String getTaxName() {
-            return taxName;
+
+    private Map<String, Object> getDataFromExternalService (
+        Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
+
+        String requestURL = httpHost + '/get-tax-rates-with-adjustments-post';
+        String requestBody = '{"state":"'+state+'", "country":"'+country+'", "taxType":"'+taxType+'", '+'"amountsBySKU":'+JSON.serialize(cartItemsMap)+'}';
+        Http http = new Http();
+        HttpRequest request = new HttpRequest();
+        request.setEndpoint(requestURL);
+        request.setMethod('POST');
+        request.setHeader('Content-Type', 'application/json');
+        request.setBody(requestBody);
+        HttpResponse response = http.send(request);
+
+        // If the request is successful, parse the JSON response
+        if (response.getStatusCode() == 200) {
+            Map<String, Object> resultsFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
+            return resultsFromExternalService;
+        } else if(response.getStatusCode() == 404) {
+            throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
+        } else {
+            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
     }
-    
+
     private sfdc_checkout.IntegrationStatus integrationStatusFailedWithCartValidationOutputError(
         sfdc_checkout.IntegrationStatus integrationStatus, String errorMessage, sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
             integrationStatus.status = sfdc_checkout.IntegrationStatus.Status.FAILED;

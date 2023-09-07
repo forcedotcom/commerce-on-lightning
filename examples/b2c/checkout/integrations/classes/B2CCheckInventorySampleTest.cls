@@ -14,48 +14,12 @@ public class B2CCheckInventorySampleTest {
     }
 
     @isTest static void testWhenExternalServiceQuantityIsLargerThanTheCartItemQuantityASuccessStatusIsReturned() {
-        // Because test methods do not support Web service callouts, we create a mock response based on a static resource.
-        // To create the static resource from the Developer Console, select File | New | Static Resource
-        StaticResourceCalloutMock mock = new StaticResourceCalloutMock();
-        mock.setStaticResource('GetInventoryResource');
-        mock.setStatusCode(200);
-        mock.setHeader('Content-Type', 'application/json;charset=UTF-8');
         Test.startTest();
-        // Associate the callout with a mock response.
-        Test.setMock(HttpCalloutMock.class, mock);
-
         // Test: execute the integration for the test cart ID.
         B2CCheckInventorySample apexSample = new B2CCheckInventorySample();
         WebCart webCart = [SELECT Id FROM WebCart WHERE Name = 'Cart' LIMIT 1];
         sfdc_checkout.IntegrationStatus integrationResult = apexSample.startCartProcessAsync(null, webCart.Id);
         System.assertEquals(sfdc_checkout.IntegrationStatus.Status.SUCCESS, integrationResult.status);
-        Test.stopTest();
-    }
-
-    @isTest static void testWhenExternalServiceCallFailsAFailedStatusIsReturnedAndACartValidationOutputEntryIsCreated() {
-        // Because test methods do not support Web service callouts, we create a mock response based on a static resource.
-        // To create the static resource from the Developer Console, select File | New | Static Resource
-        StaticResourceCalloutMock mock = new StaticResourceCalloutMock();
-        mock.setStaticResource('GetInventoryResource');
-        // The web service call returns an error code.
-        mock.setStatusCode(404);
-        mock.setHeader('Content-Type', 'application/json;charset=UTF-8');
-        Test.startTest();
-        // Associate the callout with a mock response.
-        Test.setMock(HttpCalloutMock.class, mock);
-
-        // Test: execute the integration for the test cart ID and integration info.
-        B2CCheckInventorySample apexSample = new B2CCheckInventorySample();
-        sfdc_checkout.IntegrationInfo integInfo = new sfdc_checkout.IntegrationInfo();
-        integInfo.jobId = null;
-        WebCart webCart = [SELECT Id FROM WebCart WHERE Name = 'Cart' LIMIT 1];
-        sfdc_checkout.IntegrationStatus integrationResult = apexSample.startCartProcessAsync(integInfo, webCart.Id);
-
-        // Validate: IntegrationStatus.Status is FAILED.
-        // and a new CartValidationOutput record with level 'Error' was created.
-        System.assertEquals(sfdc_checkout.IntegrationStatus.Status.FAILED, integrationResult.status);
-        List<CartValidationOutput> cartValidationOutputs = [SELECT Id FROM CartValidationOutput WHERE Level = 'Error'];
-        System.assertEquals(1, cartValidationOutputs.size());
         Test.stopTest();
     }
 
