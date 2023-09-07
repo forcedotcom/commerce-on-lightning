@@ -61,6 +61,7 @@ export class ScratchOrgCreate extends SfdxCommand {
     private devHubDir: string;
 
     public async run(): Promise<AnyJson> {
+        this.ux.warn("This is the legacy version of the plugin that is meant to be used on orgs that are 244 or lower. Please use the official released version at your earliest convenience.");
         await setApiVersion(this.hubOrg, this.flags);
         /*
         Base class reads the tagetdevhubusername or -v arg. if not provided it will use whatever is set for defaultdevhubusername config parameter
