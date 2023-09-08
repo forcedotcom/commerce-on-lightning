@@ -1,6 +1,5 @@
 // This must implement the sfdc_checkout.CartShippingCharges interface
 // in order to be processed by the checkout flow for the "Shipping" integration
-
 global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippingCharges {
     // You MUST change this to be your service or you must launch your own Heroku Service
     // and add the host in Setup | Security | Remote site settings.
@@ -27,7 +26,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
                 shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromMockedService(numberOfUniqueItems);
             }
 
-            // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
+            // On re-entry of the checkout flow delete all previous CartDeliveryGroupMethods for the given cartDeliveryGroupId
             delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId WITH SECURITY_ENFORCED];
 
             // Create orderDeliveryMethods given your shipping options or fetch existing ones. 2 should be returned.
@@ -42,7 +41,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
                                                                   cartId);
                 i+=1;
             }
-
+            
             // If everything works well, the charge is added to the cart and our integration has been successfully completed.
             integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
 
@@ -53,12 +52,13 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         } catch (DmlException de) {
             // Catch any exceptions thrown when trying to insert the shipping charge to the CartItems
             Integer numErrors = de.getNumDml();
-            String errorMessage = 'There were ' + numErrors + ' errors when trying to insert the charge in the CartDeliveryGroupMethod: ';
+            String errorMessage = 'There were ' + numErrors + ' errors when trying to insert the charge in the CartItem: ';
             for(Integer errorIdx = 0; errorIdx < numErrors; errorIdx++) {
                 errorMessage += 'Field Names = ' + de.getDmlFieldNames(errorIdx);
                 errorMessage += 'Message = ' + de.getDmlMessage(errorIdx);
                 errorMessage += ' , ';
             }
+
             return integrationStatusFailedWithCartValidationOutputError(
                 integStatus,
                 errorMessage,
@@ -68,7 +68,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         } catch(Exception e) {
             return integrationStatusFailedWithCartValidationOutputError(
                 integStatus,
-                'An exception occurred during Shipping Calculation.',
+                'An exception of type ' + e.getTypeName() + ' has occurred: ' + e.getMessage(),
                 jobInfo,
                 cartId
             );
@@ -77,10 +77,35 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
     }
 
     /**
-        This method provides a sample of how to call an external service to retrieve Shipping Options.
-        The heroku servie called in this method is just a reference implementation that responds back with
-        a sample response and MUST not be used in production systems.
+        This method provides an alternative to retrieve Shipping Options if http call needs to be bypassed.
+        This method uses a hardcoded sample response and MUST not be used in production systems.
      */
+    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (Integer numberOfUniqueItems) {
+        ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
+        String responseBody = getShippingOptionsResponse();
+        List<Object> results = (List<Object>) JSON.deserializeUntyped(responseBody);
+        for (Object result: results) {
+            Map<String, Object> subresult = (Map<String, Object>) result;
+            Map<String, Object> providerAndRate = (Map<String, Object>) subresult.get('rate');
+            shippingOptions.add( new ShippingOptionsAndRatesFromExternalService(
+                (String) providerAndRate.get('name'),
+                (String) providerAndRate.get('serviceCode'),
+                (Decimal) providerAndRate.get('shipmentCost') * numberOfUniqueItems,
+                (Decimal) providerAndRate.get('otherCost'),
+                (String) providerAndRate.get('serviceName')
+            ));
+        }
+        return shippingOptions;
+    }
+
+    private String getShippingOptionsResponse() {
+        String name1 = 'Delivery Method 1';
+        String name2 = 'Delivery Method 2';
+        String serviceName1 = 'Test Carrier 1';
+        String serviceName2 = 'Test Carrier 2';
+        return '[{"status":"calculated","rate":{"name":"'+name1+'","serviceName":"'+serviceName1+'","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},{"status":"calculated","rate":{"name":"'+name2+'","serviceName":"'+serviceName2+'","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99}}]';
+    }
+
     private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (Integer numberOfUniqueItems) {
         final Integer successfulHttpRequest = 200;
 
@@ -110,39 +135,11 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
                 ));
             }
             return shippingOptions;
+        } else if(response.getStatusCode() == 404) {
+            throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
         } else {
             throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
-    }
-
-    /**
-        This method provides an alternative to retrieve Shipping Options if http call needs to be bypassed.
-        This method uses a hardcoded sample response and MUST not be used in production systems.
-     */
-    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (Integer numberOfUniqueItems) {
-        ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
-        String responseBody = getShippingOptionsResponse();
-        List<Object> results = (List<Object>) JSON.deserializeUntyped(responseBody);
-        for (Object result: results) {
-            Map<String, Object> subresult = (Map<String, Object>) result;
-            Map<String, Object> providerAndRate = (Map<String, Object>) subresult.get('rate');
-            shippingOptions.add( new ShippingOptionsAndRatesFromExternalService(
-                (String) providerAndRate.get('name'),
-                    (String) providerAndRate.get('serviceCode'),
-                    (Decimal) providerAndRate.get('shipmentCost') * numberOfUniqueItems, // Multiply so shipping costs can change; remove when using a real shipping provider
-                    (Decimal) providerAndRate.get('otherCost'),
-                    (String) providerAndRate.get('serviceName')
-            ));
-        }
-        return shippingOptions;
-    }
-
-    private String getShippingOptionsResponse() {
-        String name1 = 'Delivery Method 1';
-        String name2 = 'Delivery Method 2';
-        String serviceName1 = 'Test Carrier 1';
-        String serviceName2 = 'Test Carrier 2';
-        return '[{"status":"calculated","rate":{"name":"'+name1+'","serviceName":"'+serviceName1+'","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},{"status":"calculated","rate":{"name":"'+name2+'","serviceName":"'+serviceName2+'","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99}}]';
     }
 
     // Structure to store the shipping options retrieved from external service.
