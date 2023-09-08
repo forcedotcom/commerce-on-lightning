@@ -5,7 +5,6 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
-
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -46,10 +45,10 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
             // If everything works well, the charge is added to the cart and our integration has been successfully completed.
             integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
 
-            // For testing purposes, this example treats exceptions as user errors, which means they are displayed to the buyer user.
-            // In production you probably want this to be an admin-type error. In that case, throw the exception here
-            // and make sure that a notification system is in place to let the admin know that the error occurred.
-            // See the readme section about error handling for details about how to create that notification.
+        // For testing purposes, this example treats exceptions as user errors, which means they are displayed to the buyer user.
+        // In production you probably want this to be an admin-type error. In that case, throw the exception here
+        // and make sure that a notification system is in place to let the admin know that the error occurred.
+        // See the readme section about error handling for details about how to create that notification.
         } catch (DmlException de) {
             // Catch any exceptions thrown when trying to insert the shipping charge to the CartItems
             Integer numErrors = de.getNumDml();
