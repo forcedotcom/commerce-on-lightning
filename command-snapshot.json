@@ -130,7 +130,8 @@
             "prompt",
             "store-name",
             "targetdevhubusername",
-            "targetusername"
+            "targetusername",
+            "templatename"
         ]
     },
     {

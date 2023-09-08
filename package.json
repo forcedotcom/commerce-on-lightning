@@ -1,6 +1,6 @@
 {
     "name": "@salesforce/commerce",
-    "version": "244.0.40",
+    "version": "244.0.47",
     "author": "Jonathan Arndt",
     "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
     "dependencies": {
@@ -10,7 +10,7 @@
         "@oclif/errors": "^1",
         "@salesforce/command": "^3.1.0",
         "@salesforce/core": "^2.36.0",
-        "fast-xml-parser": "^4.1.2",
+        "fast-xml-parser": "^4.2.4",
         "string-argv": "^0.3.1",
         "tslib": "^2.5.0",
         "yaml": "^2.2.2"
