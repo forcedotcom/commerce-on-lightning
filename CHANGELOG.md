@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 * Order Management is now supported through the plugin. See examples/som/README.md for more details!
 
-* Digital Experience Bundle in Experience Cloud is now supported which means orgs that are higher than API version 59 can be used.
+* Digital Experience Bundle in Experience Cloud is now supported which means orgs that are higher than API version 59 can be used to create stores using the plugin.
 
 * Added support for iconURI, isApplication and description fields for extensions.
 
