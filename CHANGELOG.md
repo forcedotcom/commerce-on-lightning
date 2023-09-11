@@ -1,7 +1,19 @@
+# Changelog	
+
+All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
+
 # [248.1.0](https://github.com/forcedotcom/commerce-on-lightning/compare/v242.1.1...248.1.0) (2023-09-11)
 
 
 ### Features
+
+* Order Management is now supported through the plugin. See examples/som/README.md for more details!
+
+* Digital Experience Bundle in Experience Cloud is now supported which means orgs that are higher than API version 59 can be used.
+
+* Added support for iconURI, isApplication and description fields for extensions.
+
+* The example files have been updated to be move away from the ‘b2b-commerce-test’ Heroku app.
 
 * updating stripe client side examples to latest ([#182](https://github.com/forcedotcom/commerce-on-lightning/issues/182)) ([6c73aff](https://github.com/forcedotcom/commerce-on-lightning/commit/6c73affbb8ece61e393d7c202930850f1e7f76fb))
 
