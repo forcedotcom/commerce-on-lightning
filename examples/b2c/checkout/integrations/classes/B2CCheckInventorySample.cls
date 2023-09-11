@@ -34,6 +34,10 @@ global class B2CCheckInventorySample implements sfdc_checkout.CartInventoryValid
                 );
             }
 
+            // Following snippet of code fetches a mocked static json response from getQuantitiesFromStaticResponse.
+            // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
+            // response is implemented in getQuantitiesFromExternalService method.
+
             // Get all available quantities for products in the cart (cart items) from an external service.
             Map<String, Object> quantitiesFromService = null;
             if(useHTTPService) {
@@ -41,13 +45,13 @@ global class B2CCheckInventorySample implements sfdc_checkout.CartInventoryValid
             } else {
                 quantitiesFromService = getQuantitiesFromStaticResponse(quantitiesFromSalesforce.keySet());
             }
-
+            
             // For each cart item SKU, check that the quantity from the external service
             // is greater or equal to the quantity in the cart.
             // If that is not true, set the integration status to "Failed".
             for (String sku : quantitiesFromSalesforce.keySet()) {
                 Decimal quantityFromSalesforce = quantitiesFromSalesforce.get(sku);
-                Decimal quantityFromService = (Decimal)quantitiesFromService.get(sku);
+                Decimal quantityFromService = (Decimal) quantitiesFromService.get(sku);
                 if (quantityFromService == null){
                     String errorMessage = 'The product with sku ' + sku + ' could not be found in the external system';
                     return integrationStatusFailedWithCartValidationOutputError(

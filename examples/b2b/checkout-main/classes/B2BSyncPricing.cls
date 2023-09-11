@@ -38,7 +38,7 @@ public  with sharing class B2BSyncPricing {
             }
             salesPricesFromSalesforce.put(cartItem.Sku, cartItem.SalesPrice);
         }
-        
+
         // Following snippet of code fetches a mocked static json response from getSalesPricesFromStaticResponse.
         // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
         // response is implemented in getSalesPricesFromExternalService method.

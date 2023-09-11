@@ -1,5 +1,6 @@
 // This must implement the sfdc_checkout.CartShippingCharges interface
 // in order to be processed by the checkout flow for the "Shipping" integration
+
 global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
     // You MUST change this to be your service or you must launch your own Heroku Service
     // and add the host in Setup | Security | Remote site settings.
@@ -9,7 +10,7 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
             // In the Winter '21 release there should be two delivery groups per cart.
-            // We need to get the ID of the cart delivery group in order to create the order delivery groups.
+            // We need to get the ID of the cart delivery group in order to create the cart delivery group methods.
             Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId][0].CartDeliveryGroupId;
 
             // Get the shipping options from an external service.
@@ -31,17 +32,9 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
             delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId];
 
-            // Create orderDeliveryMethods given your shipping options or fetch existing ones. 2 should be returned.
-            List<Id> orderDeliveryMethodIds = getOrderDeliveryMethods(shippingOptionsAndRatesFromExternalService);
-
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
-            Integer i = 0;
-            for (Id orderDeliveryMethodId: orderDeliveryMethodIds) {
-               populateCartDeliveryGroupMethodWithShippingOptions(shippingOptionsAndRatesFromExternalService[i],
-                                                                cartDeliveryGroupId,
-                                                                orderDeliveryMethodId,
-                                                                cartId);
-                i+=1;
+            for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromExternalService) {
+               populateCartDeliveryGroupMethodWithShippingOptions(shippingOption, cartDeliveryGroupId, cartId);
             }
             // If everything works well, the charge is added to the cart and our integration has been successfully completed.
             integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
@@ -53,7 +46,7 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         } catch (DmlException de) {
             // Catch any exceptions thrown when trying to insert the shipping charge to the CartItems
             Integer numErrors = de.getNumDml();
-            String errorMessage = 'There were ' + numErrors + ' errors when trying to insert the charge in the CartItem: ';
+            String errorMessage = 'There were ' + numErrors + ' errors when trying to insert the charge in the CartDeliveryGroupMethod: ';
             for(Integer errorIdx = 0; errorIdx < numErrors; errorIdx++) {
                 errorMessage += 'Field Names = ' + de.getDmlFieldNames(errorIdx);
                 errorMessage += 'Message = ' + de.getDmlMessage(errorIdx);
@@ -103,7 +96,11 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                     (String) providerAndRate.get('serviceCode'),
                     (Decimal) providerAndRate.get('shipmentCost'),
                     (Decimal) providerAndRate.get('otherCost'),
-                    (String) providerAndRate.get('serviceName')
+                    (String) providerAndRate.get('serviceName'),
+                    (String) providerAndRate.get('serviceName'),
+                    (String) providerAndRate.get('serviceCode'),
+                    generateRandomString(10),
+                    true
                 ));
             }
             return shippingOptions;
@@ -113,7 +110,6 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
     }
-
 
     /**
         This method provides an alternative to retrieve Shipping Options if http call needs to be bypassed.
@@ -131,10 +127,24 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                 (String) providerAndRate.get('serviceCode'),
                 (Decimal) providerAndRate.get('shipmentCost'),
                 (Decimal) providerAndRate.get('otherCost'),
-                (String) providerAndRate.get('serviceName')
+                (String) providerAndRate.get('serviceName'),
+                (String) providerAndRate.get('serviceName'),
+                (String) providerAndRate.get('serviceCode'),
+                generateRandomString(10),
+                true
             ));
         }
         return shippingOptions;
+    }
+
+    private static String generateRandomString(Integer len) {
+        final String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz';
+        String randStr = '';
+        while (randStr.length() < len) {
+        Integer idx = Math.mod(Math.abs(Crypto.getRandomInteger()), chars.length());
+        randStr += chars.substring(idx, idx+1);
+        }
+        return randStr; 
     }
 
     private String getShippingOptionsResponse(String siteLanguage) {
@@ -165,6 +175,10 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         private Decimal rate;
         private Decimal otherCost;
         private String serviceName;
+        private String carrier;
+        private String classOfService;
+        private String referenceNumber;
+        private Boolean isActive;
 
         public ShippingOptionsAndRatesFromExternalService() {
             name = '';
@@ -172,56 +186,65 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             rate = 0.0;
             serviceName = '';
             otherCost = 0.0;
+            carrier = '';
+            classOfService = '';
+            referenceNumber = '';
+            isActive = true;
         }
 
-        public ShippingOptionsAndRatesFromExternalService(String someName, String someProvider, Decimal someRate, Decimal someOtherCost, String someServiceName) {
+        public ShippingOptionsAndRatesFromExternalService(String someName, String someProvider, Decimal someRate, Decimal someOtherCost, String someServiceName,
+                String someCarrier, String someClassOfService, String someReferenceNumber, Boolean someIsActive) {
             name = someName;
             provider = someProvider;
             rate = someRate;
             otherCost = someOtherCost;
             serviceName = someServiceName;
+            carrier = someCarrier;
+            classOfService = someClassOfService;
+            referenceNumber = someReferenceNumber;
+            isActive = someIsActive;
         }
 
-        public String getProvider() {
-            return provider;
-        }
-
-        public Decimal getRate() {
-            return rate;
-        }
-
-        public Decimal getOtherCost() {
-            return otherCost;
-        }
-
-        public String getServiceName() {
-            return serviceName;
-        }
-
-        public String getName() {
-            return name;
-        }
+        public String getProvider() { return provider; }
+        public Decimal getRate() { return rate; }
+        public Decimal getOtherCost() { return otherCost; }
+        public String getServiceName() { return serviceName; }
+        public String getName() { return name; }
+        public String getCarrier() { return carrier; }
+        public String getClassOfService() { return classOfService; }
+        public String getReferenceNumber() { return referenceNumber; }
+        public Boolean isActive() { return isActive; }
     }
 
     // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
     private void populateCartDeliveryGroupMethodWithShippingOptions(ShippingOptionsAndRatesFromExternalService shippingOption,
                                                                   Id cartDeliveryGroupId,
-                                                                  Id deliveryMethodId,
                                                                   Id webCartId){
         // When inserting a new CartDeliveryGroupMethod, the following fields have to be populated:
         // CartDeliveryGroupId: Id of the delivery group of this shipping option
-        // DeliveryMethodId: Id of the delivery method for this shipping option
         // ExternalProvider: Unique identifier of shipping provider
         // Name: Name of the CartDeliveryGroupMethod record
         // ShippingFee: The cost of shipping for the delivery group
         // WebCartId: Id if the cart that the delivery group belongs to
+        // Carrier: Shipping Carrier e.g. UPS, FedEx etc.
+        // ClassOfService: Service e.g. 2 Day Ground, Overnight etc.
+        // Product: Product Id for this Shipping Charge
+        // ReferenceNumber: Reference Number from External Service
+        // IsActive: If this Option is Active
+        Id productId = getDefaultShippingChargeProduct2Id();
+        //String cartCurrency = [SELECT CurrencyIsoCode FROM WebCart WHERE Id = :webCartId][0].CurrencyIsoCode;
         CartDeliveryGroupMethod cartDeliveryGroupMethod = new CartDeliveryGroupMethod(
             CartDeliveryGroupId = cartDeliveryGroupId,
-            DeliveryMethodId = deliveryMethodId,
+            //CurrencyIsoCode = cartCurrency,
             ExternalProvider = shippingOption.getProvider(),
             Name = shippingOption.getName(),
             ShippingFee = shippingOption.getRate(),
-            WebCartId = webCartId
+            WebCartId = webCartId,
+            Carrier = shippingOption.getCarrier(),
+            ClassOfService = shippingOption.getClassOfService(),
+            ProductId = productId,
+            ReferenceNumber = shippingOption.getReferenceNumber(),
+            IsActive = shippingOption.isActive()
         );
         insert(cartDeliveryGroupMethod);
     }
@@ -251,63 +274,11 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             return integrationStatus;
     }
 
-    private Id getShippingChargeProduct2Id(Id orderDeliveryMethodId) {
-        // The Order Delivery Method should have a Product2 associated with it, because we added that in getDefaultOrderDeliveryMethod if it didn't exist.
-        List<OrderDeliveryMethod> orderDeliveryMethods = [SELECT ProductId FROM OrderDeliveryMethod WHERE Id = :orderDeliveryMethodId];
-        return orderDeliveryMethods[0].ProductId;
-    }
-
-    private List<Id> getOrderDeliveryMethods(List<ShippingOptionsAndRatesFromExternalService> shippingOptions) {
-        String defaultDeliveryMethodName = 'Order Delivery Method';
-        Id product2IdForThisDeliveryMethod = getDefaultShippingChargeProduct2Id();
-
-        // Check to see if a default OrderDeliveryMethod already exists.
-        // If it doesn't exist, create one.
-        List<Id> orderDeliveryMethodIds = new List<Id>();
-        List<OrderDeliveryMethod> orderDeliveryMethods = new List<OrderDeliveryMethod>();
-        Integer i = 1;
-        for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptions) {
-            String shippingOptionNumber = String.valueOf(i);
-            String name = defaultDeliveryMethodName + shippingOptionNumber;
-            List<OrderDeliveryMethod> odms = [SELECT Id, ProductId, Carrier, ClassOfService FROM OrderDeliveryMethod WHERE Name = :name];
-            // This is the case in which an Order Delivery method does not exist.
-            if (odms.isEmpty()) {
-                OrderDeliveryMethod defaultOrderDeliveryMethod = new OrderDeliveryMethod(
-                    Name = name,
-                    Carrier = shippingOption.serviceName,
-                    isActive = true,
-                    ProductId = product2IdForThisDeliveryMethod,
-                    ClassOfService = shippingOption.provider
-                );
-                insert(defaultOrderDeliveryMethod);
-                orderDeliveryMethodIds.add(defaultOrderDeliveryMethod.Id);
-            }
-            else {
-                // This is the case in which an Order Delivery method exists.
-                // If the OrderDeliveryMethod doesn't have a Product2 associated with it, assign one
-                // We can always pick the 0th orderDeliveryMethod since we queried based off the name.
-                OrderDeliveryMethod existingodm = odms[0];
-                // This is for reference implementation purposes only.
-                // This is the if statement that checks to make sure that there is a product carrier and class of service
-                // associated to the order delivery method.
-                if (existingodm.ProductId == null || existingodm.Carrier == null || existingodm.ClassOfService == null) {
-                    existingodm.ProductId = product2IdForThisDeliveryMethod;
-                    existingodm.Carrier = shippingOption.serviceName;
-                    existingodm.ClassOfService = shippingOption.provider;
-                    update(existingodm);
-                }
-                orderDeliveryMethodIds.add(existingodm.Id);
-            }
-            i+=1;
-        }
-        return orderDeliveryMethodIds;
-    }
-
     private Id getDefaultShippingChargeProduct2Id() {
-        // In this example we will name the product representing shipping charges 'Shipping Charge for this delivery method'.
+        // In this example we will name the product representing shipping charges 'Shipping Charge'.
         // Check to see if a Product2 with that name already exists.
         // If it doesn't exist, create one.
-        String shippingChargeProduct2Name = 'Shipping Charge for this delivery method';
+        String shippingChargeProduct2Name = 'Shipping Charge';
         List<Product2> shippingChargeProducts = [SELECT Id FROM Product2 WHERE Name = :shippingChargeProduct2Name];
         if (shippingChargeProducts.isEmpty()) {
             Product2 shippingChargeProduct = new Product2(
@@ -316,8 +287,7 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             );
             insert(shippingChargeProduct);
             return shippingChargeProduct.Id;
-        }
-        else {
+        } else {
             return shippingChargeProducts[0].Id;
         }
     }

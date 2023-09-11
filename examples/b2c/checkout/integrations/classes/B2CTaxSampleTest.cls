@@ -39,7 +39,6 @@ public class B2CTaxSampleTest {
 
     @isTest static void testProductsWithNoSkuHasError() {
         Test.startTest();
-
         WebCart webCart = [SELECT Id FROM WebCart WHERE Name = 'Cart' LIMIT 1];
         List<CartDeliveryGroup> cartDeliveryGroups = [SELECT Id FROM CartDeliveryGroup WHERE CartId = :webCart.Id LIMIT 1];
 

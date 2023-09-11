@@ -46,7 +46,7 @@ global with sharing class B2BSyncCheckInventory {
             quantitiesFromExternalService = getQuantitiesFromExternalService(cartId, quantitiesFromSalesforce.keySet());
         } else {
             quantitiesFromExternalService = getQuantitiesFromStaticResponse(cartId, quantitiesFromSalesforce.keySet());
-        }         
+        }           
         
         // For each cart item SKU, check that the quantity from the external service
         // is greater or equal to the quantity in the cart.
@@ -113,7 +113,7 @@ global with sharing class B2BSyncCheckInventory {
         } else {
             throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
-    }  
+    }
     
     private static void saveCartValidationOutputError(String errorMessage, Id cartId) {
             // To propagate the error to the user, we need to add a new CartValidationOutput record.

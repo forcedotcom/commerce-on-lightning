@@ -25,7 +25,7 @@ import {
     STORE_DIR,
 } from '../../../../lib/utils/constants/properties';
 import { copyFolderRecursiveSync, mkdirSync, remove, XML } from '../../../../lib/utils/fsUtils';
-import { BuyerUserDef, Org, parseStoreScratchDef, StoreConfig } from '../../../../lib/utils/jsonUtils';
+import { BuyerUserDef, Org, parseStoreScratchDef } from '../../../../lib/utils/jsonUtils';
 import { Requires } from '../../../../lib/utils/requires';
 import { forceDataRecordCreate, forceDataRecordUpdate, forceDataSoql } from '../../../../lib/utils/sfdx/forceDataSoql';
 import { getHubOrgByUsername, getScratchOrgByUsername } from '../../../../lib/utils/sfdx/forceOrgList';
@@ -71,7 +71,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
     public static examples = [`sfdx ${CMD} --definitionfile store-scratch-def.json`];
 
     protected static flagsConfig = {
-        ...filterFlags(['store-name', 'definitionfile', 'prompt'], allFlags),
+        ...filterFlags(['store-name', 'definitionfile', 'prompt', 'templatename'], allFlags),
     };
 
     private static storeType: string;
@@ -79,6 +79,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
     public statusFileManager: StatusFileManager;
     private devHubUsername: string;
     private storeDir: string;
+    private isUsingDigitalExperienceBundle = true;
 
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types,@typescript-eslint/no-explicit-any
     public static getStoreType(username: string, flags: OutputFlags<any>, ux, logger: Logger): string {
@@ -116,6 +117,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         // Copy all example files
         FILE_COPY_ARGS.forEach((v) => modifyArgFlag(v.args, v.value, this.argv));
         await FilesCopy.run(addAllowedArgs(this.argv, FilesCopy), this.config);
+
         this.devHubUsername = (await this.org.getDevHubOrg()).getUsername();
         this.statusFileManager = new StatusFileManager(
             this.devHubUsername,
@@ -123,6 +125,11 @@ export class StoreQuickstartSetup extends SfdxCommand {
             this.flags['store-name'] as string
         );
         const storeType = StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger);
+        const storeTemplate = this.getTemplateName();
+
+        // B2C LWR and B2B LWR uses DigitalExperienceBundle, B2B Aura uses ExperienceBundle.
+        this.isUsingDigitalExperienceBundle = !(storeType === 'B2B' && storeTemplate === 'B2B Commerce (Aura)');
+
         // TODO this is only in store create so makes sense to key off of store
         await new Requires()
             .examplesConverted(
@@ -210,9 +217,20 @@ export class StoreQuickstartSetup extends SfdxCommand {
             )
             .toString()
             .replace('YourCommunitySiteNameHere', this.varargs['communitySiteName'] as string)
-            .replace('YourCommunityExperienceBundleNameHere', this.varargs['communityExperienceBundleName'] as string)
             .replace('YourCommunityNetworkNameHere', this.varargs['communityNetworkName'] as string)
             .replace('ApiVersionHere', this.flags.apiversion as string);
+
+        const bundleName = this.varargs['communityExperienceBundleName'] as string;
+
+        if (this.isUsingDigitalExperienceBundle) {
+            // Digital Experience Bundle needs 'site/' prepended to the community name.
+            packageRetrieve = packageRetrieve
+                .replace('YourCommunityExperienceBundleNameHere', `site/${bundleName}`)
+                .replace('ExperienceBundle', 'DigitalExperienceBundle');
+        } else {
+            packageRetrieve = packageRetrieve.replace('YourCommunityExperienceBundleNameHere', bundleName);
+        }
+
         // turn sharing rule metadata off by default
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
             /* eslint-disable @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
@@ -247,16 +265,19 @@ export class StoreQuickstartSetup extends SfdxCommand {
         await StoreCreate.waitForStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
         this.ux.log(msgs.getMessage('quickstart.setup.regAndMapIntegrations'));
         let integrations = [
-            ['B2BCheckInventorySample', 'CHECK_INVENTORY', 'Inventory'],
-            ['B2BDeliverySample', 'COMPUTE_SHIPPING', 'Shipment'],
-            ['B2BTaxSample', 'COMPUTE_TAXES', 'Tax'],
+            ['B2CCheckInventorySample', 'CHECK_INVENTORY_B2C', 'Inventory'],
+            ['B2CDeliverySample', 'COMPUTE_SHIPPING_B2C', 'Shipment'],
+            ['B2CTaxSample', 'COMPUTE_TAXES_B2C', 'Tax'],
         ];
-        if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2C') {
+        if (
+            StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2B' &&
+            this.getTemplateName() === 'B2B Commerce (Aura)'
+        ) {
             //provide a unique integration name so that it will not be overwritten by B2B store in the same org
             integrations = [
-                ['B2CCheckInventorySample', 'CHECK_INVENTORY_B2C', 'Inventory'],
-                ['B2CDeliverySample', 'COMPUTE_SHIPPING_B2C', 'Shipment'],
-                ['B2CTaxSample', 'COMPUTE_TAXES_B2C', 'Tax'],
+                ['B2BCheckInventorySample', 'CHECK_INVENTORY', 'Inventory'],
+                ['B2BDeliverySample', 'COMPUTE_SHIPPING', 'Shipment'],
+                ['B2BTaxSample', 'COMPUTE_TAXES', 'Tax'],
             ];
         }
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -477,7 +498,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const networkMetaFile = `${this.storeDir}/experience-bundle-package/unpackaged/networks/${
             this.varargs['communityNetworkName'] as string
         }.network`;
-        const data = fs
+        let data = fs
             .readFileSync(networkMetaFile)
             .toString()
             .replace(
@@ -495,7 +516,8 @@ export class StoreQuickstartSetup extends SfdxCommand {
             )
             .replace(/<status>.*/, '<status>Live</status>');
         if (StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2C')
-            data.replace(/<enableGuestChatter>.*/, '<enableGuestChatter>true</enableGuestChatter>')
+            data = data
+                .replace(/<enableGuestChatter>.*/, '<enableGuestChatter>true</enableGuestChatter>')
                 .replace(/<enableGuestFileAccess>.*/, '<enableGuestFileAccess>true</enableGuestFileAccess>')
                 .replace(/<selfRegistration>.*/, '<selfRegistration>true</selfRegistration>');
         // .replace('</Network>', '    <selfRegProfile>Buyer_User_Profile_From_QuickStart</selfRegProfile>\n</Network>'); // "Error: You can only select profiles that are associated with the experience."
@@ -766,35 +788,53 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 )
             );
         }
-        if (!fs.existsSync(`${this.storeDir}/experience-bundle-package/unpackaged/experiences`)) {
+        if (!fs.existsSync(`${this.storeDir}/experience-bundle-package/unpackaged`)) {
             await this.statusFileManager.setValue('retrievedPackages', false);
             await this.retrievePackages();
         }
         this.ux.log(msgs.getMessage('quickstart.setup.makeSiteAndNavMenuItemPublic'));
-        const siteConfigMetaFileName =
-            this.storeDir +
-            `/experience-bundle-package/unpackaged/experiences/${
-                this.varargs['communityExperienceBundleName'] as string
-            }/config/${configName}.json`;
-        const siteConfigMetaFile = Object.assign(new StoreConfig(), await fs.readJson(siteConfigMetaFileName));
-        siteConfigMetaFile.isAvailableToGuests = true;
-        siteConfigMetaFile.authenticationType = 'AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED';
-        fs.writeFileSync(siteConfigMetaFileName, JSON.stringify(siteConfigMetaFile, null, 4));
+        let siteConfigMetaFileName = null;
+        let siteConfigMainAppPageFileName = null;
+        let bundleName = this.varargs['communityExperienceBundleName'] as string;
+        if (this.isUsingDigitalExperienceBundle) {
+            siteConfigMetaFileName =
+                this.storeDir +
+                `/experience-bundle-package/unpackaged/digitalExperiences/site/${bundleName}/sfdc_cms__site/${bundleName}/content.json`;
+            siteConfigMainAppPageFileName =
+                this.storeDir +
+                `/experience-bundle-package/unpackaged/digitalExperiences/site/${bundleName}/sfdc_cms__appPage/mainAppPage/content.json`;
+        } else {
+            siteConfigMetaFileName =
+                this.storeDir +
+                `/experience-bundle-package/unpackaged/experiences/${bundleName}/config/${configName}.json`;
+
+            siteConfigMainAppPageFileName =
+                this.storeDir +
+                `/experience-bundle-package/unpackaged/experiences/${
+                    this.varargs['communityExperienceBundleName'] as string
+                }/config/mainAppPage.json`;
+        }
+
+        let siteConfigJsonData = fs.readFileSync(siteConfigMetaFileName, { encoding: 'utf-8' });
+        let siteConfig = JSON.parse(siteConfigJsonData);
+
+        if (this.isUsingDigitalExperienceBundle) {
+            siteConfig.contentBody.authenticationType = 'AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED';
+        } else {
+            siteConfig.isAvailableToGuests = true;
+            siteConfig.authenticationType = 'AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED';
+        }
+
+        fs.writeFileSync(siteConfigMetaFileName, JSON.stringify(siteConfig, null, 4));
+
         const def = parseStoreScratchDef(this.flags);
         const relaxedLevel = def.settings.isRelaxedCSPLevel;
-        const siteConfigMainAppPageFileName =
-            this.storeDir +
-            `/experience-bundle-package/unpackaged/experiences/${
-                this.varargs['communityExperienceBundleName'] as string
-            }/config/mainAppPage.json`;
+
         if (relaxedLevel) {
-            fs.writeFileSync(
-                siteConfigMainAppPageFileName,
-                fs
-                    .readFileSync(siteConfigMainAppPageFileName)
-                    .toString()
-                    .replace('"isRelaxedCSPLevel" : false,', '"isRelaxedCSPLevel" : true,')
-            );
+            let appConfigJsonData = fs.readFileSync(siteConfigMainAppPageFileName, { encoding: 'utf-8' });
+            let appConfig = JSON.parse(appConfigJsonData);
+            appConfig.isRelaxedCSPLevel = true;
+            fs.writeFileSync(siteConfigMainAppPageFileName, JSON.stringify(appConfig, null, 4));
         }
 
         this.ux.log(msgs.getMessage('quickstart.setup.enableGuestBrowsingForWebStoreAndCreateGuestBuyerProfile'));
@@ -936,6 +976,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
             fs.readFileSync(`${this.storeDir}/experience-bundle-package/unpackaged/package.xml`).toString()
         );
         packageDeploy['Package']['version'] = this.flags.apiversion;
+        if (this.isUsingDigitalExperienceBundle) {
+            packageDeploy['Package']['types'][1]['name'] = 'DigitalExperienceBundle';
+        }
         // turn sharing rule metadata off by default
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
             packageDeploy['Package']['types'] = packageDeploy['Package']['types'].filter(
@@ -1017,23 +1060,32 @@ export class StoreQuickstartSetup extends SfdxCommand {
     private async updateFlowAssociatedToCheckout(): Promise<void> {
         if (await this.statusFileManager.getValue('updatedFlowAssociatedToCheckout')) return;
         this.ux.log('Updating flow associated to checkout.');
-        const checkoutMetaFolder = `${this.storeDir}/experience-bundle-package/unpackaged/experiences/${
-            this.varargs['communityExperienceBundleName'] as string
-        }/views/`;
-        // Do a case insensitive grep and capture file
-        const greppedFile = fs.readdirSync(checkoutMetaFolder).filter((f) => f.toLowerCase() === 'checkout.json')[0];
-        // This determines the name of the main flow as it will always be the only flow to terminate in "Checkout.flow"
-        const flowDir = this.storeDir + '/../force-app/main/default/flows';
-        const mainFlowName = path
-            .basename(fs.readdirSync(flowDir).filter((f) => f.endsWith('Checkout.flow-meta.xml'))[0])
-            .split('.')[0];
-        fs.writeFileSync(
-            checkoutMetaFolder + '/' + greppedFile,
-            fs
-                .readFileSync(checkoutMetaFolder + '/' + greppedFile)
-                .toString()
-                .replace('sfdc_checkout__CheckoutTemplate', mainFlowName.toString())
-        );
+        if (!this.isUsingDigitalExperienceBundle) {
+            const checkoutMetaFolder = `${this.storeDir}/experience-bundle-package/unpackaged/experiences/${
+                this.varargs['communityExperienceBundleName'] as string
+            }/views/`;
+            // Do a case insensitive grep and capture file
+            const greppedFile = fs
+                .readdirSync(checkoutMetaFolder)
+                .filter((f) => f.toLowerCase() === 'checkout.json')[0];
+            // This determines the name of the main flow as it will always be the only flow to terminate in "Checkout.flow"
+            const flowDir = this.storeDir + '/../force-app/main/default/flows';
+            const mainFlowName = path
+                .basename(fs.readdirSync(flowDir).filter((f) => f.endsWith('Checkout.flow-meta.xml'))[0])
+                .split('.')[0];
+            fs.writeFileSync(
+                checkoutMetaFolder + '/' + greppedFile,
+                fs
+                    .readFileSync(checkoutMetaFolder + '/' + greppedFile)
+                    .toString()
+                    .replace('sfdc_checkout__CheckoutTemplate', mainFlowName.toString())
+            );
+        }
+
         await this.statusFileManager.setValue('updatedFlowAssociatedToCheckout', true);
+    }
+
+    private getTemplateName(): string {
+        return this.flags['templatename'] as string;
     }
 }

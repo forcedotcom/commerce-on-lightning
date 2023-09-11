@@ -530,7 +530,7 @@ global with sharing class StripeClientSideAdapter implements commercepayments.Pa
     * Client side
     **/
     global String getClientComponentName(){
-        return 'b2c_lite_commerce/stripeCardElement';
+        return 'c/stripeCardElement';
     }
 
     global Map<String, String> getClientConfiguration(){
@@ -548,19 +548,19 @@ global with sharing class StripeClientSideAdapter implements commercepayments.Pa
         String paymentGatewayId = context.getPaymentGatewayId();
 
         boolean updateIntent = false;
-
+ 
         /*
          * Get name of Payment Gateway Adapter stored in NamedCredential
          */
-        String namedCredential = [select DeveloperName
-                                  from NamedCredential
-                                  where Id in
-                                      (select MerchantCredentialId
-                                       from PaymentGateway
+        String namedCredential = [select DeveloperName 
+                                  from NamedCredential 
+                                  where Id in 
+                                      (select MerchantCredentialId 
+                                       from PaymentGateway 
                                        where Id = :paymentGatewayId
                                       )
                                  ].DeveloperName;
-
+        
         String amountValue = toStripeCurrencyUnits(currencyCode, amount.doubleValue());
         // If gatewayToken is provided, query for the intent
         if(!String.isEmpty(gatewayToken)){

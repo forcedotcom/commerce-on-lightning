@@ -18,6 +18,7 @@ private class B2CDeliverySampleTest {
         insert cartItem;
     }
 
+
     @isTest static void testIntegrationRunsSuccessfully() {
         Test.startTest();
         // Test: execute the integration for the test cart ID.
@@ -30,5 +31,4 @@ private class B2CDeliverySampleTest {
         System.assertEquals(sfdc_checkout.IntegrationStatus.Status.SUCCESS, integrationResult.status);
         Test.stopTest();
     }
-
 }

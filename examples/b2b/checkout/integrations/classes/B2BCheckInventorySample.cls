@@ -37,11 +37,13 @@ global with sharing class B2BCheckInventorySample implements sfdc_checkout.CartI
             // Following snippet of code fetches a mocked static json response from getQuantitiesFromStaticResponse.
             // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
             // response is implemented in getQuantitiesFromExternalService method.
-            Map<String, Object> quantitiesFromExternalService = null;
+
+            // Get all available quantities for products in the cart (cart items) from an external service.
+            Map<String, Object> quantitiesFromService = null;
             if(useHTTPService) {
-                quantitiesFromExternalService = getQuantitiesFromExternalService(quantitiesFromSalesforce.keySet());
+                quantitiesFromService = getQuantitiesFromExternalService(quantitiesFromSalesforce.keySet());
             } else {
-                quantitiesFromExternalService = getQuantitiesFromStaticResponse(quantitiesFromSalesforce.keySet());
+                quantitiesFromService = getQuantitiesFromStaticResponse(quantitiesFromSalesforce.keySet());
             }
             
             // For each cart item SKU, check that the quantity from the external service
@@ -49,8 +51,8 @@ global with sharing class B2BCheckInventorySample implements sfdc_checkout.CartI
             // If that is not true, set the integration status to "Failed".
             for (String sku : quantitiesFromSalesforce.keySet()) {
                 Decimal quantityFromSalesforce = quantitiesFromSalesforce.get(sku);
-                Decimal quantityFromExternalService = (Decimal)quantitiesFromExternalService.get(sku);
-                if (quantityFromExternalService == null){
+                Decimal quantityFromService = (Decimal) quantitiesFromService.get(sku);
+                if (quantityFromService == null){
                     String errorMessage = 'The product with sku ' + sku + ' could not be found in the external system';
                     return integrationStatusFailedWithCartValidationOutputError(
                        integStatus,
@@ -58,17 +60,18 @@ global with sharing class B2BCheckInventorySample implements sfdc_checkout.CartI
                        jobInfo,
                        cartId
                    );
-                } else if (quantityFromExternalService < quantityFromSalesforce){
-                   String errorMessage = 'Insufficient quantity for the product with sku ' + sku + ': ' 
+                } else if (quantityFromService < quantityFromSalesforce){
+                   String errorMessage = 'Insufficient quantity for the product with sku ' + sku + ': '
                                + quantityFromSalesforce + ' needed, but only '
-                               + quantityFromExternalService + ' available.';
+                               + quantityFromService + ' available.';
                    return integrationStatusFailedWithCartValidationOutputError(
                        integStatus,
                        errorMessage,
                        jobInfo,
                        cartId
                    );
-                } else {
+                }
+                else {
                     // If the product exists and the available quantity is enough, set status as SUCCESS
                     integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
                 }
@@ -102,7 +105,7 @@ global with sharing class B2BCheckInventorySample implements sfdc_checkout.CartI
         responseJson = responseJson.removeEnd(',') + '}';
         return (Map<String, Object>) JSON.deserializeUntyped(responseJson);
     }
-    
+
     private Map<String, Object> getQuantitiesFromExternalService (Set<String> skus) {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
@@ -132,8 +135,8 @@ global with sharing class B2BCheckInventorySample implements sfdc_checkout.CartI
         } else {
             throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
-    }  
-    
+    }
+
     private sfdc_checkout.IntegrationStatus integrationStatusFailedWithCartValidationOutputError(
         sfdc_checkout.IntegrationStatus integrationStatus, String errorMessage, sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
             integrationStatus.status = sfdc_checkout.IntegrationStatus.Status.FAILED;

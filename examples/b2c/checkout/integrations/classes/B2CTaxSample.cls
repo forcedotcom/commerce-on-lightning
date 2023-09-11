@@ -1,5 +1,6 @@
 // This must implement the sfdc_checkout.CartTaxCalculations interface
 // in order to be processed by the checkout flow and used for your Taxes integration.
+
 global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
     // You MUST change this to be your service or you must launch your own Heroku Service
     // and add the host in Setup | Security | Remote site settings.
@@ -30,18 +31,17 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
             CartDeliveryGroup deliveryGroup = [SELECT DeliverToState, DeliverToCountry FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId][0];
             String taxType = [SELECT TaxType FROM WebCart WHERE Id = :cartId][0].TaxType;
 
-
             Map<ID, CartItem> cartItemsMap = new Map<ID, CartItem>([SELECT Id, Sku, Quantity, TotalLineAmount, AdjustmentAmount, (Select Id, TotalAmount from CartItemPriceAdjustments) FROM CartItem  WHERE CartId = :cartId]);
 
             // Following snippet of code fetches a mocked static json response from getDataFromStaticResponse.
             // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
             // response is implemented in getDataFromExternalService method.
-
-            Map<String, Object> dataFromExternalService = null;
+            
+            Map<String, Object> dataFromService = null;
             if(useHTTPService) {
-                dataFromExternalService = getDataFromExternalService(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
+                dataFromService = getDataFromExternalService(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
             } else {
-                dataFromExternalService = getDataFromStaticResponse(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
+                dataFromService = getDataFromStaticResponse(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
             }
 
             // If there are taxes from a previously cancelled checkout, delete them.
@@ -56,29 +56,29 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
             for (CartItem cartItemToUpdate : cartItemsList) {
                 // Update CartItem with taxes
                 String cartItemId = cartItemToUpdate.id;
-                Map<String, Object> cartItemsMapFromExternalService = (Map<String, Object>) dataFromExternalService.get(cartItemId);
-                cartItemToUpdate.AdjustmentTaxAmount = (Decimal)cartItemsMapFromExternalService.get('adjustmentTaxAmount');
-                cartItemToUpdate.NetUnitPrice = (Decimal)cartItemsMapFromExternalService.get('netUnitPrice');
-                cartItemToUpdate.GrossUnitPrice = (Decimal)cartItemsMapFromExternalService.get('grossUnitPrice');
+                Map<String, Object> cartItemsMapFromService = (Map<String, Object>) dataFromService.get(cartItemId);
+                cartItemToUpdate.AdjustmentTaxAmount = (Decimal)cartItemsMapFromService.get('adjustmentTaxAmount');
+                cartItemToUpdate.NetUnitPrice = (Decimal)cartItemsMapFromService.get('netUnitPrice');
+                cartItemToUpdate.GrossUnitPrice = (Decimal)cartItemsMapFromService.get('grossUnitPrice');
 
                 CartTax tax = new CartTax(
-                    Amount = (Decimal)cartItemsMapFromExternalService.get('taxAmount'),
+                    Amount = (Decimal)cartItemsMapFromService.get('taxAmount'),
                     CartItemId = cartItemId,
-                    Name = (String)cartItemsMapFromExternalService.get('taxName'),
+                    Name = (String)cartItemsMapFromService.get('taxName'),
                     TaxCalculationDate = Date.today(),
-                    TaxRate = (Decimal)cartItemsMapFromExternalService.get('taxRate'),
+                    TaxRate = (Decimal)cartItemsMapFromService.get('taxRate'),
                     TaxType = 'Actual'
                 );
                 cartTaxestoInsert.add(tax);
 
-                List<Object> itemTaxList = (List<Object>)cartItemsMapFromExternalService.get('itemizedPromotionTaxAmounts');
+                List<Object> itemTaxList = (List<Object>)cartItemsMapFromService.get('itemizedPromotionTaxAmounts');
                 for (Object cipaTax : itemTaxList) {
                     CartTax promoTax = new CartTax(
                         Amount = (Decimal)((Map<String, Object>) cipaTax).get('taxAmount'),
                         CartItemId = cartItemId,
-                        Name = (String)cartItemsMapFromExternalService.get('taxName'),
+                        Name = (String)cartItemsMapFromService.get('taxName'),
                         TaxCalculationDate = Date.today(),
-                        TaxRate = (Decimal)cartItemsMapFromExternalService.get('taxRate'),
+                        TaxRate = (Decimal)cartItemsMapFromService.get('taxRate'),
                         TaxType = 'Actual',
                         CartItemPriceAdjustmentId = (String)((Map<String, Object>) cipaTax).get('id')
                     );
@@ -110,16 +110,17 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
         if (cartItemsMap == null) {
             return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
+
         Double taxRate = 0.15;
         String responseJson = '{';
         for (ID key : cartItemsMap.keySet()) {
             CartItem cartItem = cartItemsMap.get(key);
             Id cartItemId = cartItem.Id;
-
+            
             Double amount = cartItem.TotalLineAmount==null ? 0.00 : cartItem.TotalLineAmount;
             Double tierAdjustment = cartItem.AdjustmentAmount==null ? 0.00 : cartItem.AdjustmentAmount;
             Double quantity = cartItem.Quantity==null ? 0.00 : cartItem.Quantity;
-
+            
             if(country == 'US') {
                 taxRate = 0.08;
                 String [] noSalesTaxUSStates = new String [] {'AK', 'DE', 'MT', 'NH', 'OR'};
@@ -127,25 +128,25 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
                     taxRate = 0.00;
                 }
             }
-
+            
             Double itemizedPromotionTax = 0.00;
             Double [] itemizedPromotionTaxArr = new Double [] {};
             Double netUnitPrice = 0.00;
             Double grossUnitPrice = 0.00;
-
+            
             Double multiplier = 0.00;
-
+        
             if(taxType == 'Gross') {
                 multiplier = taxRate / (1 + taxRate);
             } else {
                 multiplier = taxRate;
             }
-
+            
             Double cartItemTax = amount * multiplier;
             Double tierAdjustmentTax = (tierAdjustment!=null ? tierAdjustment : 0.00) * multiplier;
-
+            
             CartItemPriceAdjustment [] itemizedPromotions = cartItem.CartItemPriceAdjustments;
-
+            
             String itemizedPromotionTaxResp = '[';
             for(CartItemPriceAdjustment itemAdj : itemizedPromotions) {
                 Double itemTaxAmount = (itemAdj.TotalAmount!=null ? itemAdj.TotalAmount : 0.00) * multiplier;
@@ -156,7 +157,7 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
                 itemizedPromotionTax = itemizedPromotionTax + itemTaxAmount;
             }
             itemizedPromotionTaxResp = itemizedPromotionTaxResp.removeEnd(',') + ']';
-
+            
             if(taxType == 'Gross') {
                 grossUnitPrice = amount / quantity;
                 netUnitPrice = (amount - cartItemTax) / quantity;
@@ -164,17 +165,17 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
                 grossUnitPrice = (amount + cartItemTax) / quantity;
                 netUnitPrice = amount / quantity;
             }
-
+            
             responseJson = responseJson + '"'+cartItemId+'":';
             responseJson = responseJson + '{';
             responseJson = responseJson + '"cartItemId": "' + cartItemId + '",';
             responseJson = responseJson + '"taxAmount": ' + cartItemTax + ',';
             responseJson = responseJson + '"adjustmentTaxAmount": ' + tierAdjustmentTax + ',';
-
+            
             responseJson = responseJson + '"itemizedPromotionTaxAmounts": ';
             responseJson = responseJson + itemizedPromotionTaxResp;
             responseJson = responseJson + ',';
-
+            
             responseJson = responseJson + '"totalItemizedPromotionTaxAmount": ' + itemizedPromotionTax + ',';
             responseJson = responseJson + '"grossUnitPrice": ' + grossUnitPrice + ',';
             responseJson = responseJson + '"netUnitPrice": ' + netUnitPrice + ',';
@@ -182,7 +183,7 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
             responseJson = responseJson + '"taxName": "GST"';
             responseJson = responseJson + '},';
         }
-
+        
         responseJson = responseJson.removeEnd(',') + '}';        
         return (Map<String, Object>) JSON.deserializeUntyped(responseJson);
     }
@@ -204,10 +205,12 @@ global class B2CTaxSample implements sfdc_checkout.CartTaxCalculations {
         if (response.getStatusCode() == 200) {
             Map<String, Object> resultsFromExternalService = (Map<String, Object>) JSON.deserializeUntyped(response.getBody());
             return resultsFromExternalService;
-        } else if(response.getStatusCode() == 404) {
-            throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
         } else {
-            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+            if(response.getStatusCode() == 404) {
+                throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
+            } else {
+                throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+            }
         }
     }
 

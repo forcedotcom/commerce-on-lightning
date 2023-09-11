@@ -15,7 +15,10 @@
             "json",
             "targetusername",
             "apiversion",
-            "apex-namespace"
+            "apex-namespace",
+            "description",
+            "icon-uri",
+            "is-application"
         ]
     },
     {
@@ -127,7 +130,8 @@
             "prompt",
             "store-name",
             "targetdevhubusername",
-            "targetusername"
+            "targetusername",
+            "templatename"
         ]
     },
     {
@@ -148,13 +152,11 @@
     {
         "command": "commerce:search:start",
         "plugin": "@salesforce/commerce",
-        "flags": [
-            "store-name",
-            "store-id",
-            "targetusername",
-            "apiversion",
-            "json",
-            "loglevel"
-        ]
+        "flags": ["store-name", "store-id", "targetusername", "apiversion", "json", "loglevel"]
+    },
+    {
+        "command": "commerce:ordermanagement:quickstart:setup",
+        "plugin": "@salesforce/commerce",
+        "flags": ["apiversion", "json", "loglevel", "targetusername", "prompt"]
     }
 ]

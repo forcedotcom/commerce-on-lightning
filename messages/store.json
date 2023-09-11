@@ -6,7 +6,7 @@
     "setup": {
         "scratchOrgBuyerUsernameDescription": "buyer's username",
         "cmdDescription": "Setup a store",
-        "templateNameDescription": "template to use to create a site ",
+        "templateNameDescription": "Template to use to create a site. If not specified, the template is retrieved from the store config file based on the store type (b2b or b2c).",
         "buyerAliasDescription": "Buyer's alias",
         "buyerEmailDescription": "Buyer's email address",
         "storeNameDescription": "name of the site to create"
@@ -46,7 +46,7 @@
         "assigningShopperProfileToBuyer": "Assigning Shopper profile to the buyer user",
         "changingPasswordForBuyer": "Changing password for the buyer user",
         "createSearchIndexInfo": "Creating search index",
-        "configFileDescription": "Store config file",
+        "configFileDescription": "The store config file. By default it will be either of ~/.commerce/config/b2c-store-scratch-def or ~/.commerce/config/b2b-store-scratch-def based on store type. Default store type is b2c.]",
         "storeTypeDescription": "The type of store you want to create"
     },
     "quickstart": {
@@ -135,7 +135,10 @@
             "errEPN": "Invalid EPN. Run [commerce:extension:points:list] for all valid EPN values",
             "savingConfigIntoConfig": "Successfully registered the extension. Use command [commerce:extension:map] to link the extension to a webstore.",
             "apexNameSpaceFlagDescription": "Optional namespace for apex class",
-            "undefinedName": "Undefined registered extension name. Enter '-r <name>'"
+            "undefinedName": "Undefined registered extension name. Enter '-r <name>'",
+            "apexClassDescriptionFieldMessage": "A brief description of the extension",
+            "apexClassIconURIDescription": "Where to find the icon representing the extension in URI form.",
+            "apexClassisApplicationDescription": "A boolean that indicates if the extension provider is contained within a managed package"
         },
         "getEPN": {
             "cmdDescription": "Lists all EPN values"

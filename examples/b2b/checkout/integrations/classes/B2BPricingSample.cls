@@ -11,12 +11,12 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
             // To retrieve sale prices for a customer, get the cart owner's ID and pass it to the external service.
-            // 
+            //
             // In the real-life scenario, the ID will probably be an external ID
             // that identifies the customer in the external system,
             // but for simplicity we are using the Salesforce ID in this sample.
             Id customerId = [SELECT OwnerId FROM WebCart WHERE id = :cartId WITH SECURITY_ENFORCED][0].OwnerId;
-            
+
             // Get all SKUs and their sale prices (customer-specific prices) from the cart items.
             Map<String, Decimal> salesPricesFromSalesforce = new Map<String, Decimal>();
             for (CartItem cartItem : [SELECT Sku, SalesPrice FROM CartItem WHERE CartId = :cartId AND Type = 'Product' WITH SECURITY_ENFORCED]) {
@@ -35,11 +35,11 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
             // Following snippet of code fetches a mocked static json response from getSalesPricesFromStaticResponse.
             // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
             // response is implemented in getSalesPricesFromExternalService method.
-            Map<String, Object> salesPricesFromExternalService = null;
+            Map<String, Object> salesPricesFromService = null;
             if(useHTTPService) {
-                salesPricesFromExternalService = getSalesPricesFromExternalService(salesPricesFromSalesforce.keySet(), Id.valueOf(customerId));
+                salesPricesFromService = getSalesPricesFromExternalService(salesPricesFromSalesforce.keySet(), Id.valueOf(customerId));
             } else {
-                salesPricesFromExternalService = getSalesPricesFromStaticResponse(salesPricesFromSalesforce.keySet(), Id.valueOf(customerId));
+                salesPricesFromService = getSalesPricesFromStaticResponse(salesPricesFromSalesforce.keySet(), Id.valueOf(customerId));
             }
             
             // For each cart item SKU, check that the price from the external service
@@ -47,7 +47,7 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
             // If that is not true, set the integration status to "Failed".
             for (String sku : salesPricesFromSalesforce.keySet()) {
                 Decimal salesPriceFromSalesforce = salesPricesFromSalesforce.get(sku);
-                Decimal salesPriceFromExternalService = (Decimal)salesPricesFromExternalService.get(sku);
+                Decimal salesPriceFromExternalService = (Decimal)salesPricesFromService.get(sku);
                 if (salesPriceFromExternalService == null){
                    String errorMessage = 'The product with sku ' + sku + ' could not be found in the external system';
                    return integrationStatusFailedWithCartValidationOutputError(
@@ -56,22 +56,22 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
                        jobInfo,
                        cartId
                    );
-                } 
+                }
                 else if (salesPriceFromExternalService != salesPriceFromSalesforce){
                    // Add your logic here for when the price from your external service
                    // does not match what we have in Salesforce.
                    // For example, you may want to cause your pricing integration to fail.
                    // EXAMPLE: integStatus.status = sfdc_checkout.IntegrationStatus.Status.FAILED;
-                   // 
+                   //
                    // Our Heroku external service is a test service and returns a sale price of 0.00 for any SKU except 'SKU_FOR_TEST'.
                    // If the SKU of the product is 'SKU_FOR_TEST', the price returned by the external service is 100.
                    // For testing purposes, we set the integration status to SUCCESS if salesPriceFromExternalService is 0.00,
-                   // regardless of the value of the Salesforce price 
+                   // regardless of the value of the Salesforce price
                    if (salesPriceFromExternalService == 0.00){
                        integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
                    }
                    else {
-                       String errorMessage = 'The sale price has changed for the product with sku ' + sku + ': was ' 
+                       String errorMessage = 'The sale price has changed for the product with sku ' + sku + ': was '
                                + salesPriceFromSalesforce + ', but now is '
                                + salesPriceFromExternalService + '.';
                        return integrationStatusFailedWithCartValidationOutputError(
@@ -81,7 +81,7 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
                            cartId
                        );
                    }
-                   // ----- End of the section that is only for testing.                   
+                   // ----- End of the section that is only for testing.
                 }
                 else {
                     // If the prices in the external system are the same as the prices in Salesforce, set integration status as SUCCESS.
@@ -107,7 +107,7 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
         if (skus.isEmpty()) {
             return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
-
+        
         String responseJson = '{';
         for(String sku : skus) {
             Double price = 0.00;
@@ -122,8 +122,8 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
         responseJson = responseJson.removeEnd(',') + '}';
         return (Map<String, Object>) JSON.deserializeUntyped(responseJson);
     }
-    
-    private Map<String, Object> getSalesPricesFromExternalService (Set<String> skus, String customerId) {
+
+    private Map<String, Object> getSalesPricesFromExternalService(Set<String> skus, String customerId) {
         Http http = new Http();
         HttpRequest request = new HttpRequest();
         Integer successfulHttpRequest = 200;
@@ -134,8 +134,7 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
             encodedSkus.add(EncodingUtil.urlEncode(sku, 'UTF-8'));
         }
 
-        request.setEndpoint(httpHost + '/get-sales-prices?customerId=' 
-                            + customerId + '&skus=' + JSON.serialize(encodedSkus));
+        request.setEndpoint(httpHost + '/get-sales-prices?customerId=' + customerId + '&skus=' + JSON.serialize(encodedSkus));
         request.setMethod('GET');
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
@@ -153,7 +152,7 @@ global with sharing class B2BPricingSample implements sfdc_checkout.CartPriceCal
             throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
         }
     }
-    
+
     private sfdc_checkout.IntegrationStatus integrationStatusFailedWithCartValidationOutputError(
         sfdc_checkout.IntegrationStatus integrationStatus, String errorMessage, sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
             integrationStatus.status = sfdc_checkout.IntegrationStatus.Status.FAILED;
