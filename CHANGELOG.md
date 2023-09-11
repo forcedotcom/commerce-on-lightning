@@ -7,13 +7,15 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* Order Management is now supported through the plugin. See examples/som/README.md for more details!
+* Order Management is now supported through the plugin. See examples/som/README.md for more details!([903b7a9] https://github.com/forcedotcom/commerce-on-lightning/commit/903b7a9223b8c4dcca179a05aff774c642a23321)
 
-* Digital Experience Bundle in Experience Cloud is now supported which means orgs that are higher than API version 59 can be used to create stores using the plugin.
+* Digital Experience Bundle in Experience Cloud is now supported which means orgs that are higher than API version 59 can be used to create stores using the plugin ([4e866ed] https://github.com/forcedotcom/commerce-on-lightning/commit/4e866ed3b42c12da4e8e0a8f0869ad554507a774).
 
-* Added support for iconURI, isApplication and description fields for extensions.
+* New LWR order confirmation email flow ([b88ad9a] https://github.com/forcedotcom/commerce-on-lightning/commit/b88ad9ab15b99a907ebc5493b2d40b941bb7075b)
 
-* The example files have been updated to be move away from the ‘b2b-commerce-test’ Heroku app.
+* Added support for iconURI, isApplication and description fields for extensions ([fce0fb0] https://github.com/forcedotcom/commerce-on-lightning/commit/fce0fb0def1b68e5bbd332758221cb8c41ef36a3).
+
+* The example files have been updated to be move away from the ‘b2b-commerce-test’ Heroku app [40c6aba](https://github.com/forcedotcom/commerce-on-lightning/commit/40c6aba5d124f11336ba4256816d7c3d03a02fb4).
 
 * updating stripe client side examples to latest ([#182](https://github.com/forcedotcom/commerce-on-lightning/issues/182)) ([6c73aff](https://github.com/forcedotcom/commerce-on-lightning/commit/6c73affbb8ece61e393d7c202930850f1e7f76fb))
 
