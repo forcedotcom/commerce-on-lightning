@@ -49,9 +49,9 @@ global with sharing class B2BTaxSample implements sfdc_checkout.CartTaxCalculati
 
             Map<String, TaxDataFromExternalService> rateAndAmountFromExternalServicePerSku = null;
             if(useHTTPService) {
-                rateAndAmountFromExternalServicePerSku = getTaxRatesAndAmountsFromExternalService(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry);
+                rateAndAmountFromExternalServicePerSku = getTaxRatesAndAmountsFromExternalService(cartItemTotalPriceBySKU, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry);
             } else {
-                rateAndAmountFromExternalServicePerSku = getDataFromStaticResponse(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry);
+                rateAndAmountFromExternalServicePerSku = getDataFromStaticResponse(cartItemTotalPriceBySKU, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry);
             }
             
             // If there are taxes from a previously cancelled checkout, delete them.
@@ -108,7 +108,7 @@ global with sharing class B2BTaxSample implements sfdc_checkout.CartTaxCalculati
     }
 
     private Map<String, TaxDataFromExternalService> getDataFromStaticResponse(Map<String, Decimal> cartItemTotalAmountBySKU, String state, String country) {
-        if (cartItemsMap == null) {
+        if (cartItemTotalAmountBySKU == null) {
             throw new ApplicationException('Input SKUs list is empty or undefined.');
         }
 
@@ -116,7 +116,6 @@ global with sharing class B2BTaxSample implements sfdc_checkout.CartTaxCalculati
 
         Map<String, TaxDataFromExternalService> taxDataFromStaticServiceBySKU = new Map<String, TaxDataFromExternalService>();
         for (String sku : cartItemTotalAmountBySKU.keySet()) {
-            Map<String, Object> rateAndAmountFromStaticService = (Map<String, Object>) resultsFromStaticServiceBySKU.get(sku);
             taxDataFromStaticServiceBySKU.put(sku, new TaxDataFromExternalService(
                 taxRate,
                 cartItemTotalAmountBySKU.get(sku) * taxRate,
