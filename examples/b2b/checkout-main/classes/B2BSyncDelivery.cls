@@ -92,7 +92,7 @@ public class B2BSyncDelivery {
     
     // Do hit Heroku Server: You can comment this out and uncomment out the above class if you don't want to hit the Heroku Service.
     private static ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (String cartId, Integer numberOfUniqueItems) {
-        final Integer SuccessfulHttpRequest = 200;
+        final Integer successfulHttpRequest = 200;
 
         ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
 
@@ -106,7 +106,7 @@ public class B2BSyncDelivery {
         // The response looks like this:
         // [{"status":"calculated","rate":{"name":"Delivery Method 1","serviceName":"Test Carrier 1","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},
         // {"status":"calculated","rate":{"name":"Delivery Method 2","serviceName":"Test Carrier 2","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99}}]
-        if (response.getStatusCode() == SuccessfulHttpRequest) {
+        if (response.getStatusCode() == successfulHttpRequest) {
            List<Object> results = (List<Object>) JSON.deserializeUntyped(response.getBody());
            for (Object result: results) {
                 Map<String, Object> subresult = (Map<String, Object>) result;
