@@ -109,7 +109,7 @@ public class B2BSyncTax {
             Double tierAdjustment = cartItem.AdjustmentAmount==null ? 0.00 : cartItem.AdjustmentAmount;
             Double quantity = cartItem.Quantity==null ? 0.00 : cartItem.Quantity;
             
-            if(country == 'US') {
+            if(country == null || country == 'US' || country == 'United States') {
                 taxRate = 0.08;
                 String [] noSalesTaxUSStates = new String [] {'AK', 'DE', 'MT', 'NH', 'OR'};
                 if (noSalesTaxUSStates.contains(state)) {
