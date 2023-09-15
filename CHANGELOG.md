@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+# [248.1.1] (https://github.com/forcedotcom/commerce-on-lightning/compare/248.1.0...v248.1.1)
+
+### Bug Fixes
+
+- Bug fixes in example integration files ([d9b0f74] https://github.com/forcedotcom/commerce-on-lightning/commit/d9b0f7499d16c5e4566286c7bdecd39bd7cda906)
+- Dependency updates
+
 # [248.1.0](https://github.com/forcedotcom/commerce-on-lightning/compare/v242.1.1...248.1.0) (2023-09-11)
 
 
