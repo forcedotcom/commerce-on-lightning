@@ -11,12 +11,7 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         try {
             // In the Winter '21 release there should be two delivery groups per cart.
             // We need to get the ID of the cart delivery group in order to create the cart delivery group methods.
-            List<CartItem> cartItems = new List<CartItem>([SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId]);
-
-            Set<Id> cartDeliveryGroupsIDs = new Set<Id>();
-            for(CartItem curCartItem : cartItems){
-                cartDeliveryGroupsIDs.add(curCartItem.CartDeliveryGroupId);
-            }
+            List<CartDeliveryGroup> cartDeliveryGroups = new List<CartDeliveryGroup>([SELECT Id FROM CartDeliveryGroup WHERE CartId = :cartId]);
 
             // Get the shipping options from an external service.
             // We're getting information like rates and carriers from this external service.
@@ -40,8 +35,8 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
             Integer cdgmToBeCreated = 0;
             for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromExternalService) {
-                for(Id curDeliveryGroupID : cartDeliveryGroupsIDs){
-                    populateCartDeliveryGroupMethodWithShippingOptions(shippingOption, curDeliveryGroupID, cartId);
+                for(CartDeliveryGroup curCartDeliveryGroup : cartDeliveryGroups){
+                    populateCartDeliveryGroupMethodWithShippingOptions(shippingOption, curCartDeliveryGroup.Id, cartId);
                     cdgmToBeCreated += 1;
                 }
             }
@@ -95,6 +90,9 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         request.setEndpoint(httpHost + '/calculate-shipping-rates-winter-21-with-lang?lang=' + siteLanguage);
         request.setMethod('GET');
         HttpResponse response = http.send(request);
+
+        System.debug('gal>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
+
         // If the request is successful, parse the JSON response.
         // The response looks like this:
         // [{"status":"calculated","rate":{"name":"Delivery Method 1","serviceName":"Test Carrier 1","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},
