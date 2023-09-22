@@ -11,7 +11,12 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         try {
             // In the Winter '21 release there should be two delivery groups per cart.
             // We need to get the ID of the cart delivery group in order to create the cart delivery group methods.
-            Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId][0].CartDeliveryGroupId;
+            List<CartItem> cartItems = new List<CartItem>([SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId]);
+
+            Set<Id> cartDeliveryGroupsIDs = new Set<Id>();
+            for(CartItem curCartItem : cartItems){
+                cartDeliveryGroupsIDs.add(curCartItem.CartDeliveryGroupId);
+            }
 
             // Get the shipping options from an external service.
             // We're getting information like rates and carriers from this external service.
@@ -30,12 +35,20 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             }
 
             // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
-            delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId];
+            delete [SELECT Id FROM CartDeliveryGroupMethod WHERE WebCartId = :cartId];
 
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
+            Integer cdgmToBeCreated = 0;
             for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromExternalService) {
-               populateCartDeliveryGroupMethodWithShippingOptions(shippingOption, cartDeliveryGroupId, cartId);
+                for(Id curDeliveryGroupID : cartDeliveryGroupsIDs){
+                    populateCartDeliveryGroupMethodWithShippingOptions(shippingOption, curDeliveryGroupID, cartId);
+                    cdgmToBeCreated += 1;
+                }
             }
+            
+            List<CartDeliveryGroupMethod> cdgms = new List<CartDeliveryGroupMethod>([SELECT Id FROM CartDeliveryGroupMethod WHERE WebCartId = :cartId]);
+            System.assertEquals(cdgmToBeCreated, cdgms.size(),'The number of created CDGMs is not matching'); // It's important to fail the example integration early
+
             // If everything works well, the charge is added to the cart and our integration has been successfully completed.
             integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
 
