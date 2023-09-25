@@ -91,8 +91,6 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         request.setMethod('GET');
         HttpResponse response = http.send(request);
 
-        System.debug('gal>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>');
-
         // If the request is successful, parse the JSON response.
         // The response looks like this:
         // [{"status":"calculated","rate":{"name":"Delivery Method 1","serviceName":"Test Carrier 1","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},
