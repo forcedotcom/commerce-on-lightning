@@ -33,7 +33,7 @@ global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
             }
 
             // Following snippet of code fetches a mocked static json response from getSalesPricesFromStaticResponse.
-            // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
+            // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired
             // response is implemented in getSalesPricesFromExternalService method.
             Map<String, Object> salesPricesFromService = null;
             if(useHTTPService) {
@@ -41,7 +41,7 @@ global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
             } else {
                 salesPricesFromService = getSalesPricesFromStaticResponse(salesPricesFromSalesforce.keySet(), Id.valueOf(customerId));
             }
-            
+
             // For each cart item SKU, check that the price from the external service
             // is the same as the sale price in the cart.
             // If that is not true, set the integration status to "Failed".
@@ -107,7 +107,7 @@ global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
         if (skus.isEmpty()) {
             return (Map<String, Object>) JSON.deserializeUntyped('{"error":"Input SKUs list is empty or undefined."}');
         }
-        
+
         String responseJson = '{';
         for(String sku : skus) {
             Double price = 0.00;
@@ -124,18 +124,15 @@ global class B2CPricingSample implements sfdc_checkout.CartPriceCalculations {
     }
 
     private Map<String, Object> getSalesPricesFromExternalService(Set<String> skus, String customerId) {
+        Integer successfulHttpRequest = 200;
         Http http = new Http();
         HttpRequest request = new HttpRequest();
-        Integer successfulHttpRequest = 200;
-
-        // Encode the product SKUs to avoid any invalid characters in the request URL.
-        Set<String> encodedSkus = new Set<String>();
-        for (String sku : skus) {
-            encodedSkus.add(EncodingUtil.urlEncode(sku, 'UTF-8'));
-        }
-
-        request.setEndpoint(httpHost + '/get-sales-prices?customerId=' + customerId + '&skus=' + JSON.serialize(encodedSkus));
-        request.setMethod('GET');
+        String requestURL = httpHost + '/get-sales-prices';
+        String requestBody = '{"skus":' + JSON.serialize(skus) + '}';
+        request.setEndpoint(requestURL);
+        request.setMethod('POST');
+        request.setHeader('Content-Type', 'application/json');
+        request.setBody(requestBody);
         HttpResponse response = http.send(request);
         // If the request is successful, parse the JSON response.
         // The response includes the sale price for each SKU and looks something like this:
