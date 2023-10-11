@@ -11,6 +11,7 @@ import { fs, Messages, SfdxError, Org as SfdxOrg, Logger } from '@salesforce/cor
 import chalk from 'chalk';
 import { AnyJson } from '@salesforce/ts-types';
 import { OutputFlags } from '@oclif/parser';
+import { JsonCollection } from '@salesforce/ts-types/lib/types/json';
 import { allFlags } from '../../../../lib/flags/commerce/all.flags';
 import { addAllowedArgs, filterFlags, modifyArgFlag } from '../../../../lib/utils/args/flagsUtils';
 import {
@@ -41,6 +42,10 @@ Messages.importMessagesDirectory(__dirname);
 const TOPIC = 'store';
 const CMD = `commerce:${TOPIC}:quickstart:setup`;
 const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
+
+const WEBSTORE_ID = '${WEBSTORE_ID}';
+const APPLICATION_CONTEXT_API_PATH = `commerce/webstores/${WEBSTORE_ID}/application-context`;
+const TOOLING_CURRENCY_SETTINGS = 'tooling/query?q=SELECT+Id,IsMulticurrencyEnabled+FROM+CurrencySettings';
 
 export class StoreQuickstartSetup extends SfdxCommand {
     // TODO add apiversion to all shell'd commands
@@ -163,9 +168,11 @@ export class StoreQuickstartSetup extends SfdxCommand {
         }
         await this.updateMemberListActivateCommunity();
         this.ux.log(chalk.green.bold(msgs.getMessage('quickstart.setup.completedQuickstartStep3')));
+        await this.initShipping();
+        this.ux.log(chalk.green.bold(msgs.getMessage('quickstart.setup.completedQuickstartStep4')));
         await this.importProducts();
         await this.mapAdminUserToRole();
-        this.ux.log(chalk.green.bold(msgs.getMessage('quickstart.setup.completedQuickstartStep4')));
+        this.ux.log(chalk.green.bold(msgs.getMessage('quickstart.setup.completedQuickstartStep5')));
         await this.createBuyerUserWithContactAndAccount();
         await this.addContactPointAndDeploy();
         await this.publishCommunity();
@@ -486,6 +493,144 @@ export class StoreQuickstartSetup extends SfdxCommand {
             this.flags,
             this.logger
         );
+    }
+
+    private async initShipping(): Promise<void> {
+        // retrieve webStoreId
+        const webStoreId = forceDataSoql(
+            `SELECT Id FROM WebStore WHERE Name='${this.varargs['communityNetworkName'] as string}' LIMIT 1`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        ).result.records[0].Id;
+
+        // Retrieve the application context from WebStore
+        const applicationContext = await this.getApplicationContextFromWebStoreId(webStoreId);
+        this.ux.log(`Retrieved Application Context for WebStore : '${JSON.stringify(applicationContext)}'`);
+
+        // Retrieve the Currency Settings for the Org
+        const currencySettings = await this.getCurrencySettings();
+        this.ux.log(`Retrieved CurrencySettings for org : '${JSON.stringify(currencySettings)}'`);
+
+        // Creating Shipping Configuration Set
+        forceDataRecordCreate(
+            'ShippingConfigurationSet',
+            `TargetRecordId=${webStoreId}`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        );
+
+        const configurationSetId = forceDataSoql(
+            `SELECT Id FROM ShippingConfigurationSet WHERE TargetRecordId='${webStoreId}' LIMIT 1`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        ).result.records[0].Id;
+
+        this.ux.log(`Created shippingConfigurationSet with id : '${configurationSetId}'`);
+
+        // Creating ShippingRateGroup
+        forceDataRecordCreate(
+            'ShippingRateGroup',
+            `ShippingProfileId=${configurationSetId}`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        );
+
+        const shippingRateGroupId = forceDataSoql(
+            `SELECT Id FROM ShippingRateGroup WHERE ShippingProfileId='${configurationSetId}'`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        ).result.records[0].Id;
+
+        this.ux.log(`Created ShippingRateGroup with id : '${shippingRateGroupId}'`);
+
+        // Creating ShippingRateArea
+        forceDataRecordCreate(
+            'ShippingRateArea',
+            `ShippingRateGroupId=${shippingRateGroupId} Countries='${applicationContext['country']}'`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        );
+
+        const shippingZoneId = forceDataSoql(
+            `SELECT Id from ShippingRateArea WHERE ShippingRateGroupId='${shippingRateGroupId}'`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        ).result.records[0].Id;
+
+        this.ux.log(`Created ShippingRateArea with id : '${shippingZoneId}'`);
+
+        // Creating StandardShippingArea
+        const isMultiCurrencyEnabled = currencySettings['records'][0]['IsMultiCurrencyEnabled'];
+
+        if (isMultiCurrencyEnabled) {
+            this.ux.log(`Multicurrency is Enabled, using defaultCurrency for CurrencyIsoCode`);
+            forceDataRecordCreate(
+                'StandardShippingRate',
+                `ShippingZoneId=${shippingZoneId} Price='0.0' CurrencyIsoCode='${applicationContext['defaultCurrency']}'`,
+                this.org.getUsername(),
+                this.flags,
+                this.logger
+            );
+        } else {
+            this.ux.log(`Multicurrency is not enabled, currencyIsoCode wont be populated`);
+            forceDataRecordCreate(
+                'StandardShippingRate',
+                `ShippingZoneId=${shippingZoneId} Price='0.0'`,
+                this.org.getUsername(),
+                this.flags,
+                this.logger
+            );
+        }
+
+        const standardShippingRateId = forceDataSoql(
+            `SELECT Id from StandardShippingRate WHERE ShippingZoneId='${shippingZoneId}'`,
+            this.org.getUsername(),
+            this.flags,
+            this.logger
+        ).result.records[0].Id;
+
+        this.ux.log(`Created StandardShippingRate with id : '${standardShippingRateId}'`);
+
+        return;
+    }
+
+    private async getApplicationContextFromWebStoreId(webStoreId: string): Promise<JsonCollection> {
+        const conn = this.org.getConnection();
+        const url = `${conn.baseUrl()}/${APPLICATION_CONTEXT_API_PATH.replace(WEBSTORE_ID, webStoreId)}`;
+
+        this.ux.log(`Fetching ApplicationContext for Webstore Id : ${webStoreId} to ${url}`);
+        return await conn.request({
+            method: 'GET',
+            url,
+            headers: {
+                key: 'Content-Type',
+                type: 'text',
+                value: 'application/json',
+            },
+        });
+    }
+
+    private async getCurrencySettings(): Promise<JsonCollection> {
+        const conn = this.org.getConnection();
+        const url = `${conn.baseUrl()}/${TOOLING_CURRENCY_SETTINGS}`;
+
+        this.ux.log(`Fetching CurrencySettings from tooling API`);
+        return await conn.request({
+            method: 'GET',
+            url,
+            headers: {
+                key: 'Content-Type',
+                type: 'text',
+                value: 'application/json',
+            },
+        });
     }
 
     private async updateMemberListActivateCommunity(): Promise<void> {
