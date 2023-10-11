@@ -24,6 +24,9 @@
         },
         "commerceSettings": {
             "commerceEnabled": true
+        },
+        "addressSettings": {
+            "countriesAndStates": true
         }
     }
 }

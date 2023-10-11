@@ -27,6 +27,9 @@
         },
         "languageSettings": {
             "enableTranslationWorkbench": true
+        },
+        "addressSettings": {
+            "countriesAndStates": true
         }
     }
 }
