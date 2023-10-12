@@ -92,7 +92,7 @@ const testFile = `<?xml version="1.0" encoding="UTF-8"?>
 </Network>
 `;
 
-describe('commerce:store:qickstart:setup', () => {
+describe('commerce:store:quickstart:setup', () => {
     const config = stubInterface<IConfig>($$.SANDBOX, {});
     const logger = new Logger('test');
     let loggerStub: sinon.SinonStub;
@@ -145,7 +145,7 @@ describe('commerce:store:qickstart:setup', () => {
         getApplicationContextFromWebStoreIdStub.restore();
     });
 
-    it('shouldPopulateCurrencyIsoCodeIfOrgIsMulticurrency', async () => {
+    it('Should populate CurrencyIsoCode if org is Multicurrency', async () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         getCurrencySettingsStub = stub(storeQuickstartSetup, 'getCurrencySettings' as any).resolves(
             JSON.parse('{"records":[{"IsMultiCurrencyEnabled":true}]}')
@@ -164,7 +164,7 @@ describe('commerce:store:qickstart:setup', () => {
         getCurrencySettingsStub.restore();
     });
 
-    it('shouldNotPopulateCurrencyIsoCodeIfOrgIsNotMulticurrency', async () => {
+    it('Should not populate CurrencyIsoCode if Org is not Multicurrency', async () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         getCurrencySettingsStub = stub(storeQuickstartSetup, 'getCurrencySettings' as any).resolves(
             JSON.parse('{"records":[{"IsMultiCurrencyEnabled":false}]}')
