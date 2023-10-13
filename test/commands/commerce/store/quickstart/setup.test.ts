@@ -131,21 +131,67 @@ describe('commerce:store:quickstart:setup', () => {
         forceDataSoqlStub.returns(queryResult);
         forceDataRecordCreateStub = stub(forceOrgSoqlExports, 'forceDataRecordCreate');
         forceDataRecordCreateStub.returns(null);
-        getApplicationContextFromWebStoreIdStub = stub(
-            storeQuickstartSetup,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            'getApplicationContextFromWebStoreId' as any
-        ).resolves(JSON.parse('{"country":"US", "defaultCurrency":"USD"}'));
     });
 
     afterEach(() => {
         loggerStub.restore();
         forceDataSoqlStub.restore();
         forceDataRecordCreateStub.restore();
-        getApplicationContextFromWebStoreIdStub.restore();
     });
 
     it('Should populate CurrencyIsoCode if org is Multicurrency', async () => {
+        getApplicationContextFromWebStoreIdStub = stub(
+            storeQuickstartSetup,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            'getApplicationContextFromWebStoreId' as any
+        ).resolves(JSON.parse('{"country":"IN", "defaultCurrency":"INR"}'));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        getCurrencySettingsStub = stub(storeQuickstartSetup, 'getCurrencySettings' as any).resolves(
+            JSON.parse('{"records":[{"IsMultiCurrencyEnabled":true}]}')
+        );
+        const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
+        storeQuickstartSetup.org = org;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await storeQuickstartSetup.initShipping();
+
+        assert.equal(
+            forceDataRecordCreateStub.getCall(-1).args[1],
+            "ShippingZoneId=testId Price='0.0' CurrencyIsoCode='INR'"
+        );
+        getCurrencySettingsStub.restore();
+        getApplicationContextFromWebStoreIdStub.restore();
+    });
+
+    it('Should not populate CurrencyIsoCode if Org is not Multicurrency', async () => {
+        getApplicationContextFromWebStoreIdStub = stub(
+            storeQuickstartSetup,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            'getApplicationContextFromWebStoreId' as any
+        ).resolves(JSON.parse('{"country":"IN", "defaultCurrency":"INR"}'));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        getCurrencySettingsStub = stub(storeQuickstartSetup, 'getCurrencySettings' as any).resolves(
+            JSON.parse('{"records":[{"IsMultiCurrencyEnabled":false}]}')
+        );
+        const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
+        storeQuickstartSetup.org = org;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await storeQuickstartSetup.initShipping();
+
+        assert.equal(forceDataRecordCreateStub.getCall(-1).args[1], "ShippingZoneId=testId Price='0.0'");
+        getCurrencySettingsStub.restore();
+        getApplicationContextFromWebStoreIdStub.restore();
+    });
+
+    it('Should populate default currency if applicationContext has no defaultCurrency set', async () => {
+        getApplicationContextFromWebStoreIdStub = stub(
+            storeQuickstartSetup,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            'getApplicationContextFromWebStoreId' as any
+        ).resolves(JSON.parse('{"country":"IN", "defaultCurrency":""}'));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         getCurrencySettingsStub = stub(storeQuickstartSetup, 'getCurrencySettings' as any).resolves(
             JSON.parse('{"records":[{"IsMultiCurrencyEnabled":true}]}')
@@ -162,12 +208,18 @@ describe('commerce:store:quickstart:setup', () => {
             "ShippingZoneId=testId Price='0.0' CurrencyIsoCode='USD'"
         );
         getCurrencySettingsStub.restore();
+        getApplicationContextFromWebStoreIdStub.restore();
     });
 
-    it('Should not populate CurrencyIsoCode if Org is not Multicurrency', async () => {
+    it('Should populate default country if applicationContext has no country set', async () => {
+        getApplicationContextFromWebStoreIdStub = stub(
+            storeQuickstartSetup,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            'getApplicationContextFromWebStoreId' as any
+        ).resolves(JSON.parse('{"defaultCurrency":""}'));
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         getCurrencySettingsStub = stub(storeQuickstartSetup, 'getCurrencySettings' as any).resolves(
-            JSON.parse('{"records":[{"IsMultiCurrencyEnabled":false}]}')
+            JSON.parse('{"records":[{"IsMultiCurrencyEnabled":true}]}')
         );
         const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
         storeQuickstartSetup.org = org;
@@ -176,8 +228,9 @@ describe('commerce:store:quickstart:setup', () => {
         // @ts-ignore
         await storeQuickstartSetup.initShipping();
 
-        assert.equal(forceDataRecordCreateStub.getCall(-1).args[1], "ShippingZoneId=testId Price='0.0'");
+        assert.equal(forceDataRecordCreateStub.getCall(-2).args[1], "ShippingRateGroupId=testId Countries='US'");
         getCurrencySettingsStub.restore();
+        getApplicationContextFromWebStoreIdStub.restore();
     });
 });
 

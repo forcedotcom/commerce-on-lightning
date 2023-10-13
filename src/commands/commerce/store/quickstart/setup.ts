@@ -549,9 +549,18 @@ export class StoreQuickstartSetup extends SfdxCommand {
         this.ux.log(`Created ShippingRateGroup with id : '${shippingRateGroupId}'`);
 
         // Creating ShippingRateArea
+        let country = 'US';
+        if (
+            !Array.isArray(applicationContext) &&
+            'country' in applicationContext &&
+            applicationContext['country'] != ''
+        ) {
+            country = applicationContext['country'].toString();
+        }
+
         forceDataRecordCreate(
             'ShippingRateArea',
-            `ShippingRateGroupId=${shippingRateGroupId} Countries='${applicationContext['country']}'`,
+            `ShippingRateGroupId=${shippingRateGroupId} Countries='${country}'`,
             this.org.getUsername(),
             this.flags,
             this.logger
@@ -569,11 +578,20 @@ export class StoreQuickstartSetup extends SfdxCommand {
         // Creating StandardShippingArea
         const isMultiCurrencyEnabled = currencySettings['records'][0]['IsMultiCurrencyEnabled'];
 
+        let currency = 'USD';
+        if (
+            !Array.isArray(applicationContext) &&
+            'defaultCurrency' in applicationContext &&
+            applicationContext['defaultCurrency'] != ''
+        ) {
+            currency = applicationContext['defaultCurrency'].toString();
+        }
+
         if (isMultiCurrencyEnabled) {
             this.ux.log(`Multicurrency is Enabled, using defaultCurrency for CurrencyIsoCode`);
             forceDataRecordCreate(
                 'StandardShippingRate',
-                `ShippingZoneId=${shippingZoneId} Price='0.0' CurrencyIsoCode='${applicationContext['defaultCurrency']}'`,
+                `ShippingZoneId=${shippingZoneId} Price='0.0' CurrencyIsoCode='${currency}'`,
                 this.org.getUsername(),
                 this.flags,
                 this.logger
