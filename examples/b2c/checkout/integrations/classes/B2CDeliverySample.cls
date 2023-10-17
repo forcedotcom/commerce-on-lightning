@@ -231,11 +231,10 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         // Product: Product Id for this Shipping Charge
         // ReferenceNumber: Reference Number from External Service
         // IsActive: If this Option is Active
+
         Id productId = getDefaultShippingChargeProduct2Id();
-        String cartCurrency = [SELECT CurrencyIsoCode FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId][0].CurrencyIsoCode;
         CartDeliveryGroupMethod cartDeliveryGroupMethod = new CartDeliveryGroupMethod(
             CartDeliveryGroupId = cartDeliveryGroupId,
-            CurrencyIsoCode = cartCurrency,
             ExternalProvider = shippingOption.getProvider(),
             Name = shippingOption.getName(),
             ShippingFee = shippingOption.getRate(),
@@ -246,6 +245,14 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             ReferenceNumber = shippingOption.getReferenceNumber(),
             IsActive = shippingOption.isActive()
         );
+
+        Boolean multiCurrencyEnabled = UserInfo.isMultiCurrencyOrganization();
+        if(multiCurrencyEnabled) {
+            String cartDeliveryGroupQuery = 'SELECT CurrencyIsoCode FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId LIMIT 1';
+            CartDeliveryGroup cartDeliveryGroup = (CartDeliveryGroup) Database.query(cartDeliveryGroupQuery);
+            String cartDeliveryGroupMethodCurrency = (String) cartDeliveryGroup.get('CurrencyIsoCode');
+            cartDeliveryGroupMethod.put('CurrencyIsoCode', cartDeliveryGroupMethodCurrency);
+        }
         insert(cartDeliveryGroupMethod);
     }
 
