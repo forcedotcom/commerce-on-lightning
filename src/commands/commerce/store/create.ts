@@ -256,11 +256,12 @@ export class StoreCreate extends SfdxCommand {
         if (
             !this.varargs['buyerEmail'] ||
             (this.varargs['buyerEmail'] as string).indexOf('scratchOrgBuyerUsername.replace') >= 0
-        )
-            this.varargs['buyerEmail'] = `${os.userInfo().username}+${(this.flags['buyer-username'] as string).replace(
-                '@',
-                'AT'
-            )}@salesforce.com`;
+        ) {
+            let buyerEmail = os.userInfo().username + '+' + (this.flags['buyer-username'] as string);
+            buyerEmail = buyerEmail.replace('@', 'AT') + '@salesforce.com';
+            this.varargs['buyerEmail'] = buyerEmail;
+        }
+
         if (!this.varargs['existingBuyerAuthentication'])
             this.varargs['existingBuyerAuthentication'] = `${os.homedir()}/.sfdx/${
                 this.flags['buyer-username'] as string
