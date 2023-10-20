@@ -257,7 +257,7 @@ export class StoreCreate extends SfdxCommand {
             !this.varargs['buyerEmail'] ||
             (this.varargs['buyerEmail'] as string).indexOf('scratchOrgBuyerUsername.replace') >= 0
         ) {
-            let buyerEmail = os.userInfo().username + (this.flags['buyer-username'] as string);
+            let buyerEmail = os.userInfo().username + '+' + (this.flags['buyer-username'] as string);
             buyerEmail = buyerEmail.replace('@', 'AT') + '@salesforce.com';
             this.varargs['buyerEmail'] = buyerEmail;
         }
