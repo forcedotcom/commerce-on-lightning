@@ -29,8 +29,7 @@ Messages.importMessagesDirectory(__dirname);
 const TOPIC = 'products';
 const CMD = `commerce:${TOPIC}:import`;
 const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
-const WEBSTORE_ID = '${WEBSTORE_ID}';
-const PRODUCT_IMPORT_API_PATH = `commerce/management/webstores/${WEBSTORE_ID}/product-import`;
+const PRODUCT_IMPORT_API_ASYNC = '/commerce/management/import/product/jobs';
 
 export class ProductsImport extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -319,7 +318,7 @@ export class ProductsImport extends SfdxCommand {
 
     public async importFromUploadedFile(contentVersionId: string, webStoreId: string): Promise<JsonCollection> {
         const conn = this.org.getConnection();
-        const url = `${conn.baseUrl()}/${PRODUCT_IMPORT_API_PATH.replace(WEBSTORE_ID, webStoreId)}`;
+        const url = `${conn.baseUrl()}/${PRODUCT_IMPORT_API_ASYNC}`;
 
         this.ux.log(`Starting import for WebStore ID: ${webStoreId} to ${url}`);
 
@@ -330,6 +329,11 @@ export class ProductsImport extends SfdxCommand {
                 "importConfiguration": {
                     "importSource": {
                         "contentVersionId": "${contentVersionId}"
+                    },
+                    "importSettings": {
+                        "webstore": {
+                            "webstoreId": ${webStoreId}
+                        }
                     }
                 }
             }`,
