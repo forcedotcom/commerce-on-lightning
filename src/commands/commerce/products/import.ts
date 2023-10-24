@@ -29,7 +29,7 @@ Messages.importMessagesDirectory(__dirname);
 const TOPIC = 'products';
 const CMD = `commerce:${TOPIC}:import`;
 const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
-const PRODUCT_IMPORT_API_ASYNC = '/commerce/management/import/product/jobs';
+const PRODUCT_IMPORT_API_ASYNC = 'commerce/management/import/product/jobs';
 
 export class ProductsImport extends SfdxCommand {
     public static readonly requiresUsername = true;
@@ -332,7 +332,7 @@ export class ProductsImport extends SfdxCommand {
                     },
                     "importSettings": {
                         "webstore": {
-                            "webstoreId": ${webStoreId}
+                            "webstoreId": "${webStoreId}"
                         }
                     }
                 }
