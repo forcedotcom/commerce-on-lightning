@@ -4,20 +4,21 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
-// import { strict as assert } from 'assert';
-// import sinon, { stub } from 'sinon';
-// import { stubInterface } from '@salesforce/ts-sinon';
-// import { IConfig } from '@oclif/config';
-// import { $$ } from '@salesforce/command/lib/test';
-// import { fs, Org } from '@salesforce/core';
-// import { UX } from '@salesforce/command';
-// import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
+import { strict as assert } from 'assert';
+import sinon, { stub } from 'sinon';
+import { Logger } from '@salesforce/core';
+import { stubInterface } from '@salesforce/ts-sinon';
+import { IConfig } from '@oclif/config';
+import { $$ } from '@salesforce/command/lib/test';
+import { Org } from '@salesforce/core';
+import { UX } from '@salesforce/command';
+import { QueryResult } from '@mshanemc/plugin-helpers/dist/typeDefs';
 // import { StatusFileManager } from '../../../../../src/lib/utils/statusFileManager';
 // import { StoreQuickstartSetup } from '../../../../../src/commands/commerce/store/quickstart/setup';
-// import * as forceOrgSoqlExports from '../../../../../src/lib/utils/sfdx/forceDataSoql';
-// import { Result } from '../../../../../src/lib/utils/jsonUtils';
+import * as forceOrgSoqlExports from '../../../../../src/lib/utils/sfdx/forceDataSoql';
+import { StoreQuickstartSetup } from '../../../../../src/commands/commerce/store/quickstart/setup';
+import { Result } from '../../../../../src/lib/utils/jsonUtils';
 //
-import { strict as assert } from 'assert';
 
 describe('test updating self reg', () => {
     it('should format file correctly', () => {
@@ -90,6 +91,148 @@ const testFile = `<?xml version="1.0" encoding="UTF-8"?>
     <selfRegProfile>Buyer_User_Profile_From_QuickStart</selfRegProfile>
 </Network>
 `;
+
+describe('commerce:store:quickstart:setup', () => {
+    const config = stubInterface<IConfig>($$.SANDBOX, {});
+    const logger = new Logger('test');
+    let loggerStub: sinon.SinonStub;
+    let forceDataSoqlStub: sinon.SinonStub;
+    let forceDataRecordCreateStub: sinon.SinonStub;
+    let getApplicationContextFromWebStoreIdStub: sinon.SinonStub;
+    let getCurrencySettingsStub: sinon.SinonStub;
+    let queryResult: Result<QueryResult>;
+    let storeQuickstartSetup: StoreQuickstartSetup;
+
+    before(() => {
+        queryResult = new Result<QueryResult>();
+        queryResult.result = new (class implements QueryResult {
+            public done: boolean;
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            public records: Record[] = [{ Id: 'testId' }];
+            public totalSize: number;
+        })();
+        storeQuickstartSetup = new StoreQuickstartSetup([], config);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any,@typescript-eslint/no-unsafe-member-access
+        (storeQuickstartSetup as any).varargs = { communitySiteName: 'test', getUsername: 'test' };
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        storeQuickstartSetup.ux = stubInterface<UX>($$.SANDBOX);
+    });
+
+    after(() => {
+        sinon.restore();
+    });
+
+    beforeEach(() => {
+        loggerStub = sinon.stub(logger, 'debug').returns(logger);
+        forceDataSoqlStub = stub(forceOrgSoqlExports, 'forceDataSoql');
+        forceDataSoqlStub.returns(queryResult);
+        forceDataRecordCreateStub = stub(forceOrgSoqlExports, 'forceDataRecordCreate');
+        forceDataRecordCreateStub.returns(null);
+    });
+
+    afterEach(() => {
+        loggerStub.restore();
+        forceDataSoqlStub.restore();
+        forceDataRecordCreateStub.restore();
+    });
+
+    it('Should populate CurrencyIsoCode if org is Multicurrency', async () => {
+        getApplicationContextFromWebStoreIdStub = stub(
+            storeQuickstartSetup,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            'getApplicationContextFromWebStoreId' as any
+        ).resolves(JSON.parse('{"country":"IN", "defaultCurrency":"INR"}'));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        getCurrencySettingsStub = stub(storeQuickstartSetup, 'getCurrencySettings' as any).resolves(
+            JSON.parse('{"records":[{"IsMultiCurrencyEnabled":true}]}')
+        );
+        const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
+        storeQuickstartSetup.org = org;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await storeQuickstartSetup.initShipping();
+
+        assert.equal(
+            forceDataRecordCreateStub.getCall(-1).args[1],
+            "ShippingZoneId=testId Price='0.0' CurrencyIsoCode='INR'"
+        );
+        getCurrencySettingsStub.restore();
+        getApplicationContextFromWebStoreIdStub.restore();
+    });
+
+    it('Should not populate CurrencyIsoCode if Org is not Multicurrency', async () => {
+        getApplicationContextFromWebStoreIdStub = stub(
+            storeQuickstartSetup,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            'getApplicationContextFromWebStoreId' as any
+        ).resolves(JSON.parse('{"country":"IN", "defaultCurrency":"INR"}'));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        getCurrencySettingsStub = stub(storeQuickstartSetup, 'getCurrencySettings' as any).resolves(
+            JSON.parse('{"records":[{"IsMultiCurrencyEnabled":false}]}')
+        );
+        const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
+        storeQuickstartSetup.org = org;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await storeQuickstartSetup.initShipping();
+
+        assert.equal(forceDataRecordCreateStub.getCall(-1).args[1], "ShippingZoneId=testId Price='0.0'");
+        getCurrencySettingsStub.restore();
+        getApplicationContextFromWebStoreIdStub.restore();
+    });
+
+    it('Should populate default currency if applicationContext has no defaultCurrency set', async () => {
+        getApplicationContextFromWebStoreIdStub = stub(
+            storeQuickstartSetup,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            'getApplicationContextFromWebStoreId' as any
+        ).resolves(JSON.parse('{"country":"IN", "defaultCurrency":""}'));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        getCurrencySettingsStub = stub(storeQuickstartSetup, 'getCurrencySettings' as any).resolves(
+            JSON.parse('{"records":[{"IsMultiCurrencyEnabled":true}]}')
+        );
+        const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
+        storeQuickstartSetup.org = org;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await storeQuickstartSetup.initShipping();
+
+        assert.equal(
+            forceDataRecordCreateStub.getCall(-1).args[1],
+            "ShippingZoneId=testId Price='0.0' CurrencyIsoCode='USD'"
+        );
+        getCurrencySettingsStub.restore();
+        getApplicationContextFromWebStoreIdStub.restore();
+    });
+
+    it('Should populate default country if applicationContext has no country set', async () => {
+        getApplicationContextFromWebStoreIdStub = stub(
+            storeQuickstartSetup,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            'getApplicationContextFromWebStoreId' as any
+        ).resolves(JSON.parse('{"defaultCurrency":""}'));
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        getCurrencySettingsStub = stub(storeQuickstartSetup, 'getCurrencySettings' as any).resolves(
+            JSON.parse('{"records":[{"IsMultiCurrencyEnabled":true}]}')
+        );
+        const org = await Org.create({ aliasOrUsername: 'foo@example.com' });
+        storeQuickstartSetup.org = org;
+
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        await storeQuickstartSetup.initShipping();
+
+        assert.equal(forceDataRecordCreateStub.getCall(-2).args[1], "ShippingRateGroupId=testId Countries='US'");
+        getCurrencySettingsStub.restore();
+        getApplicationContextFromWebStoreIdStub.restore();
+    });
+});
 
 // describe('commerce:store:quickstart:setup', () => {
 //     const config = stubInterface<IConfig>($$.SANDBOX, {});
