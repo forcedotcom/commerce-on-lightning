@@ -22,10 +22,10 @@ const child = spawn(command, { shell: true });
 
 child.stderr.on('data', (data) => {
     // eslint-disable-next-line no-console
-    console.error(String(data));
+    process.stderr.write(String(data));
 });
 
 child.stdout.on('data', (data) => {
     // eslint-disable-next-line no-console
-    console.log(String(data));
+    process.stdout.write(String(data));
 });
