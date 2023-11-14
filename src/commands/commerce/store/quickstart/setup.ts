@@ -251,11 +251,10 @@ export class StoreQuickstartSetup extends SfdxCommand {
         fs.writeFileSync(PACKAGE_RETRIEVE(this.storeDir), packageRetrieve);
         this.ux.log(msgs.getMessage('quickstart.setup.usingToRetrieveStoreInfo', [packageRetrieve]));
         this.ux.log(msgs.getMessage('quickstart.setup.getStoreMetadatFromZip'));
+        const targetDirectory = path.join(this.storeDir, 'experience-bundle-package');
         shell(
             appendCommonFlags(
-                `sfdx force:mdapi:retrieve -u "${this.org.getUsername()}" -r "${
-                    this.storeDir
-                }/experience-bundle-package" -k "${PACKAGE_RETRIEVE(this.storeDir)}"
+                `sfdx force:mdapi:retrieve -u "${this.org.getUsername()}" -r "${targetDirectory}" -k "${PACKAGE_RETRIEVE(this.storeDir)}"
                 --unzip --zipfilename "${this.storeDir}/experience-bundle-package/unpackaged.zip"`,
                 this.flags,
                 this.logger
