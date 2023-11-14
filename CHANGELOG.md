@@ -2,13 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-# [248.1.2] (https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.1...v248.1.2)
+# [248.1.3](https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.2...v248.1.3)
+
+### Bug Fixes
+- hotfix: Switch to replaceAll by @avaHitesh-github in #281
+
+# [248.1.2](https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.1...v248.1.2)
 
 ### Bug Fixes
 
 - This patch release includes a hotfix for the situation where '@' symbol can be in the os username.
 
-# [248.1.1] (https://github.com/forcedotcom/commerce-on-lightning/compare/248.1.0...v248.1.1)
+# [248.1.1](https://github.com/forcedotcom/commerce-on-lightning/compare/248.1.0...v248.1.1)
 
 ### Bug Fixes
 
