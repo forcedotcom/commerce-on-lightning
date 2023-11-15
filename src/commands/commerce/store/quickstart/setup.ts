@@ -260,17 +260,13 @@ export class StoreQuickstartSetup extends SfdxCommand {
             )
         );
         if(process.platform === 'win32') {
-            shell(`Expand-Archive -Path ${path.join(bundleDirectory, 'unpackaged.zip')} -DestinationPath ${bundleDirectory}`);
+            shell(`Microsoft.PowerShell.Archive\\Expand-Archive -Path ${path.join(bundleDirectory, 'unpackaged.zip')} -DestinationPath ${bundleDirectory}`);
         }
         else {
             shell(
                 `unzip -o -d "${bundleDirectory}" "${path.join(bundleDirectory, 'unpackaged.zip')}"`
             );
         }
-        // Note: when the retrieved sources are unzipped using --unzip, the extracted files are inside ...experience-bundle-package/unpackaged/unpackaged (likely a bug in https://github.com/forcedotcom/source-deploy-retrieve)
-        // As a workaround, the directory structure has to be fixed which will enable rest of the operations.
-        shell(`cp -R ${path.join(bundleDirectory, 'unpackaged', 'unpackaged', '.')} ${path.join(bundleDirectory, 'unpackaged')}`);
-        shell(`rm -rf ${path.join(bundleDirectory, 'unpackaged', 'unpackaged')}`);
 
         await StoreCreate.waitForStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
         await this.statusFileManager.setValue('retrievedPackages', true);
