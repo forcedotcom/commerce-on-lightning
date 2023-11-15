@@ -261,7 +261,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         );
         // Note: when the retrieved sources are unzipped using --unzip, the extracted files are inside ...experience-bundle-package/unpackaged/unpackaged (likely a bug in https://github.com/forcedotcom/source-deploy-retrieve)
         // As a workaround, the directory structure has to be fixed which will enable rest of the operations.
-        shell(`cp ${path.join(targetDirectory, 'unpackaged', 'unpackaged', '.')} ${path.join(targetDirectory, 'unpackaged')}`);
+        shell(`cp -R ${path.join(targetDirectory, 'unpackaged', 'unpackaged', '.')} ${path.join(targetDirectory, 'unpackaged')}`);
         shell(`rm -rf ${path.join(targetDirectory, 'unpackaged', 'unpackaged')}`);
 
         await StoreCreate.waitForStoreId(this.statusFileManager, this.flags, this.ux, this.logger);
