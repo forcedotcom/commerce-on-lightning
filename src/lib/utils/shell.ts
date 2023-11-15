@@ -75,12 +75,6 @@ export const shell = (
     };
 };
 
-export const powerShell = (
-    cmd: string
-): ShellOutput => {
-    const child = spawn(cmd, { shell: true });
-}
-
 class ShellOutput {
     public res: string;
     public err;
