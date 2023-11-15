@@ -254,7 +254,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const targetDirectory = path.join(this.storeDir, 'experience-bundle-package');
         shell(
             appendCommonFlags(
-                `sfdx force:mdapi:retrieve -u '${this.org.getUsername()}' -r '${targetDirectory}' -k '${PACKAGE_RETRIEVE(this.storeDir)}' --unzip"`,
+                `sfdx force:mdapi:retrieve -u "${this.org.getUsername()}" -r "${targetDirectory}" -k "${PACKAGE_RETRIEVE(this.storeDir)}" --unzip`,
                 this.flags,
                 this.logger
             )
