@@ -5,6 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import os from 'os';
+import path from 'path';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { Messages } from '@salesforce/core';
 import { AnyJson } from '@salesforce/ts-types';
@@ -108,9 +109,10 @@ export class ExamplesConvert extends SfdxCommand {
     private convert(r: string[]): void {
         r.map((l) => l.replace('$EXAMPLE_DIR', EXAMPLE_DIR).replace('~', os.homedir())).forEach((dir) =>
             shell(
-                `cd ${this.flags.outputdir as string} && sfdx force:mdapi:convert -r ${dir} -d ${
-                    this.flags.outputdir as string
-                }/force-app`
+                `cd ${this.flags.outputdir as string} && sfdx force:mdapi:convert -r ${dir} -d ${path.join(
+                    this.flags.outputdir as string,
+                    'force-app'
+                )}`
             )
         );
     }
