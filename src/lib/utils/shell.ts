@@ -53,7 +53,7 @@ export const shell = (
     let j = '';
     Object.assign(envars, envs);
     try {
-        res = execSync(cmd, { stdio: _stdio, cwd: _cwd, env: envars }).toString();
+        res = execSync(cmd, { stdio: _stdio, cwd: _cwd, env: envars, shell: process.platform === 'win32' ? 'powershell.exe' : '/bin/sh' }).toString();
         if (res) res = cleanConsoleCharacters(res);
         else return;
         try {
@@ -74,6 +74,12 @@ export const shell = (
         json: j,
     };
 };
+
+export const powerShell = (
+    cmd: string
+): ShellOutput => {
+    const child = spawn(cmd, { shell: true });
+}
 
 class ShellOutput {
     public res: string;

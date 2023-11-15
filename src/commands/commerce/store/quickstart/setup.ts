@@ -260,7 +260,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
             )
         );
         if(process.platform === 'win32') {
-            shell(`Microsoft.PowerShell.Archive\\Expand-Archive -Path ${path.join(bundleDirectory, 'unpackaged.zip')} -DestinationPath ${bundleDirectory}`);
+            shell(`Expand-Archive -Path ${path.join(bundleDirectory, 'unpackaged.zip')} -DestinationPath ${bundleDirectory}`);
         }
         else {
             shell(
