@@ -107,13 +107,9 @@ export class ExamplesConvert extends SfdxCommand {
     }
 
     private convert(r: string[]): void {
-        r.map((l) => l.replace('$EXAMPLE_DIR', EXAMPLE_DIR).replace('~', os.homedir())).forEach((dir) =>
-            shell(
-                `cd ${this.flags.outputdir as string} && sfdx force:mdapi:convert -r ${dir} -d ${path.join(
-                    this.flags.outputdir as string,
-                    'force-app'
-                )}`
-            )
-        );
+        r.map((l) => l.replace('$EXAMPLE_DIR', EXAMPLE_DIR).replace('~', os.homedir())).forEach((dir) => {
+            shell(`cd ${this.flags.outputdir as string}`);
+            shell(`sfdx force:mdapi:convert -r ${dir} -d ${path.join(this.flags.outputdir as string, 'force-app')}`);
+        });
     }
 }

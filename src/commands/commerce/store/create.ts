@@ -361,9 +361,10 @@ export class StoreCreate extends SfdxCommand {
             if (e.message && JSON.stringify(e.message).indexOf(msgs.getMessage('create.checkInvalidSession')) >= 0) {
                 this.ux.log(msgs.getMessage('create.preMessageOpeningPageSessinonRefresh', [e.message]));
                 shell('sfdx force:org:open -u ' + this.org.getUsername()); // todo might puppet this
+                shell(`cd ${scratchOrgDir}`);
                 shellJsonSfdx(
                     appendCommonFlags(
-                        `cd ${scratchOrgDir} && sfdx force:source:push -f -u "${this.org.getUsername()}"`,
+                        `sfdx force:source:push -f -u "${this.org.getUsername()}"`,
                         this.flags,
                         this.logger
                     )

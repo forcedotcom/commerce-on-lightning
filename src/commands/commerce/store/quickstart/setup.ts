@@ -931,10 +931,11 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const srcGuestProfile = `${pathToGuestProfile}/profiles/InsertStoreNameHere Profile.profile`;
         const trgtGuestProfile = `${pathToGuestProfile}/profiles/${communityNetworkName} Profile.profile`;
         fs.renameSync(srcGuestProfile, trgtGuestProfile);
-        shell(`cd "${scratchOrgDir}" && sfdx force:mdapi:convert -r "${pathToGuestProfile}" -d "${tmpDirName}"`);
+        shell(`cd "${scratchOrgDir}"`);
+        shell(`sfdx force:mdapi:convert -r "${pathToGuestProfile}" -d "${tmpDirName}"`);
         shell(
             appendCommonFlags(
-                `cd "${scratchOrgDir}" && sfdx force:source:deploy -p "${tmpDirName}" -u "${this.org.getUsername()}"`,
+                `sfdx force:source:deploy -p "${tmpDirName}" -u "${this.org.getUsername()}"`,
                 this.flags,
                 this.logger
             )
