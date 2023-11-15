@@ -920,16 +920,16 @@ export class StoreQuickstartSetup extends SfdxCommand {
             /[\W_]+/g,
             ''
         );
-        const tmpDirName = this.storeDir + '/sourceGuestProfile';
+        const tmpDirName = path.join(this.storeDir, 'sourceGuestProfile');
         // Can only force:source:deploy from sfdx project folder
         // Cannot push source Guest Profile earlier as Store is not created yet
         // TODO hardcoded b2c add this to store config file
-        let pathToGuestProfile = EXAMPLE_DIR + '/b2c/users/guest-user-profile-setup';
+        let pathToGuestProfile = path.join(EXAMPLE_DIR, 'b2c', 'users', 'guest-user-profile-setup');
         copyFolderRecursiveSync(pathToGuestProfile, this.storeDir);
-        pathToGuestProfile = this.storeDir + '/guest-user-profile-setup';
+        pathToGuestProfile = path.join(this.storeDir, 'guest-user-profile-setup');
         // Guest Profile has a space in the name. Do not be alarmed.
-        const srcGuestProfile = `${pathToGuestProfile}/profiles/InsertStoreNameHere Profile.profile`;
-        const trgtGuestProfile = `${pathToGuestProfile}/profiles/${communityNetworkName} Profile.profile`;
+        const srcGuestProfile = path.join(pathToGuestProfile, 'profiles', 'InsertStoreNameHere Profile.profile');
+        const trgtGuestProfile = path.join(pathToGuestProfile, 'profiles', `${communityNetworkName} Profile.profile`);;
         fs.renameSync(srcGuestProfile, trgtGuestProfile);
         shell(`cd "${scratchOrgDir}"`);
         shell(`sfdx force:mdapi:convert -r "${pathToGuestProfile}" -d "${tmpDirName}"`);
