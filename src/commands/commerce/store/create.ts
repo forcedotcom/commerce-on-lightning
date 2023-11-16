@@ -348,6 +348,7 @@ export class StoreCreate extends SfdxCommand {
             this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:source:push']));
             const cwd = process.cwd();
             process.chdir(scratchOrgDir);
+            console.log(shell('ls'));
             shellJsonSfdx(
                 appendCommonFlags(
                     `sfdx force:source:tracking:clear -u "${this.org.getUsername()}" -p`,
