@@ -354,7 +354,11 @@ export class StoreCreate extends SfdxCommand {
                 )
             );
             shellJsonSfdx(
-                appendCommonFlags(`sfdx force:source:push -f -u "${this.org.getUsername()}"`, this.flags, this.logger)
+                appendCommonFlags(
+                    `cd ${scratchOrgDir} | sfdx force:source:push -f -u "${this.org.getUsername()}"`,
+                    this.flags,
+                    this.logger
+                )
             );
         } catch (e) {
             if (e.message && JSON.stringify(e.message).indexOf(msgs.getMessage('create.checkInvalidSession')) >= 0) {
