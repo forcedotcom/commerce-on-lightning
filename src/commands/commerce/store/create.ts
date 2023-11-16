@@ -349,7 +349,7 @@ export class StoreCreate extends SfdxCommand {
             shell(`cd ${scratchOrgDir}`);
             shellJsonSfdx(
                 appendCommonFlags(
-                    `sfdx force:source:tracking:clear -u "${this.org.getUsername()} -p`,
+                    `sfdx force:source:tracking:clear -u "${this.org.getUsername()}" -p`,
                     this.flags,
                     this.logger
                 )
