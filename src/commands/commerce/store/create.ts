@@ -350,7 +350,7 @@ export class StoreCreate extends SfdxCommand {
             let sourceTrackingCommand = '';
             // echo y running from node to powershell is not giving the right behavior.
             if (process.platform === 'win32') {
-                sourceTrackingCommand = `sfdx force:source:tracking:clear -u "${this.org.getUsername()}" -NonInteractive`;
+                sourceTrackingCommand = `cmd /c echo 'y' | sfdx force:source:tracking:clear -u "${this.org.getUsername()}"`;
             } else {
                 sourceTrackingCommand = `echo y | sfdx force:source:tracking:clear -u "${this.org.getUsername()}"`;
             }
