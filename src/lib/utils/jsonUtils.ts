@@ -5,6 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import * as os from 'os';
+import path from 'path';
 import { fs, Messages, SfdxError } from '@salesforce/core';
 import { convertKabobToCamel, convertToCamelKabob } from './stringUtils';
 import { EXAMPLE_DIR } from './constants/properties';
@@ -130,29 +131,26 @@ export const parseStoreScratchDef = (flags: Record<string, unknown>): StoreScrat
 };
 
 export const convertStoreScratchDefToExamples = (def: StoreScratchDef): string[] => {
-    let path = EXAMPLE_DIR + '/' + def.edition.toLowerCase() + '/';
+    // let path = EXAMPLE_DIR + '/' + def.edition.toLowerCase() + '/';
+    let scratchDefPath = path.join(EXAMPLE_DIR, def.edition.toLowerCase()); 
     const paths = [];
     Object.keys(def.settings)
         .filter((key) => !Array.isArray(def.settings[key]) && key !== 'lwc')
         .forEach((key) => {
-            if (typeof def.settings[key] !== 'object')
-                paths.push(path + convertToCamelKabob(key) + '/' + convertToCamelKabob(def.settings[key]));
-            else
+            if (typeof def.settings[key] !== 'object') {
+                paths.push(path.join(scratchDefPath, convertToCamelKabob(key), convertToCamelKabob(def.settings[key])));
+            }
+            else {
                 Object.keys(def.settings[key]).forEach((key1) => {
                     // TODO theoretically make this recursive
-                    if (typeof def.settings[key][key1] !== 'string')
-                        paths.push(path + convertToCamelKabob(key) + '/' + convertToCamelKabob(key1) + '/');
-                    else
-                        paths.push(
-                            path +
-                                convertToCamelKabob(key) +
-                                '/' +
-                                convertToCamelKabob(key1) +
-                                '/' +
-                                def.settings[key][key1] +
-                                '/'
-                        );
+                    if (typeof def.settings[key][key1] !== 'string') {
+                        paths.push(path.join(scratchDefPath, convertToCamelKabob(key), convertToCamelKabob(key1)));
+                    }
+                    else {
+                        paths.push(path.join(scratchDefPath, convertToCamelKabob(key), convertToCamelKabob(key1), def.settings[key][key1]));
+                    }
                 });
+            }
         });
     return paths;
 };
