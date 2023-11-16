@@ -347,13 +347,14 @@ export class StoreCreate extends SfdxCommand {
         try {
             this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:source:push']));
             shell(`cd ${scratchOrgDir}`);
-            shellJsonSfdx(
-                appendCommonFlags(
-                    `echo y | sfdx force:source:tracking:clear -u "${this.org.getUsername()}"`,
-                    this.flags,
-                    this.logger
-                )
-            );
+            let sourceTrackingCommand = '';
+            // echo y running from node to powershell is not giving the right behavior.
+            if (process.platform === 'win32') {
+                sourceTrackingCommand = `sfdx force:source:tracking:clear -u "${this.org.getUsername()}" -NonInteractive`;
+            } else {
+                sourceTrackingCommand = `echo y | sfdx force:source:tracking:clear -u "${this.org.getUsername()}"`;
+            }
+            shellJsonSfdx(appendCommonFlags(sourceTrackingCommand, this.flags, this.logger));
             shellJsonSfdx(
                 appendCommonFlags(`sfdx force:source:push -f -u "${this.org.getUsername()}"`, this.flags, this.logger)
             );
