@@ -346,7 +346,7 @@ export class StoreCreate extends SfdxCommand {
         this.ux.startSpinner(msgs.getMessage('create.pushingStoreSources'));
         try {
             this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:source:push']));
-            shell(`cd ${scratchOrgDir}`);
+            shell(appendCommonFlags(`cd ${scratchOrgDir}`, this.flags, this.logger));
             shellJsonSfdx(
                 appendCommonFlags(
                     `sfdx force:source:tracking:clear -u "${this.org.getUsername()}" -p`,
