@@ -721,19 +721,22 @@ export class StoreQuickstartSetup extends SfdxCommand {
             (v) => (data = data.replace(new RegExp(`<${v}>.*</${v}>`, 'g'), `<${v}>${r[v]}</${v}>`))
         );
         fs.writeFileSync(networkMetaFile, data);
-        shell(
-            `cd "${this.storeDir}/experience-bundle-package/unpackaged" && zip -r -X "../${
-                this.varargs['communityExperienceBundleName'] as string
-            }ToDeploy.zip" ./*`
-        );
+        const unpackagedPath = path.join(this.storeDir, 'experience-bundle-package', 'unpackaged');
+        const toDeployPath = path.join('..', `${this.varargs['communityExperienceBundleName'] as string}ToDeploy.zip`);
+        let zipCommand = '';
+        if(process.platform === 'win32') {
+            zipCommand = `Compress-Archive -Path ${unpackagedPath} -Recurse -DestinationPath "${toDeployPath}" ./*`;
+        }
+        else {
+            zipCommand = `cd "${unpackagedPath}" && zip -r -X "${toDeployPath}" ./*`;
+        }
+        shell(zipCommand);
+
+        const constructedToDeployPath = path.join(this.storeDir, 'experience-bundle-package', `${this.varargs['communityExperienceBundleName'] as string}ToDeploy.zip`);
 
         shellJsonSfdx(
             appendCommonFlags(
-                `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${
-                    this.storeDir
-                }/experience-bundle-package/${
-                    this.varargs['communityExperienceBundleName'] as string
-                }ToDeploy.zip" --wait 60 --verbose --singlepackage`,
+                `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${constructedToDeployPath}" --wait 60 --verbose --singlepackage`,
                 this.flags,
                 this.logger
             )
