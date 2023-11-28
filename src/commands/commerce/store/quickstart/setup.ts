@@ -190,11 +190,12 @@ export class StoreQuickstartSetup extends SfdxCommand {
          * Removing the urlPathPrefix will NOT remove it from the site.
          * This function will only be executed in catch blocks when an error occurs
          */
-        const expSiteMetaFileName =
-            this.storeDir +
+        const expSiteMetaFileName = path.join(
+            this.storeDir,
             `/experience-bundle-package/unpackaged/experiences/${
                 this.varargs['communityExperienceBundleName'] as string
-            }.site-meta.xml`;
+            }.site-meta.xml`
+        );
 
         this.ux.log(msgs.getMessage('quickstart.setup.removeUrlPathPrefix', [expSiteMetaFileName]));
 
@@ -659,7 +660,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
 
     private async updateMemberListActivateCommunity(): Promise<void> {
         if (await this.statusFileManager.getValue('memberListUpdatedCommunityActive')) return;
-        if (!fs.existsSync(`${this.storeDir}/experience-bundle-package/unpackaged`)) {
+        if (!fs.existsSync(path.join(this.storeDir, 'experience-bundle-package/unpackaged'))) {
             await this.statusFileManager.setValue('retrievedPackages', false);
             await this.retrievePackages();
         }
@@ -694,9 +695,9 @@ export class StoreQuickstartSetup extends SfdxCommand {
 
     private updateSelfRegProfile(): void {
         this.ux.log(msgs.getMessage('quickstart.setup.updateSelfRegProfile'));
-        const networkMetaFile = `${this.storeDir}/experience-bundle-package/unpackaged/networks/${
+        const networkMetaFile = path.join(this.storeDir, `experience-bundle-package/unpackaged/networks/${
             this.varargs['communityNetworkName'] as string
-        }.network`;
+        }.network`);
 
         let data = fs.readFileSync(networkMetaFile).toString();
 
@@ -721,11 +722,15 @@ export class StoreQuickstartSetup extends SfdxCommand {
             (v) => (data = data.replace(new RegExp(`<${v}>.*</${v}>`, 'g'), `<${v}>${r[v]}</${v}>`))
         );
         fs.writeFileSync(networkMetaFile, data);
-        const unpackagedPath = path.join(this.storeDir, 'experience-bundle-package', 'unpackaged');
-        const toDeployPath = path.join('..', `${this.varargs['communityExperienceBundleName'] as string}ToDeploy.zip`);
+        const experienceBundlePath = path.join(this.storeDir, 'experience-bundle-package');
+        const unpackagedPath = path.join(experienceBundlePath, 'unpackaged');
+        const toDeployPath = path.join(experienceBundlePath, `${this.varargs['communityExperienceBundleName'] as string}ToDeploy.zip`);
         let zipCommand = '';
         if(process.platform === 'win32') {
-            zipCommand = `Compress-Archive -Path ${unpackagedPath} -Recurse -DestinationPath "${toDeployPath}" ./*`;
+            if(existsSync(toDeployPath)){
+                shell(`rm -Force "${toDeployPath}"`);
+            }
+            zipCommand = `Compress-Archive -Path ${unpackagedPath}\\* -DestinationPath "${toDeployPath}"`;
         }
         else {
             zipCommand = `cd "${unpackagedPath}" && zip -r -X "${toDeployPath}" ./*`;
@@ -736,7 +741,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
 
         shellJsonSfdx(
             appendCommonFlags(
-                `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${constructedToDeployPath}" --wait 60 --verbose --singlepackage`,
+                `sf project deploy start -o "${this.org.getUsername()}" -g --metadata-dir='${constructedToDeployPath}' -w 60 --verbose --single-package`,
                 this.flags,
                 this.logger
             )
@@ -946,20 +951,20 @@ export class StoreQuickstartSetup extends SfdxCommand {
 
         // Sharing Rules
         if (!(this.varargs['isSharingRuleMetadataNeeded'] && this.varargs['isSharingRuleMetadataNeeded'] === 'true')) {
-            const sharingRulesDirOrg = QUICKSTART_CONFIG() + '/guestbrowsing/sharingRules';
-            const sharingRulesDir = this.storeDir + '/experience-bundle-package/unpackaged/sharingRules';
+            const sharingRulesDirOrg = path.join(QUICKSTART_CONFIG(), '/guestbrowsing/sharingRules');
+            const sharingRulesDir = path.join(this.storeDir, '/experience-bundle-package/unpackaged/sharingRules');
             mkdirSync(sharingRulesDir);
             ['ProductCatalog-template.sharingRules', 'Product2-template.sharingRules'].forEach((r) =>
                 fs.writeFileSync(
-                    sharingRulesDir + '/' + r.replace('-template', ''),
+                    path.join(sharingRulesDir, r.replace('-template', '')),
                     fs
-                        .readFileSync(sharingRulesDirOrg + '/' + r)
+                        .readFileSync(path.join(sharingRulesDirOrg, r))
                         .toString()
                         .replace(/YourStoreName/g, this.varargs['communitySiteName'] as string)
                 )
             );
         }
-        if (!fs.existsSync(`${this.storeDir}/experience-bundle-package/unpackaged`)) {
+        if (!fs.existsSync(path.join(this.storeDir, 'experience-bundle-package', 'unpackaged'))) {
             await this.statusFileManager.setValue('retrievedPackages', false);
             await this.retrievePackages();
         }
@@ -968,22 +973,13 @@ export class StoreQuickstartSetup extends SfdxCommand {
         let siteConfigMainAppPageFileName = null;
         let bundleName = this.varargs['communityExperienceBundleName'] as string;
         if (this.isUsingDigitalExperienceBundle) {
-            siteConfigMetaFileName =
-                this.storeDir +
-                `/experience-bundle-package/unpackaged/digitalExperiences/site/${bundleName}/sfdc_cms__site/${bundleName}/content.json`;
-            siteConfigMainAppPageFileName =
-                this.storeDir +
-                `/experience-bundle-package/unpackaged/digitalExperiences/site/${bundleName}/sfdc_cms__appPage/mainAppPage/content.json`;
+            siteConfigMetaFileName = path.join(this.storeDir, `/experience-bundle-package/unpackaged/digitalExperiences/site/${bundleName}/sfdc_cms__site/${bundleName}/content.json`);
+            siteConfigMainAppPageFileName = path.join(this.storeDir,  `/experience-bundle-package/unpackaged/digitalExperiences/site/${bundleName}/sfdc_cms__appPage/mainAppPage/content.json`);
         } else {
-            siteConfigMetaFileName =
-                this.storeDir +
-                `/experience-bundle-package/unpackaged/experiences/${bundleName}/config/${configName}.json`;
-
-            siteConfigMainAppPageFileName =
-                this.storeDir +
-                `/experience-bundle-package/unpackaged/experiences/${
-                    this.varargs['communityExperienceBundleName'] as string
-                }/config/mainAppPage.json`;
+            siteConfigMetaFileName = path.join(this.storeDir, `/experience-bundle-package/unpackaged/experiences/${bundleName}/config/${configName}.json`);
+            siteConfigMainAppPageFileName = path.join(this.storeDir, `/experience-bundle-package/unpackaged/experiences/${
+                this.varargs['communityExperienceBundleName'] as string
+            }/config/mainAppPage.json`);
         }
 
         let siteConfigJsonData = fs.readFileSync(siteConfigMetaFileName, { encoding: 'utf-8' });
@@ -1132,7 +1128,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         
         if (!existsSync(path.join(this.storeDir, 'experience-bundle-package', 'unpackaged')))
             throw new SfdxError(
-                'Something went wrong no experience bundle ' + `${this.storeDir}/experience-bundle-package/unpackaged/`
+                'Something went wrong no experience bundle ' + `${path.join(this.storeDir, 'experience-bundle-package', 'unpackaged')}`
             );
         const deployTemplateCopySource = path.join(QUICKSTART_CONFIG(), `${StoreQuickstartSetup.getStoreType(
             this.org.getUsername(),
@@ -1165,23 +1161,24 @@ export class StoreQuickstartSetup extends SfdxCommand {
         );
         let res;
         let zipProcedures = [];
-        const unpackagedDirectory = path.join(this.storeDir, 'experience-bundle-package', 'unpackaged');
+        const experienceBundlePath = path.join(this.storeDir, 'experience-bundle-package');
+        const unpackagedDirectory = path.join(experienceBundlePath, 'unpackaged');
         const bundleName = this.varargs['communityExperienceBundleName'] as string;
-
-        zipProcedures.push(`cd ${unpackagedDirectory}`);
-        zipProcedures.push(`rm -f "${path.join('..', bundleName)}ToDeploy.zip"`);
+        const zipFilePath = `${path.join(experienceBundlePath, bundleName)}ToDeploy.zip`;
 
         if(os.platform() === 'win32') {
-            zipProcedures.push(`Compress-Archive -LiteralPath ${path.join('..', bundleName)}ToDeployZip -DestinationPath .`);
+            if(existsSync(zipFilePath)){
+                zipProcedures.push(`rm -Force "${zipFilePath}"`);
+            }
+            zipProcedures.push(`Compress-Archive -Path ${unpackagedDirectory}\\* -DestinationPath "${zipFilePath}"`);
         }
         else {
-            zipProcedures.push(`zip -r -X "${path.join('..', bundleName)}}ToDeploy.zip" ./*`);
+            zipProcedures.push(`rm -f "${zipFilePath}"`);
+            zipProcedures.push(`cd ${unpackagedDirectory}; zip -r -X "${zipFilePath}" ./*`);
         }
 
-        const deployPath = path.join(this.storeDir, 'experience-bundle-package', `${bundleName}ToDeploy.zip`);
-
         let deployCommand = appendCommonFlags(
-            `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -g -f "${deployPath}" --wait 60 --verbose --singlepackage`,
+            `sf project deploy start -o "${this.org.getUsername()}" -g --metadata-dir='${zipFilePath}' -w 60 --verbose --single-package`,
             this.flags,
             this.logger
         );
