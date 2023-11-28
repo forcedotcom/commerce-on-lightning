@@ -339,6 +339,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 this.logger
             ).result.records[0].Id;
         } catch (e) {
+            console.error(e);
             this.ux.log(
                 chalk.red(
                     msgs.getMessage('quickstart.setup.errorRegApexClassForIntegrationsInfo', [

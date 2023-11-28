@@ -4,6 +4,7 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import path from 'path';
 import { fs } from '@salesforce/core';
 import { ExamplesConvert } from '../../commands/commerce/examples/convert';
 import { BASE_DIR, STATUS_FILE } from './constants/properties';
@@ -24,12 +25,13 @@ export class Requires {
         apiVersion = '',
         force = 'false'
     ): Promise<void> {
+        const forceAppDir = path.join(dir, 'force-app');
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-        if (force === 'true' || !fs.existsSync(dir + '/force-app') || !fs.lstatSync(dir + '/force-app').isDirectory()) {
+        if (force === 'true' || !fs.existsSync(forceAppDir) || !fs.lstatSync(forceAppDir).isDirectory()) {
             // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-            if (fs.existsSync(dir + '/force-app') && !fs.lstatSync(dir + '/force-app').isDirectory())
+            if (fs.existsSync(forceAppDir) && !fs.lstatSync(forceAppDir).isDirectory())
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access
-                fs.unlinkSync(dir + '/force-app'); // this shouldn't happen, but if it does...
+                fs.unlinkSync(forceAppDir); // this shouldn't happen, but if it does...
             createSfdxProjectFile(apiVersion, dir);
             await ExamplesConvert.run(['-d', dir, '-n', storeName, '-f', configFile, '-o', storeType]);
         }

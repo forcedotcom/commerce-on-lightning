@@ -348,25 +348,26 @@ export class StoreCreate extends SfdxCommand {
             this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:source:push']));
             shellJsonSfdx(
                 appendCommonFlags(
-                    `cd ${scratchOrgDir} | sfdx force:source:tracking:clear -u "${this.org.getUsername()}" -p`,
+                    `cd ${scratchOrgDir}; sfdx force:source:tracking:clear -u "${this.org.getUsername()}" -p`,
                     this.flags,
                     this.logger
                 )
             );
             shellJsonSfdx(
                 appendCommonFlags(
-                    `cd ${scratchOrgDir} | sfdx force:source:push -f -u "${this.org.getUsername()}"`,
+                    `cd ${scratchOrgDir}; sfdx force:source:push -f -u "${this.org.getUsername()}"`,
                     this.flags,
                     this.logger
                 )
             );
         } catch (e) {
+            console.error(e);
             if (e.message && JSON.stringify(e.message).indexOf(msgs.getMessage('create.checkInvalidSession')) >= 0) {
                 this.ux.log(msgs.getMessage('create.preMessageOpeningPageSessinonRefresh', [e.message]));
                 shell('sfdx force:org:open -u ' + this.org.getUsername()); // todo might puppet this
                 shellJsonSfdx(
                     appendCommonFlags(
-                        `cd ${scratchOrgDir} | sfdx force:source:push -f -u "${this.org.getUsername()}"`,
+                        `cd ${scratchOrgDir}; sfdx force:source:push -f -u "${this.org.getUsername()}"`,
                         this.flags,
                         this.logger
                     )
