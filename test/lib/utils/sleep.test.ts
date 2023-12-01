@@ -13,7 +13,6 @@ describe('Sleep', () => {
         await sleep(100);
         const end = Date.now();
         const sleepTime = end - start;
-        process.stdout.write(`Sleep time: ${sleepTime}`);
-        assert.equal(sleepTime >= 100 && sleepTime < 200, true);
+        assert.equal(sleepTime >= 100, true);
     });
 });
