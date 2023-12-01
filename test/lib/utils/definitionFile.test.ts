@@ -4,14 +4,15 @@
  * Licensed under the BSD 3-Clause license.
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
+import path from 'path';
 import { strict as assert } from 'assert';
 import { CONFIG_DIR } from '../../../src/lib/utils/constants/properties';
 import { getDefinitionFile } from '../../../src/lib/utils/definitionFile';
 
 describe('getDefinitionFile', () => {
-    const B2C_DEF_FILE = `${CONFIG_DIR}/b2c-store-scratch-def.json`;
-    const B2B_DEF_FILE = `${CONFIG_DIR}/b2b-store-scratch-def.json`;
-    const VALID_B2B_DEF_FILE = `${__dirname}/../../../config/b2b-store-scratch-def.json`;
+    const B2C_DEF_FILE = path.join(CONFIG_DIR, 'b2c-store-scratch-def.json');
+    const B2B_DEF_FILE = path.join(CONFIG_DIR, 'b2b-store-scratch-def.json');
+    const VALID_B2B_DEF_FILE = path.join(__dirname, '..', '..', '..', 'config', 'b2b-store-scratch-def.json');
 
     it('should return default b2c def file given undefined flags', () => {
         const flags = undefined;
