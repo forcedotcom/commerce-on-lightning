@@ -53,7 +53,6 @@ export const shell = (
     let j = '';
     Object.assign(envars, envs);
     try {
-        console.log(`Running command: ${cmd}`);
         res = execSync(cmd, { stdio: _stdio, cwd: _cwd, env: envars, shell: process.platform === 'win32' ? 'powershell.exe' : '/bin/sh' }).toString();
         if (res) res = cleanConsoleCharacters(res);
         else return;
