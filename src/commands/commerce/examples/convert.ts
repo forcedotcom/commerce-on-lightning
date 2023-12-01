@@ -89,18 +89,19 @@ export class ExamplesConvert extends SfdxCommand {
         await renameRecursive(
             [{ name: 'InsertStoreNameHere', value: this.flags['store-name'] as string }],
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-            `${this.flags.outputdir}/force-app`
+            path.join(this.flags.outputdir, 'force-app')
         );
         if (scratchDef.settings.lwc) {
-            const pathFrom = EXAMPLE_DIR + '/' + scratchDef.edition.toLowerCase() + '/lwc/force-app/main/default';
-            const pathTo = (this.flags.outputdir as string) + '/force-app/main/default';
+            const pathFrom = path.join(EXAMPLE_DIR, scratchDef.edition.toLowerCase(), '/lwc/force-app/main/default');
+            const pathTo = path.join(this.flags.outputdir as string, '/force-app/main/default');
+
             if (scratchDef.settings.lwc.classes)
                 scratchDef.settings.lwc.classes.forEach((clz) =>
-                    shell(`cp -r ${pathFrom}/classes/${clz} ${mkdirSync(pathTo + '/classes/')}`)
+                    shell(`cp -r ${path.join(pathFrom, 'classes', clz)} ${mkdirSync(path.join(pathTo, 'classes'))}`)
                 );
             if (scratchDef.settings.lwc.lwc)
                 scratchDef.settings.lwc.lwc.forEach((clz) =>
-                    shell(`cp -r ${pathFrom}/lwc/${clz} ${mkdirSync(pathTo + '/lwc/')}`)
+                    shell(`cp -r ${path.join(pathFrom, 'lwc', clz)} ${mkdirSync(path.join(pathTo, 'lwc'))}`)
                 );
         }
         return { convertedExamples: true };

@@ -131,7 +131,6 @@ export const parseStoreScratchDef = (flags: Record<string, unknown>): StoreScrat
 };
 
 export const convertStoreScratchDefToExamples = (def: StoreScratchDef): string[] => {
-    // let path = EXAMPLE_DIR + '/' + def.edition.toLowerCase() + '/';
     let scratchDefPath = path.join(EXAMPLE_DIR, def.edition.toLowerCase()); 
     const paths = [];
     Object.keys(def.settings)
