@@ -1248,7 +1248,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 .readdirSync(checkoutMetaFolder)
                 .filter((f) => f.toLowerCase() === 'checkout.json')[0];
             // This determines the name of the main flow as it will always be the only flow to terminate in "Checkout.flow"
-            const flowDir = path.join('..', 'force-app', 'main', 'default', 'flows');
+            const flowDir = path.join(this.storeDir, '..', 'force-app', 'main', 'default', 'flows');
             const mainFlowName = path
                 .basename(fs.readdirSync(flowDir).filter((f) => f.endsWith('Checkout.flow-meta.xml'))[0])
                 .split('.')[0];
