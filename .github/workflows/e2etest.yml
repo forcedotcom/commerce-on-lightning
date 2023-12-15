@@ -21,8 +21,8 @@ jobs:
           sf --version
           sf plugins install https://github.com/forcedotcom/commerce-on-lightning.git#develop 
           sf plugins install shane-sfdx-plugins
-          echo ${{ env.DEVHUB_AUTH }} > authFile.json
-          sf force auth sfdxurl store -f 'authFile.json'
+          echo ${{ env.DEVHUB_AUTH }} > authFile
+          sf force auth sfdxurl store -f 'authFile'
 
           echo SCRATCH_ORG_ID=`date +%Y%m%d-%H%M%S` >> $GITHUB_ENV
           echo SCRATCH_ORG_ALIAS="gworkflow_${{ env.SCRATCH_ORG_ID }}" >> $GITHUB_ENV
