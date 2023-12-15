@@ -19,8 +19,8 @@ jobs:
       - run: |
           echo 'y' | npm install @salesforce/cli --global 
           sf --version
-          sf plugins install https://github.com/forcedotcom/commerce-on-lightning.git#develop 
-          sf plugins install shane-sfdx-plugins
+          echo 'y' | sf plugins install https://github.com/forcedotcom/commerce-on-lightning.git#develop 
+          echo 'y' | sf plugins install shane-sfdx-plugins
           echo ${{ env.DEVHUB_AUTH }} > authFile
           sf force auth sfdxurl store -f 'authFile'
 
