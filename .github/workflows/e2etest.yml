@@ -25,12 +25,12 @@ jobs:
           sf force auth sfdxurl store -f 'authFile'
 
           export SCRATCH_ORG_ID=`date +%Y%m%d-%H%M%S`
-          export SCRATCH_ORG_ALIAS="gworkflow_$SCRATCH_ORG_ID"
+          export SCRATCH_ORG_ALIAS="gworkflow-$SCRATCH_ORG_ID"
           export SCRATCH_ORG_USERNAME="$SCRATCH_ORG_ALIAS@scratch.com"
 
           echo "Scratch org name is going to be $SCRATCH_ORG_USERNAME"
 
-          LAST_SCRATCH_ORG=`sf data query --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE 'gworkflow_%' LIMIT 1" -u ${{ env.DEVHUB_USERNAME }} | egrep '[0-9a-zA-Z]{18}'` 
+          LAST_SCRATCH_ORG=`sf data query -o ${{ env.DEVHUB_USERNAME }} --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE 'gworkflow-%' LIMIT 1" | egrep '[0-9a-zA-Z]{18}'` 
 
           echo "Last scratch org is $LAST_SCRATCH_ORG"
 
