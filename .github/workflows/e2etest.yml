@@ -29,5 +29,15 @@ jobs:
           export SCRATCH_ORG_USERNAME="$SCRATCH_ORG_ALIAS@scratch.com"
 
           echo "Scratch org name is going to be $SCRATCH_ORG_USERNAME"
+
+          sf commerce scratchorg create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }}
+
+          sf commerce store create -n b2cstore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u "$SCRATCH_ORG_ALIAS" --json
+
+          sf commerce store create -o b2b -n b2bstore01 -b b2bbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u "$SCRATCH_ORG_ALIAS" --json
+
+          sf commerce store create -o b2b -t "B2B Commerce (Aura)" -n b2cstore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u "$SCRATCH_ORG_ALIAS" --json
+
+          echo "All stores are created!"
           
-          sf commerce scratchorg create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }}         
+#DELETE scratch org
