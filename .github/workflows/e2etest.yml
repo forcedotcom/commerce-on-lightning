@@ -28,5 +28,7 @@ jobs:
           echo SCRATCH_ORG_ALIAS="gworkflow_${{ env.SCRATCH_ORG_ID }}" >> $GITHUB_ENV
           echo SCRATCH_ORG_USERNAME="${{ env.SCRATCH_ORG_ALIAS }}@scratch.com" >> $GITHUB_ENV
 
-          sf data record delete -o ${{ env.DEVHUB_USERNAME }} -s ActiveScratchOrg -i \$(sf data soql query --query='SELECT Id FROM ActiveScratchOrg LIMIT 1' -u ${{ env.DEVHUB_USERNAME }} | egrep '[0-9a-zA-Z]{18}') || true)
+          echo "Scratch org name is going to be ${{ env.SCRATCH_ORG_USERNAME }}"
+
+          sf data record delete -o ${{ env.DEVHUB_USERNAME }} -s ActiveScratchOrg -i $(sf data soql query --query='SELECT Id FROM ActiveScratchOrg LIMIT 1' -u ${{ env.DEVHUB_USERNAME }} | egrep '[0-9a-zA-Z]{18}') || true)
           sf commerce scratchorg create -u ${{ env.SCRATCH_ORG_USERNAME }} -a ${{ env.SCRATCH_ORG_ALIAS }} -v ${{ env.DEVHUB_USERNAME }}         
