@@ -29,7 +29,5 @@ jobs:
           export SCRATCH_ORG_USERNAME="$SCRATCH_ORG_ALIAS@scratch.com"
 
           echo "Scratch org name is going to be $SCRATCH_ORG_USERNAME"
-
-          sf data query -o ${{ env.DEVHUB_USERNAME }} --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE 'gworkflow-%' LIMIT 1" | egrep '[0-9a-zA-Z]{18}'
-
+          
           sf commerce scratchorg create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }}         
