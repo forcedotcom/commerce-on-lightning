@@ -24,11 +24,11 @@ jobs:
           echo ${{ env.DEVHUB_AUTH }} > authFile
           sf force auth sfdxurl store -f 'authFile'
 
-          echo SCRATCH_ORG_ID=`date +%Y%m%d-%H%M%S` >> $GITHUB_ENV
-          echo SCRATCH_ORG_ALIAS="gworkflow_$SCRATCH_ORG_ID" >> $GITHUB_ENV
-          echo SCRATCH_ORG_USERNAME="$SCRATCH_ORG_ALIAS@scratch.com" >> $GITHUB_ENV
+          export SCRATCH_ORG_ID=`date +%Y%m%d-%H%M%S`
+          export SCRATCH_ORG_ALIAS="gworkflow_$SCRATCH_ORG_ID"
+          export SCRATCH_ORG_USERNAME="$SCRATCH_ORG_ALIAS@scratch.com"
 
           echo "Scratch org name is going to be $SCRATCH_ORG_USERNAME"
 
           sf data record delete -o ${{ env.DEVHUB_USERNAME }} -s ActiveScratchOrg -i $(sf data soql query --query='SELECT Id FROM ActiveScratchOrg LIMIT 1' -u ${{ env.DEVHUB_USERNAME }} | egrep '[0-9a-zA-Z]{18}') || true)
-          sf commerce scratchorg create -u ${{ env.SCRATCH_ORG_USERNAME }} -a ${{ env.SCRATCH_ORG_ALIAS }} -v ${{ env.DEVHUB_USERNAME }}         
+          sf commerce scratchorg create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }}         
