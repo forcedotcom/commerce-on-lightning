@@ -32,9 +32,4 @@ jobs:
 
           sf data query -o ${{ env.DEVHUB_USERNAME }} --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE 'gworkflow-%' LIMIT 1" | egrep '[0-9a-zA-Z]{18}'
 
-          LAST_SCRATCH_ORG=`sf data query -o ${{ env.DEVHUB_USERNAME }} --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE 'gworkflow-%' LIMIT 1" | egrep '[0-9a-zA-Z]{18}'` 
-
-          echo "Last scratch org is $LAST_SCRATCH_ORG"
-
-          sf data record delete -o ${{ env.DEVHUB_USERNAME }} -s ActiveScratchOrg -i $LAST_SCRATCH_ORG -u ${{ env.DEVHUB_USERNAME }} | egrep '[0-9a-zA-Z]{18}'` || true)
           sf commerce scratchorg create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }}         
