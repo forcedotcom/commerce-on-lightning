@@ -30,6 +30,8 @@ jobs:
 
           echo "Scratch org name is going to be $SCRATCH_ORG_USERNAME"
 
+          sf data query -o ${{ env.DEVHUB_USERNAME }} --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE 'gworkflow-%' LIMIT 1" | egrep '[0-9a-zA-Z]{18}'
+
           LAST_SCRATCH_ORG=`sf data query -o ${{ env.DEVHUB_USERNAME }} --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE 'gworkflow-%' LIMIT 1" | egrep '[0-9a-zA-Z]{18}'` 
 
           echo "Last scratch org is $LAST_SCRATCH_ORG"
