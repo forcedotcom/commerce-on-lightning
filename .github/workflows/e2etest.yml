@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: '20'
       - run: |
-          yes | npm install @salesforce/cli --global 
+          echo 'y' | npm install @salesforce/cli --global 
           sf --version
           sf plugins install https://github.com/forcedotcom/commerce-on-lightning.git#develop 
           sf plugins install shane-sfdx-plugins
