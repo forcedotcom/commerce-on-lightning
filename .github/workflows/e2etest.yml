@@ -1,0 +1,32 @@
+name: e2e-tests
+
+on:
+  push:
+    branches-ignore: [main]
+  workflow_dispatch:
+
+jobs:
+  e2e-test-job:
+    runs-on: ubuntu-latest
+    env:
+      DEVHUB_USERNAME: ${{ secrets.PATCH_DEVHUB_USERNAME }}
+      DEVHUB_AUTH: ${{ secrets.PATCH_DEVHUB_AUTH }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - run: |
+          npm install @salesforce/cli --global
+          sf --version
+          sf plugins install https://github.com/forcedotcom/commerce-on-lightning.git#develop 
+          sf plugins install shane-sfdx-plugins
+          echo ${{ env.DEVHUB_AUTH }} > authFile.json
+          sf force auth sfdxurl store -f 'authFile.json'
+
+          echo SCRATCH_ORG_ID=`date +%Y%m%d-%H%M%S` >> $GITHUB_ENV
+          echo SCRATCH_ORG_ALIAS="gworkflow_${{ env.SCRATCH_ORG_ID }}" >> $GITHUB_ENV
+          echo SCRATCH_ORG_USERNAME="${{ env.SCRATCH_ORG_ALIAS }}@scratch.com" >> $GITHUB_ENV
+
+          sf data record delete -o ${{ env.DEVHUB_USERNAME }} -s ActiveScratchOrg -i \$(sf data soql query --query='SELECT Id FROM ActiveScratchOrg LIMIT 1' -u ${{ env.DEVHUB_USERNAME }} | egrep '[0-9a-zA-Z]{18}') || true)
+          sf commerce scratchorg create -u ${{ env.SCRATCH_ORG_USERNAME }} -a ${{ env.SCRATCH_ORG_ALIAS }} -v ${{ env.DEVHUB_USERNAME }}         
