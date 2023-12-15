@@ -99,6 +99,10 @@ export class StoreCreate extends SfdxCommand {
             default: false,
             description: 'If there is a file difference detected, prompt before overwriting file',
         }),
+        'skip-store-open': flags.boolean({
+            default: false,
+            description: 'Skips opening up the store after a successful creation. Useful for automation purposes.',
+        }),
     };
 
     public org: Org;
@@ -291,9 +295,11 @@ export class StoreCreate extends SfdxCommand {
         this.ux.log(chalk.green.bold(msgs.getMessage('create.completedStep8')));
         await this.createSearchIndex();
         this.ux.log(msgs.getMessage('create.openingBrowserTheStoreAdminPage'));
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const res = await StoreOpen.run(addAllowedArgs(this.argv, StoreOpen), this.config);
-        if (!res) return;
+        if (!this.flags['skip-store-open']) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+            const res = await StoreOpen.run(addAllowedArgs(this.argv, StoreOpen), this.config);
+            if (!res) return;
+        }
         this.ux.log(chalk.green.bold(msgs.getMessage('create.allDone'))); // don't delete the status file here. Status file deleted with reset.
         await StoreDisplay.run(addAllowedArgs(this.argv, StoreDisplay), this.config);
         await this.statusFileManager.setValue('done', true);

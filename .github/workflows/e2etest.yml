@@ -5,7 +5,7 @@ on:
     branches-ignore: [main]
 
 jobs:
-  e2e-test-setup:
+  e2e-test:
     runs-on: ubuntu-latest
     env:
       DEVHUB_USERNAME: ${{ secrets.PATCH_DEVHUB_USERNAME }}
@@ -17,12 +17,15 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: '20'
-      - name: Setup SF and the plugin
+      - name: Setup SF and yarn
         run: |
           echo 'y' | npm install @salesforce/cli --global 
+          npm install --global yarn
           sf --version
-          echo 'y' | sf plugins install https://github.com/forcedotcom/commerce-on-lightning.git#develop 
           echo 'y' | sf plugins install shane-sfdx-plugins
+      - name: Build the plugin
+        run: |
+            yarn install && yarn build
       - name: Auth Devhub
         run: |
           echo ${{ env.DEVHUB_AUTH }} > authFile
@@ -34,24 +37,22 @@ jobs:
           export SCRATCH_ORG_ALIAS="gworkflow-$SCRATCH_ORG_ID"
           export SCRATCH_ORG_USERNAME="$SCRATCH_ORG_ALIAS@scratch.com"
 
-          echo "Scratch org name is going to be $SCRATCH_ORG_USERNAME"
-
-          sf commerce scratchorg create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }}
+          ./bin/run commerce:scratchorg:create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }}
           echo "USERNAME=$SCRATCH_ORG_USERNAME" >> "$GITHUB_OUTPUT"
       - name: Create B2C LWR Store
         env:
-            SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-        run: sf commerce store create -n b2cstore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json    
+          SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
+        run: ./bin/run commerce:store:create -n b2cstore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --skip-store-open --json    
           
       - name: Create B2B LWR Store
         env:
           SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-        run: sf commerce store create -o b2b -n b2bstore01 -b b2bbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
+        run: ./bin/run commerce:store:create -o b2b -n b2bstore01 -b b2bbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --skip-store-open --json
       - name: Create B2B Aura Store
         env: 
           SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-        run: sf commerce store create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u "$SCRATCH_ORG_ALIAS" --json
+        run: ./bin/run commerce:store:create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --skip-store-open --json
       - name: Cleanup
         run: echo "All stores are created!" 
-        
+
 #DELETE scratch org
