@@ -2,7 +2,7 @@ name: e2e-tests
 
 on:
   pull_request:
-    branches-ignore: [main]
+    branches: [ develop ]
 
 jobs:
   e2e-test:

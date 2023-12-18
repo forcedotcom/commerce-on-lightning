@@ -3,6 +3,7 @@ name: Close Pull Request (Cleanup)
 on:
     pull_request:
         types: [ closed ]
+        branches: [ develop ]
 
 jobs:
     cleanup_job:
