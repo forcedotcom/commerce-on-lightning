@@ -18,11 +18,11 @@ import { CONFIG_DIR } from '../../../../src/lib/utils/constants/properties';
 import * as flagHelpers from '../../../../src/lib/utils/args/flagsUtils';
 
 describe('commerce:scratchorg:create', () => {
-    const config = stubInterface<IConfig>($$.SANDBOX, {});
     afterEach(() => {
         sinon.restore();
     });
     it('should create a scratch org', async () => {
+        const config = stubInterface<IConfig>($$.SANDBOX, {});
         const devhubUser = 'test_devhub@1commerce.com';
         const orgUser = 'test_org@1commerce.com';
         const sfm = new StatusFileManager(devhubUser, orgUser);
@@ -42,6 +42,7 @@ describe('commerce:scratchorg:create', () => {
             apiversion: '52.0',
             alias: 'a',
             wait: 5,
+            duration: 15,
         };
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
@@ -56,7 +57,7 @@ describe('commerce:scratchorg:create', () => {
 --definitionfile=${CONFIG_DIR}/${flagObject.type}-project-scratch-def.json \
 --apiversion="${flagObject.apiversion}" \
 --setalias="${flagObject.alias}" \
---durationdays=30 \
+--durationdays=${flagObject.duration} \
 --wait=${flagObject.wait} \
 username="${flagObject.username}" \
 --setdefaultusername \

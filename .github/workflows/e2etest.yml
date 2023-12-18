@@ -10,6 +10,7 @@ jobs:
     env:
       DEVHUB_USERNAME: ${{ secrets.PATCH_DEVHUB_USERNAME }}
       DEVHUB_AUTH: ${{ secrets.PATCH_DEVHUB_AUTH }}
+      PR_NUMBER:  ${{ github.event.pull_request.number }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,6 +31,9 @@ jobs:
         run: |
           echo ${{ env.DEVHUB_AUTH }} > authFile
           sf force auth sfdxurl store -f 'authFile'
+      # - name: Cleanup Older Scratch Orgs From This Pull Request
+      #   run: |
+      #     sf data delete record -s ActiveScratchOrg --where 
       - name: Create Scratch Org
         id: scratch-org-step
         run: |
@@ -37,21 +41,21 @@ jobs:
           export SCRATCH_ORG_ALIAS="gworkflow-$SCRATCH_ORG_ID"
           export SCRATCH_ORG_USERNAME="$SCRATCH_ORG_ALIAS@scratch.com"
 
-          ./bin/run commerce:scratchorg:create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }}
+          ./bin/run commerce:scratchorg:create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }} -d 1
           echo "USERNAME=$SCRATCH_ORG_USERNAME" >> "$GITHUB_OUTPUT"
       - name: Create B2C LWR Store
         env:
           SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-        run: ./bin/run commerce:store:create -n b2cstore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --skip-store-open --json    
+        run: ./bin/run commerce:store:create -n b2cstore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json    
           
       - name: Create B2B LWR Store
         env:
           SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-        run: ./bin/run commerce:store:create -o b2b -n b2bstore01 -b b2bbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --skip-store-open --json
+        run: ./bin/run commerce:store:create -o b2b -n b2bstore01 -b b2bbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
       - name: Create B2B Aura Store
         env: 
           SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-        run: ./bin/run commerce:store:create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --skip-store-open --json
+        run: ./bin/run commerce:store:create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
       - name: Cleanup
         run: echo "All stores are created!" 
 
