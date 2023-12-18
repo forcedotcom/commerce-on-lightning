@@ -1,7 +1,7 @@
 {
     "name": "@salesforce/commerce",
     "version": "250.0.0",
-    "author": "Jonathan Arndt",
+    "author": "CC Mostly Harmless",
     "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
     "dependencies": {
         "@mshanemc/plugin-helpers": "^2.1.0",
