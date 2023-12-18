@@ -34,6 +34,7 @@ jobs:
       - name: Cleanup The Latest Scratch Org From This Pull Request
         run: |
           LAST_SCRATCH_ID=`sf data query --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE '%pr${{ env.PR_NUMBER }}%'" -o ${{ env.DEVHUB_USERNAME }} --json | jq -r '.result.records[0].Id'`
+          echo $LAST_SCRATCH_ID
           [ "$LAST_SCRATCH_ID" != "null" ] && sf data delete record -s ActiveScratchOrg -o ${{ env.DEVHUB_USERNAME }} -i $LAST_SCRATCH_ID
       - name: Create Scratch Org
         id: scratch-org-step
