@@ -58,6 +58,4 @@ jobs:
           SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
         run: ./bin/run commerce:store:create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
       - name: Cleanup
-        run: echo "All stores are created!" 
-
-#DELETE scratch org
+        run: echo "All stores are created!"
