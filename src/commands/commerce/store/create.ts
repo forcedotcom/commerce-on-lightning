@@ -292,8 +292,8 @@ export class StoreCreate extends SfdxCommand {
         await this.createSearchIndex();
         this.ux.log(msgs.getMessage('create.openingBrowserTheStoreAdminPage'));
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const res = await StoreOpen.run(addAllowedArgs(this.argv, StoreOpen), this.config);
-        if (!res) return;
+        await StoreOpen.run(addAllowedArgs(this.argv, StoreOpen), this.config);
+
         this.ux.log(chalk.green.bold(msgs.getMessage('create.allDone'))); // don't delete the status file here. Status file deleted with reset.
         await StoreDisplay.run(addAllowedArgs(this.argv, StoreDisplay), this.config);
         await this.statusFileManager.setValue('done', true);
