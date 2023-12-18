@@ -38,7 +38,7 @@ jobs:
         id: scratch-org-step
         run: |
           export SCRATCH_ORG_ID=`date +%Y%m%d-%H%M%S`
-          export SCRATCH_ORG_ALIAS="gworkflow-PR${{ env.PR_NUMBER }}-$SCRATCH_ORG_ID"
+          export SCRATCH_ORG_ALIAS="gworkflow-pr${{ env.PR_NUMBER }}-$SCRATCH_ORG_ID"
           export SCRATCH_ORG_USERNAME="$SCRATCH_ORG_ALIAS@scratch.com"
 
           ./bin/run commerce:scratchorg:create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }} -d 1
