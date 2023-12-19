@@ -1,11 +1,13 @@
-# [250.1.0](https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.3...250.1.0) (2023-12-19)
+## [250.1.0](https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.3...250.1.0) (2023-12-19)
 
 
 ### Features
 
 * Added Multicurrency permission to both and b2c scratch definitions ([b4ffc04](https://github.com/forcedotcom/commerce-on-lightning/commit/b4ffc04d6650afa3f567f1292a7dd82e7c16d0b4))
-
-
+* Flows added to create fulfillment orders after place order ([be9a338](https://github.com/forcedotcom/commerce-on-lightning/commit/be9a33889ea4fac6eda63eb19f4458b6f8d6a7c8))
+* Windows compatibility fixed ([717551a](https://github.com/forcedotcom/commerce-on-lightning/commit/717551af8bb944109e902b00fe34bb14339043e4))
+* Updated @babel/traverse from 7.19.3 to 7.23.2 ([429ca92](https://github.com/forcedotcom/commerce-on-lightning/commit/429ca9221171414e9655eac2bb4b6590c9d52ebd))
+* Updated get-func-name from 2.0.0 to 2.0.2 ([af2356b](https://github.com/forcedotcom/commerce-on-lightning/commit/af2356ba23831dc06cc67190ef6e566ff8af9147))
 
 ## [248.1.3](https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.2...v248.1.3) (2023-10-26)
 
