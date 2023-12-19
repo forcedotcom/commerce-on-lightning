@@ -2,38 +2,33 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-# [248.1.3](https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.2...v248.1.3)
+## [250.1.0](https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.3...250.1.0) (2023-12-19)
 
-### Bug Fixes
-- hotfix: Switch to replaceAll by @avaHitesh-github in #281
 
-# [248.1.2](https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.1...v248.1.2)
+### Features
 
-### Bug Fixes
+* Added Multicurrency permission to both and b2c scratch definitions ([b4ffc04](https://github.com/forcedotcom/commerce-on-lightning/commit/b4ffc04d6650afa3f567f1292a7dd82e7c16d0b4))
+* Flows added to create fulfillment orders after place order ([be9a338](https://github.com/forcedotcom/commerce-on-lightning/commit/be9a33889ea4fac6eda63eb19f4458b6f8d6a7c8))
+* Windows compatibility fixed ([717551a](https://github.com/forcedotcom/commerce-on-lightning/commit/717551af8bb944109e902b00fe34bb14339043e4))
+* Updated @babel/traverse from 7.19.3 to 7.23.2 ([429ca92](https://github.com/forcedotcom/commerce-on-lightning/commit/429ca9221171414e9655eac2bb4b6590c9d52ebd))
+* Updated get-func-name from 2.0.0 to 2.0.2 ([af2356b](https://github.com/forcedotcom/commerce-on-lightning/commit/af2356ba23831dc06cc67190ef6e566ff8af9147))
 
-- This patch release includes a hotfix for the situation where '@' symbol can be in the os username.
+## [248.1.3](https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.2...v248.1.3) (2023-10-26)
 
-# [248.1.1](https://github.com/forcedotcom/commerce-on-lightning/compare/248.1.0...v248.1.1)
 
-### Bug Fixes
 
-- Bug fixes in example integration files ([d9b0f74] https://github.com/forcedotcom/commerce-on-lightning/commit/d9b0f7499d16c5e4566286c7bdecd39bd7cda906)
-- Dependency updates
+## [248.1.2](https://github.com/forcedotcom/commerce-on-lightning/compare/v248.1.1...v248.1.2) (2023-10-20)
+
+
+
+## [248.1.1](https://github.com/forcedotcom/commerce-on-lightning/compare/248.1.0...v248.1.1) (2023-09-15)
+
+
 
 # [248.1.0](https://github.com/forcedotcom/commerce-on-lightning/compare/v242.1.1...248.1.0) (2023-09-11)
 
 
 ### Features
-
-* Order Management is now supported through the plugin. See examples/som/README.md for more details!([903b7a9] https://github.com/forcedotcom/commerce-on-lightning/commit/903b7a9223b8c4dcca179a05aff774c642a23321)
-
-* Digital Experience Bundle in Experience Cloud is now supported which means orgs that are higher than API version 59 can be used to create stores using the plugin ([4e866ed] https://github.com/forcedotcom/commerce-on-lightning/commit/4e866ed3b42c12da4e8e0a8f0869ad554507a774).
-
-* New LWR order confirmation email flow ([b88ad9a] https://github.com/forcedotcom/commerce-on-lightning/commit/b88ad9ab15b99a907ebc5493b2d40b941bb7075b)
-
-* Added support for iconURI, isApplication and description fields for extensions ([fce0fb0] https://github.com/forcedotcom/commerce-on-lightning/commit/fce0fb0def1b68e5bbd332758221cb8c41ef36a3).
-
-* The example files have been updated to be move away from the ‘b2b-commerce-test’ Heroku app [40c6aba](https://github.com/forcedotcom/commerce-on-lightning/commit/40c6aba5d124f11336ba4256816d7c3d03a02fb4).
 
 * updating stripe client side examples to latest ([#182](https://github.com/forcedotcom/commerce-on-lightning/issues/182)) ([6c73aff](https://github.com/forcedotcom/commerce-on-lightning/commit/6c73affbb8ece61e393d7c202930850f1e7f76fb))
 
