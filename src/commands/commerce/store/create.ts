@@ -5,6 +5,7 @@
  * For full license text, see LICENSE.txt file in the repo root or https://opensource.org/licenses/BSD-3-Clause
  */
 import os from 'os';
+import path from 'path';
 import { flags, SfdxCommand } from '@salesforce/command';
 import { fs, Logger, Messages, Org, SfdxError } from '@salesforce/core';
 import chalk from 'chalk';
@@ -291,8 +292,8 @@ export class StoreCreate extends SfdxCommand {
         await this.createSearchIndex();
         this.ux.log(msgs.getMessage('create.openingBrowserTheStoreAdminPage'));
         // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const res = await StoreOpen.run(addAllowedArgs(this.argv, StoreOpen), this.config);
-        if (!res) return;
+        await StoreOpen.run(addAllowedArgs(this.argv, StoreOpen), this.config);
+
         this.ux.log(chalk.green.bold(msgs.getMessage('create.allDone'))); // don't delete the status file here. Status file deleted with reset.
         await StoreDisplay.run(addAllowedArgs(this.argv, StoreDisplay), this.config);
         await this.statusFileManager.setValue('done', true);
@@ -328,7 +329,7 @@ export class StoreCreate extends SfdxCommand {
         if ((await this.statusFileManager.getValue('pushedSources')) === 'true') return;
         const scratchOrgDir = mkdirSync(SCRATCH_ORG_DIR(BASE_DIR, this.devhubUsername, this.org.getUsername()));
         try {
-            fs.removeSync(scratchOrgDir + '/force-app');
+            fs.removeSync(path.join(scratchOrgDir, 'force-app'));
         } catch (e) {
             /* IGNORE */
         }
@@ -347,25 +348,26 @@ export class StoreCreate extends SfdxCommand {
             this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:source:push']));
             shellJsonSfdx(
                 appendCommonFlags(
-                    `cd ${scratchOrgDir} && echo y | sfdx force:source:tracking:clear -u "${this.org.getUsername()}"`,
+                    `cd ${scratchOrgDir}; sfdx force:source:tracking:clear -u "${this.org.getUsername()}" -p`,
                     this.flags,
                     this.logger
                 )
             );
             shellJsonSfdx(
                 appendCommonFlags(
-                    `cd ${scratchOrgDir} && sfdx force:source:push -f -u "${this.org.getUsername()}"`,
+                    `cd ${scratchOrgDir}; sfdx force:source:push -f -u "${this.org.getUsername()}"`,
                     this.flags,
                     this.logger
                 )
             );
         } catch (e) {
+            console.error(e);
             if (e.message && JSON.stringify(e.message).indexOf(msgs.getMessage('create.checkInvalidSession')) >= 0) {
                 this.ux.log(msgs.getMessage('create.preMessageOpeningPageSessinonRefresh', [e.message]));
                 shell('sfdx force:org:open -u ' + this.org.getUsername()); // todo might puppet this
                 shellJsonSfdx(
                     appendCommonFlags(
-                        `cd ${scratchOrgDir} && sfdx force:source:push -f -u "${this.org.getUsername()}"`,
+                        `cd ${scratchOrgDir}; sfdx force:source:push -f -u "${this.org.getUsername()}"`,
                         this.flags,
                         this.logger
                     )

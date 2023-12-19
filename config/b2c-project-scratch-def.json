@@ -3,7 +3,7 @@
     "country": "us",
     "language": "en_US",
     "edition": "Developer",
-    "features": ["Communities", "B2CCommerceGMV", "PersonAccounts", "EnableSetPasswordInApi"],
+    "features": ["Communities", "B2CCommerceGMV", "PersonAccounts", "EnableSetPasswordInApi", "Multicurrency"],
     "settings": {
         "lightningExperienceSettings": {
             "enableS1DesktopEnabled": true
@@ -27,6 +27,9 @@
         },
         "languageSettings": {
             "enableTranslationWorkbench": true
+        },
+        "addressSettings": {
+            "countriesAndStates": true
         }
     }
 }

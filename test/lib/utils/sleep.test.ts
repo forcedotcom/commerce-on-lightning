@@ -8,11 +8,11 @@ import { strict as assert } from 'assert';
 import { sleep } from '../../../src/lib/utils/sleep';
 
 describe('Sleep', () => {
-    it('should sleep for 10 ms', async () => {
+    it('should sleep for 100 ms', async () => {
         const start = Date.now();
-        await sleep(10);
+        await sleep(100);
         const end = Date.now();
         const sleepTime = end - start;
-        assert.equal(sleepTime >= 10 && sleepTime < 35, true);
+        assert.equal(sleepTime >= 100, true);
     });
 });

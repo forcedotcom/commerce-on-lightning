@@ -10,7 +10,8 @@
         "B2CCommerceGMV",
         "PersonAccounts",
         "OrderManagement",
-        "EnableSetPasswordInApi"
+        "EnableSetPasswordInApi",
+        "Multicurrency"
     ],
     "settings": {
         "lightningExperienceSettings": {
@@ -35,6 +36,9 @@
         },
         "languageSettings": {
             "enableTranslationWorkbench": true
+        },
+        "addressSettings": {
+            "countriesAndStates": true
         }
     }
 }

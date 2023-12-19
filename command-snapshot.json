@@ -146,7 +146,8 @@
             "username",
             "alias",
             "wait",
-            "type"
+            "type",
+            "duration"
         ]
     },
     {
