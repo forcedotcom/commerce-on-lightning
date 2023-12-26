@@ -8,8 +8,8 @@ jobs:
   e2e-test:
     runs-on: ubuntu-latest
     env:
-      DEVHUB_USERNAME: ${{ secrets.PATCH_DEVHUB_USERNAME }}
-      DEVHUB_AUTH: ${{ secrets.PATCH_DEVHUB_AUTH }}
+      DEVHUB_USERNAME: ${{ secrets.DEVHUB_USERNAME }}
+      DEVHUB_AUTH: ${{ secrets.DEVHUB_AUTH }}
       PR_NUMBER:  ${{ github.event.pull_request.number }}
     steps:
       - name: Checkout
@@ -57,6 +57,6 @@ jobs:
       - name: Create B2B Aura Store
         env: 
           SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-        run: ./bin/run commerce:store:create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
+        run: ./bin/run commerce:store:create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2baurabuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
       - name: Confirmation
         run: echo "All stores are created!"
