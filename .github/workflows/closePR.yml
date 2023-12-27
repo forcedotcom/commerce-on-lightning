@@ -9,8 +9,8 @@ jobs:
     cleanup_job:
         runs-on: ubuntu-latest
         env:
-            DEVHUB_USERNAME: ${{ secrets.PATCH_DEVHUB_USERNAME }}
-            DEVHUB_AUTH: ${{ secrets.PATCH_DEVHUB_AUTH }}
+            DEVHUB_USERNAME: ${{ secrets.DEVHUB_USERNAME }}
+            DEVHUB_AUTH: ${{ secrets.DEVHUB_AUTH }}
             PR_NUMBER:  ${{ github.event.pull_request.number }}
         steps:
         - name: Setup Node (v20)
