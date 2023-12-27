@@ -8,8 +8,8 @@ jobs:
   e2e-test:
     runs-on: ubuntu-latest
     env:
-      DEVHUB_USERNAME: ${{ secrets.PATCH_DEVHUB_USERNAME }}
-      DEVHUB_AUTH: ${{ secrets.PATCH_DEVHUB_AUTH }}
+      DEVHUB_USERNAME: ${{ secrets.DEVHUB_USERNAME }}
+      DEVHUB_AUTH: ${{ secrets.DEVHUB_AUTH }}
       PR_NUMBER:  ${{ github.event.pull_request.number }}
     steps:
       - name: Checkout
@@ -32,10 +32,9 @@ jobs:
           echo ${{ env.DEVHUB_AUTH }} > authFile
           sf force auth sfdxurl store -f 'authFile'
       - name: Cleanup The Latest Scratch Org From This Pull Request
-        continue-on-error: true
         run: |
           LAST_SCRATCH_ID=`sf data query --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE '%pr${{ env.PR_NUMBER }}%'" -o ${{ env.DEVHUB_USERNAME }} --json | jq -r '.result.records[0].Id'`
-          [ "$LAST_SCRATCH_ID" != "null" ] && sf data delete record -s ActiveScratchOrg -o ${{ env.DEVHUB_USERNAME }} -i $LAST_SCRATCH_ID
+          if [ "$LAST_SCRATCH_ID" != "null" ]; then sf data delete record -s ActiveScratchOrg -o ${{ env.DEVHUB_USERNAME }} -i $LAST_SCRATCH_ID; else echo 'No scratch org needs to be deleted.'; fi
       - name: Create Scratch Org
         id: scratch-org-step
         run: |
@@ -57,6 +56,6 @@ jobs:
       - name: Create B2B Aura Store
         env: 
           SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-        run: ./bin/run commerce:store:create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
+        run: ./bin/run commerce:store:create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2baurabuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
       - name: Confirmation
         run: echo "All stores are created!"

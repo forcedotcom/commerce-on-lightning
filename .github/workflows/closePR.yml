@@ -28,5 +28,5 @@ jobs:
         - name: Cleanup the last created scratch org for the PR CI
           run: |
             LAST_SCRATCH_ID=`sf data query --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE '%pr${{ env.PR_NUMBER }}%'" -o ${{ env.DEVHUB_USERNAME }} --json | jq -r '.result.records[0].Id'`
-            [ "$LAST_SCRATCH_ID" != "null" ] && sf data delete record -s ActiveScratchOrg -o ${{ env.DEVHUB_USERNAME }} -i $LAST_SCRATCH_ID
+            if [ "$LAST_SCRATCH_ID" != "null" ]; then sf data delete record -s ActiveScratchOrg -o ${{ env.DEVHUB_USERNAME }} -i $LAST_SCRATCH_ID; else echo 'No scratch org needs to be deleted.'; fi
             
