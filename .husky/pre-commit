@@ -1,4 +1,4 @@
 #!/usr/bin/env sh
 . "$(dirname -- "$0")/_/husky.sh"
 chmod ug+x .husky/* 
-yarn lint \"src/**/*.ts\" \"test/**/*.ts\" --fix ;if git --no-pager diff HEAD package.json | egrep '\"version\": \"[0-9]+\\.'; then npm run version; else (npm --no-git-tag-version version patch; git add package.json;); fi && yarn pretty-quick --staged
+yarn lint \"src/**/*.ts\" \"test/**/*.ts\" --fix ;if git --no-pager diff HEAD package.json | egrep '\"version\": \"[0-9]+\\.'; then npm run version; fi && yarn pretty-quick --staged
