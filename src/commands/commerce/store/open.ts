@@ -45,7 +45,7 @@ export class StoreOpen extends SfdxCommand {
         this.ux.log('Store id is: ' + storeId);
         shell(
             appendCommonFlags(
-                `SFDX_DOMAIN_RETRY=5 sfdx force:org:open -p "/lightning/r/WebStore/${storeId}/view" -u ${this.org.getUsername()}`,
+                `sfdx force:org:open -p "/lightning/r/WebStore/${storeId}/view" -u ${this.org.getUsername()}`,
                 this.flags,
                 this.logger
             )
@@ -56,7 +56,7 @@ export class StoreOpen extends SfdxCommand {
     public viewAll(): boolean {
         shell(
             appendCommonFlags(
-                `SFDX_DOMAIN_RETRY=5 sfdx force:org:open -u ${this.org.getUsername()} -p _ui/networks/setup/SetupNetworksPage`,
+                `sfdx force:org:open -u ${this.org.getUsername()} -p _ui/networks/setup/SetupNetworksPage`,
                 this.flags,
                 this.logger
             )

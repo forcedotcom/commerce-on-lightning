@@ -57,6 +57,7 @@
             "completedQuickstartStep2": "Completed Quickstart Step 2",
             "completedQuickstartStep3": "Completed Quickstart Step 3",
             "completedQuickstartStep4": "Completed Quickstart Step 4",
+            "completedQuickstartStep5": "Completed Quickstart Step 5",
             "completedQuickstartSetup": "Completed Quickstart Setup",
             "usingToRetrieveStoreInfo": "Using this to retrieve your store info: \n%s",
             "getStoreMetadatFromZip": "Retrieving the store metadata and extracting it from the zip file.",

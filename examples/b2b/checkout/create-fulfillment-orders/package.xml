@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package xmlns="http://soap.sforce.com/2006/04/metadata">
+    <types>
+        <members>Create_Fulfillment_Orders_from_Order_Summary_Subflow</members>
+        <members>Create_Fulfillment_Orders_on_OrderSummaryRoutingSchedule</members>
+        <members>Create_OrderSummaryRoutingSchedule_on_OrderSummary_event</members>
+        <name>Flow</name>
+    </types>
+    <version>60.0</version>
+</Package>

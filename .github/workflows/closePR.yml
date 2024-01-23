@@ -1,0 +1,32 @@
+name: Close Pull Request (Cleanup)
+
+on:
+    pull_request:
+        types: [ closed ]
+        branches: [ develop ]
+
+jobs:
+    cleanup_job:
+        runs-on: ubuntu-latest
+        env:
+            DEVHUB_USERNAME: ${{ secrets.DEVHUB_USERNAME }}
+            DEVHUB_AUTH: ${{ secrets.DEVHUB_AUTH }}
+            PR_NUMBER:  ${{ github.event.pull_request.number }}
+        steps:
+        - name: Setup Node (v20)
+          uses: actions/setup-node@v3
+          with:
+            node-version: '20'
+        - name: Setup SF
+          run: |
+            echo 'y' | npm install @salesforce/cli --global 
+            sf --version
+        - name: Auth Devhub
+          run: |
+            echo ${{ env.DEVHUB_AUTH }} > authFile
+            sf force auth sfdxurl store -f 'authFile'
+        - name: Cleanup the last created scratch org for the PR CI
+          run: |
+            LAST_SCRATCH_ID=`sf data query --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE '%pr${{ env.PR_NUMBER }}%'" -o ${{ env.DEVHUB_USERNAME }} --json | jq -r '.result.records[0].Id'`
+            if [ "$LAST_SCRATCH_ID" != "null" ]; then sf data delete record -s ActiveScratchOrg -o ${{ env.DEVHUB_USERNAME }} -i $LAST_SCRATCH_ID; else echo 'No scratch org needs to be deleted.'; fi
+            

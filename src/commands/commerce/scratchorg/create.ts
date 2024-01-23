@@ -55,6 +55,13 @@ export class ScratchOrgCreate extends SfdxCommand {
             default: false,
             description: 'If there is a file difference detected, prompt before overwriting file',
         }),
+        duration: flags.number({
+            char: 'd',
+            default: 30,
+            description: 'Duration of the scratch org (in days)',
+            max: 30,
+            min: 1,
+        }),
     };
     public statusManager: StatusFileManager;
     public devhubUsername: string;
@@ -107,7 +114,7 @@ export class ScratchOrgCreate extends SfdxCommand {
 --targetdevhubusername="${this.devhubUsername}" \
 --definitionfile=${CONFIG_DIR}/${orgType}-project-scratch-def.json \
 --setalias="${this.flags.alias as string}" \
---durationdays=30 \
+--durationdays=${this.flags.duration as number} \
 --wait=${this.flags.wait as number} \
 username="${this.flags.username as string}" \
 --setdefaultusername \

@@ -1,7 +1,7 @@
 {
   "name": "@salesforce/commerce",
-  "version": "248.1.1",
-  "author": "Jonathan Arndt",
+  "version": "250.1.0",
+  "author": "CC Mostly Harmless",
   "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
   "dependencies": {
     "@mshanemc/plugin-helpers": "^2.1.0",
@@ -128,7 +128,7 @@
     "posttest": "yarn lint && yarn test:deprecation-policy && yarn test:command-reference",
     "precommit": "npm run clean && npm run build && npm run lint && npm run version",
     "prepack": "sf-prepack",
-    "prepare": "rm -f .oclif.manifest.json && yarn run prepack && husky install",
+    "prepare": "node scripts/prepare.mjs",
     "prepublishOnly": "yarn run build && oclif-dev manifest",
     "pretest": "sf-compile-test",
     "prettier": "prettier --write src/**/**/*.ts && prettier --write src/**/*.ts && prettier --write src/*.ts && prettier --write test/**/*.ts && prettier --write test/**/**/*.ts",
