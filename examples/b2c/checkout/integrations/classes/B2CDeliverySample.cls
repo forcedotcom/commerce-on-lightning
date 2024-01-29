@@ -6,7 +6,7 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
-    private static String className = String.valueOf(this).split(':')[0];
+    private String className = String.valueOf(this).split(':')[0];
     ApexClass apexClass = [SELECT ApiVersion FROM ApexClass WHERE Name = :className];
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
