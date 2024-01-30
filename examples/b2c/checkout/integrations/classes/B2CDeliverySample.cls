@@ -6,6 +6,8 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
+    private String className = String.valueOf(this).split(':')[0];
+    ApexClass apexClass = [SELECT ApiVersion FROM ApexClass WHERE Name = :className];
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
@@ -34,12 +36,16 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
 
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
             Integer cdgmToBeCreated = 0;
+            CartDeliveryGroupMethod[] cdgmsToInsert = new CartDeliveryGroupMethod[]{};
             for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromExternalService) {
                for(CartDeliveryGroup curCartDeliveryGroup : cartDeliveryGroups){
-                    populateCartDeliveryGroupMethodWithShippingOptions(shippingOption, curCartDeliveryGroup.Id, cartId);
+                    CartDeliveryGroupMethod cdgm = populateCartDeliveryGroupMethodWithShippingOptions(shippingOption, curCartDeliveryGroup.Id, cartId);
+                    cdgmsToInsert.add(cdgm);
                     cdgmToBeCreated += 1;
                 }
             }
+
+            insert(cdgmsToInsert);
 
             List<CartDeliveryGroupMethod> cdgms = new List<CartDeliveryGroupMethod>([SELECT Id FROM CartDeliveryGroupMethod WHERE WebCartId = :cartId]);
             System.assertEquals(cdgmToBeCreated, cdgms.size(),'The number of created CDGMs is not matching'); // It's important to fail the example integration early
@@ -93,8 +99,8 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
 
         // If the request is successful, parse the JSON response.
         // The response looks like this:
-        // [{"status":"calculated","rate":{"name":"Delivery Method 1","serviceName":"Test Carrier 1","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},
-        // {"status":"calculated","rate":{"name":"Delivery Method 2","serviceName":"Test Carrier 2","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99}}]
+        // [{"status":"calculated","rate":{"name":"'+name1+'","serviceName":"'+serviceName1+'","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99,"transitTimeMin":1,"transitTimeMax":2,"transitTimeUnit":"Days","processTime":1,"processTimeUnit":"Days"}},
+        // {"status":"calculated","rate":{"name":"'+name2+'","serviceName":"'+serviceName2+'","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99,"transitTimeMin":2,"transitTimeMax":3,"transitTimeUnit":"Days","processTime":1,"processTimeUnit":"Days"}}]
         if (response.getStatusCode() == successfulHttpRequest) {
            List<Object> results = (List<Object>) JSON.deserializeUntyped(response.getBody());
            for (Object result: results) {
@@ -109,7 +115,12 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                     (String) providerAndRate.get('serviceName'),
                     (String) providerAndRate.get('serviceCode'),
                     generateRandomString(10),
-                    true
+                    true,
+                    (Integer) providerAndRate.get('transitTimeMin'),
+                    (Integer) providerAndRate.get('transitTimeMax'),
+                    (String) providerAndRate.get('transitTimeUnit'),
+                    (Integer) providerAndRate.get('processTime'),
+                    (String) providerAndRate.get('processTimeUnit')
                 ));
             }
             return shippingOptions;
@@ -140,7 +151,12 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                 (String) providerAndRate.get('serviceName'),
                 (String) providerAndRate.get('serviceCode'),
                 generateRandomString(10),
-                true
+                true,
+                (Integer) providerAndRate.get('transitTimeMin'),
+                (Integer) providerAndRate.get('transitTimeMax'),
+                (String) providerAndRate.get('transitTimeUnit'),
+                (Integer) providerAndRate.get('processTime'),
+                (String) providerAndRate.get('processTimeUnit')
             ));
         }
         return shippingOptions;
@@ -158,6 +174,8 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
 
     private String getShippingOptionsResponse(String siteLanguage) {
         String name1, name2, serviceName1, serviceName2;
+        Integer transitTimeMin, transitTimeMax, processTime;
+        String transitTimeUnit, processTimeUnit;
         if(siteLanguage == 'de') {
             name1 = 'Liefermethode 1';
             name2 = 'Liefermethode 2';
@@ -174,7 +192,8 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             serviceName1 = 'Test Carrier 1';
             serviceName2 = 'Test Carrier 2';
         }
-        return '[{"status":"calculated","rate":{"name":"'+name1+'","serviceName":"'+serviceName1+'","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},{"status":"calculated","rate":{"name":"'+name2+'","serviceName":"'+serviceName2+'","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99}}]';
+
+        return '[{"status":"calculated","rate":{"name":"'+name1+'","serviceName":"'+serviceName1+'","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99,"transitTimeMin":1,"transitTimeMax":2,"transitTimeUnit":"Days","processTime":1,"processTimeUnit":"Days"}},{"status":"calculated","rate":{"name":"'+name2+'","serviceName":"'+serviceName2+'","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99,"transitTimeMin":2,"transitTimeMax":3,"transitTimeUnit":"Days","processTime":1,"processTimeUnit":"Days"}}]';
     }
 
     // Structure to store the shipping options retrieved from external service.
@@ -188,6 +207,11 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         private String classOfService;
         private String referenceNumber;
         private Boolean isActive;
+        private Integer transitTimeMin;
+        private Integer transitTimeMax;
+        private String transitTimeUnit;
+        private Integer processTime;
+        private String processTimeUnit;
 
         public ShippingOptionsAndRatesFromExternalService() {
             name = '';
@@ -199,10 +223,16 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             classOfService = '';
             referenceNumber = '';
             isActive = true;
+            transitTimeMin = 0;
+            transitTimeMax = 0;
+            transitTimeUnit = '';
+            processTime = 0;
+            processTimeUnit = '';
         }
 
         public ShippingOptionsAndRatesFromExternalService(String someName, String someProvider, Decimal someRate, Decimal someOtherCost, String someServiceName,
-                String someCarrier, String someClassOfService, String someReferenceNumber, Boolean someIsActive) {
+                String someCarrier, String someClassOfService, String someReferenceNumber, Boolean someIsActive, Integer someTransitTimeMin, Integer someTransitTimeMax,
+                String someTransitTimeUnit, Integer someProcessTime, String someProcessTimeUnit) {
             name = someName;
             provider = someProvider;
             rate = someRate;
@@ -212,6 +242,11 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             classOfService = someClassOfService;
             referenceNumber = someReferenceNumber;
             isActive = someIsActive;
+            transitTimeMin = someTransitTimeMin;
+            transitTimeMax = someTransitTimeMax;
+            transitTimeUnit = someTransitTimeUnit;
+            processTime = someProcessTime;
+            processTimeUnit = someProcessTimeUnit;
         }
 
         public String getProvider() { return provider; }
@@ -223,10 +258,15 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         public String getClassOfService() { return classOfService; }
         public String getReferenceNumber() { return referenceNumber; }
         public Boolean isActive() { return isActive; }
+        public Integer getTransitTimeMin() { return transitTimeMin; }
+        public Integer getTransitTimeMax() { return transitTimeMax; }
+        public String getTransitTimeUnit() { return transitTimeUnit; }
+        public Integer getProcessTime() { return processTime; }
+        public String getProcessTimeUnit() { return processTimeUnit; }
     }
 
     // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
-    private void populateCartDeliveryGroupMethodWithShippingOptions(ShippingOptionsAndRatesFromExternalService shippingOption,
+    private CartDeliveryGroupMethod populateCartDeliveryGroupMethodWithShippingOptions(ShippingOptionsAndRatesFromExternalService shippingOption,
                                                                   Id cartDeliveryGroupId,
                                                                   Id webCartId){
         // When inserting a new CartDeliveryGroupMethod, the following fields have to be populated:
@@ -241,19 +281,35 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         // ReferenceNumber: Reference Number from External Service
         // IsActive: If this Option is Active
 
+        // Below fields are available only for api version >= 61
+
+        // TransitTimeMin: Minimum Transit Time
+        // TransitTimeMax: Maximum Transit Time
+        // TransitTimeUnit: Time Unit for Transit Time (Valid Values are "Hours", "Days", "Weeks")
+        // ProcessTime: Process Time
+        // ProcessTimeUnit: Time Unit for Process Time (Valid Values are "Hours", "Days", "Weeks")
+
         Id productId = getDefaultShippingChargeProduct2Id();
-        CartDeliveryGroupMethod cartDeliveryGroupMethod = new CartDeliveryGroupMethod(
-            CartDeliveryGroupId = cartDeliveryGroupId,
-            ExternalProvider = shippingOption.getProvider(),
-            Name = shippingOption.getName(),
-            ShippingFee = shippingOption.getRate(),
-            WebCartId = webCartId,
-            Carrier = shippingOption.getCarrier(),
-            ClassOfService = shippingOption.getClassOfService(),
-            ProductId = productId,
-            ReferenceNumber = shippingOption.getReferenceNumber(),
-            IsActive = shippingOption.isActive()
-        );
+
+        CartDeliveryGroupMethod cartDeliveryGroupMethod = new CartDeliveryGroupMethod();
+        cartDeliveryGroupMethod.put('CartDeliveryGroupId', cartDeliveryGroupId);
+        cartDeliveryGroupMethod.put('ExternalProvider', shippingOption.getProvider());
+        cartDeliveryGroupMethod.put('Name', shippingOption.getName());
+        cartDeliveryGroupMethod.put('ShippingFee', shippingOption.getRate());
+        cartDeliveryGroupMethod.put('WebCartId', webCartId);
+        cartDeliveryGroupMethod.put('Carrier', shippingOption.getCarrier());
+        cartDeliveryGroupMethod.put('ClassOfService', shippingOption.getClassOfService());
+        cartDeliveryGroupMethod.put('ProductId', productId);
+        cartDeliveryGroupMethod.put('ReferenceNumber', shippingOption.getReferenceNumber());
+        cartDeliveryGroupMethod.put('IsActive', shippingOption.isActive());
+
+        if(apexClass.ApiVersion >= 61) {
+            cartDeliveryGroupMethod.put('TransitTimeMin', shippingOption.getTransitTimeMin());
+            cartDeliveryGroupMethod.put('TransitTimeMax', shippingOption.getTransitTimeMax());
+            cartDeliveryGroupMethod.put('TransitTimeUnit', shippingOption.getTransitTimeUnit());
+            cartDeliveryGroupMethod.put('ProcessTime', shippingOption.getProcessTime());
+            cartDeliveryGroupMethod.put('ProcessTimeUnit', shippingOption.getProcessTimeUnit());
+        }
 
         Boolean multiCurrencyEnabled = UserInfo.isMultiCurrencyOrganization();
         if(multiCurrencyEnabled) {
@@ -262,7 +318,7 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             String cartDeliveryGroupMethodCurrency = (String) cartDeliveryGroup.get('CurrencyIsoCode');
             cartDeliveryGroupMethod.put('CurrencyIsoCode', cartDeliveryGroupMethodCurrency);
         }
-        insert(cartDeliveryGroupMethod);
+        return cartDeliveryGroupMethod;
     }
 
     private sfdc_checkout.IntegrationStatus integrationStatusFailedWithCartValidationOutputError(
