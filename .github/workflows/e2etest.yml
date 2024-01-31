@@ -26,10 +26,10 @@ jobs:
           echo 'y' | sf plugins install shane-sfdx-plugins
       - name: Build the plugin
         run: |
-            yarn install && yarn build
+          yarn install && yarn build
       - name: Auth Devhub
         run: |
-          echo ${{ env.DEVHUB_AUTH }} > authFile
+          echo ${{ env.DEVHUB_AUTH }} > authFile 
           sf force auth sfdxurl store -f 'authFile'
       - name: Cleanup The Latest Scratch Org From This Pull Request
         run: |
