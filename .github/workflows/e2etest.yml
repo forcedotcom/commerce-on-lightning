@@ -1,61 +1,61 @@
 name: e2e-tests
 
 on:
-    pull_request:
-        branches: [develop]
+  pull_request:
+    branches: [ develop ]
 
 jobs:
-    e2e-test:
-        runs-on: ubuntu-latest
+  e2e-test:
+    runs-on: ubuntu-latest
+    env:
+      DEVHUB_USERNAME: ${{ secrets.DEVHUB_USERNAME }}
+      DEVHUB_AUTH: ${{ secrets.DEVHUB_AUTH }}
+      PR_NUMBER:  ${{ github.event.pull_request.number }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node (v20)
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
+      - name: Setup SF and yarn
+        run: |
+          echo 'y' | npm install @salesforce/cli --global 
+          npm install --global yarn
+          sf --version
+          echo 'y' | sf plugins install shane-sfdx-plugins
+      - name: Build the plugin
+        run: |
+          yarn install && yarn build
+      - name: Auth Devhub
+        run: |
+          echo ${{ env.DEVHUB_AUTH }} > authFile 
+          sf force auth sfdxurl store -f 'authFile'
+      - name: Cleanup The Latest Scratch Org From This Pull Request
+        run: |
+          LAST_SCRATCH_ID=`sf data query --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE '%pr${{ env.PR_NUMBER }}%'" -o ${{ env.DEVHUB_USERNAME }} --json | jq -r '.result.records[0].Id'`
+          if [ "$LAST_SCRATCH_ID" != "null" ]; then sf data delete record -s ActiveScratchOrg -o ${{ env.DEVHUB_USERNAME }} -i $LAST_SCRATCH_ID; else echo 'No scratch org needs to be deleted.'; fi
+      - name: Create Scratch Org
+        id: scratch-org-step
+        run: |
+          export SCRATCH_ORG_ID=`date +%Y%m%d-%H%M%S`
+          export SCRATCH_ORG_ALIAS="gworkflow-pr${{ env.PR_NUMBER }}-$SCRATCH_ORG_ID"
+          export SCRATCH_ORG_USERNAME="$SCRATCH_ORG_ALIAS@scratch.com"
+
+          ./bin/run commerce:scratchorg:create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }} -d 1
+          echo "USERNAME=$SCRATCH_ORG_USERNAME" >> "$GITHUB_OUTPUT"
+      - name: Create B2C LWR Store
         env:
-            DEVHUB_USERNAME: ${{ secrets.DEVHUB_USERNAME }}
-            DEVHUB_AUTH: ${{ secrets.DEVHUB_AUTH }}
-            PR_NUMBER: ${{ github.event.pull_request.number }}
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-            - name: Setup Node (v20)
-              uses: actions/setup-node@v3
-              with:
-                  node-version: '20'
-            - name: Setup SF and yarn
-              run: |
-                  echo 'y' | npm install @salesforce/cli --global 
-                  npm install --global yarn
-                  sf --version
-                  echo 'y' | sf plugins install shane-sfdx-plugins
-            - name: Build the plugin
-              run: |
-                  yarn install && yarn build
-            - name: Auth Devhub
-              run: |
-                  echo '${{ env.DEVHUB_AUTH }}' > authFile 
-                  sf force auth sfdxurl store -f authFile
-            - name: Cleanup The Latest Scratch Org From This Pull Request
-              run: |
-                  LAST_SCRATCH_ID=`sf data query --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE '%pr${{ env.PR_NUMBER }}%'" -o ${{ env.DEVHUB_USERNAME }} --json | jq -r '.result.records[0].Id'`
-                  if [ "$LAST_SCRATCH_ID" != "null" ]; then sf data delete record -s ActiveScratchOrg -o ${{ env.DEVHUB_USERNAME }} -i $LAST_SCRATCH_ID; else echo 'No scratch org needs to be deleted.'; fi
-            - name: Create Scratch Org
-              id: scratch-org-step
-              run: |
-                  export SCRATCH_ORG_ID=`date +%Y%m%d-%H%M%S`
-                  export SCRATCH_ORG_ALIAS="gworkflow-pr${{ env.PR_NUMBER }}-$SCRATCH_ORG_ID"
-                  export SCRATCH_ORG_USERNAME="$SCRATCH_ORG_ALIAS@scratch.com"
-
-                  ./bin/run commerce:scratchorg:create -u "$SCRATCH_ORG_USERNAME" -a "$SCRATCH_ORG_ALIAS" -v ${{ env.DEVHUB_USERNAME }} -d 1
-                  echo "USERNAME=$SCRATCH_ORG_USERNAME" >> "$GITHUB_OUTPUT"
-            - name: Create B2C LWR Store
-              env:
-                  SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-              run: ./bin/run commerce:store:create -n b2cstore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
-
-            - name: Create B2B LWR Store
-              env:
-                  SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-              run: ./bin/run commerce:store:create -o b2b -n b2bstore01 -b b2bbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
-            - name: Create B2B Aura Store
-              env:
-                  SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
-              run: ./bin/run commerce:store:create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2baurabuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
-            - name: Confirmation
-              run: echo "All stores are created!"
+          SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
+        run: ./bin/run commerce:store:create -n b2cstore01 -b b2cbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json    
+          
+      - name: Create B2B LWR Store
+        env:
+          SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
+        run: ./bin/run commerce:store:create -o b2b -n b2bstore01 -b b2bbuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
+      - name: Create B2B Aura Store
+        env: 
+          SCRATCH_ORG_USERNAME: ${{ steps.scratch-org-step.outputs.USERNAME }}
+        run: ./bin/run commerce:store:create -o b2b -t "B2B Commerce (Aura)" -n b2baurastore01 -b b2baurabuyer@commerce.com -v ${{ env.DEVHUB_USERNAME }} -u ${{ env.SCRATCH_ORG_USERNAME }} --json
+      - name: Confirmation
+        run: echo "All stores are created!"
