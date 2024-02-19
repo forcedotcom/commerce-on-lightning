@@ -3,7 +3,15 @@
     "country": "us",
     "language": "en_US",
     "edition": "Developer",
-    "features": ["Communities", "B2CCommerceGMV", "PersonAccounts", "EnableSetPasswordInApi", "Multicurrency"],
+    "features": [
+        "Communities",
+        "B2CCommerceGMV",
+        "PersonAccounts",
+        "EnableSetPasswordInApi",
+        "Multicurrency",
+        "DebugApex",
+        "AuthorApex"
+    ],
     "settings": {
         "lightningExperienceSettings": {
             "enableS1DesktopEnabled": true
