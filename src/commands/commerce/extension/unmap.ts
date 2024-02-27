@@ -68,7 +68,7 @@ export class UnMapExtension extends SfdxCommand {
         ).result.records[0].Name;
         let deletedId: string;
         const existingIds = forceDataSoql(
-            `SELECT DeveloperName,ExternalServiceProviderType FROM RegisteredExternalService WHERE DeveloperName='${extensionName}' AND ExternalServiceProviderType='Extension'`,
+            `SELECT Id FROM RegisteredExternalService WHERE DeveloperName='${extensionName}' AND ExternalServiceProviderType='Extension'`,
             userName,
             this.flags,
             this.logger
@@ -77,9 +77,7 @@ export class UnMapExtension extends SfdxCommand {
             throw new SfdxError(msgs.getMessage('extension.unmap.error', [extensionName, '\n', existingIds.message]));
         }
         for (const record of existingIds.result.records) {
-            const id = (record['ExternalServiceProviderType'] as string)
-                .concat('__' as string)
-                .concat(record['DeveloperName'] as string);
+            const id = record['Id'];
             const deleteId = forceDataSoql(
                 `SELECT Id FROM StoreIntegratedService WHERE Integration='${id}' AND StoreId='${storeid}'`,
                 userName,
