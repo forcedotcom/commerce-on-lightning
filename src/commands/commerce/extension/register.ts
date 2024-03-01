@@ -99,6 +99,9 @@ export class RegisterExtension extends SfdxCommand {
         // get apexClass id from table
         const apexClassId = this.getApexClass(storeApexClass, storeUserName);
 
+        // eslint-disable-next-line
+        console.log(`Store username is ${storeUserName}`);
+
         // checks if user passed valid EPN
         const epnVal = forceDataSoql(
             `SELECT Value FROM PicklistValueInfo WHERE Value='${storeEPN}' AND EntityParticle.DurableId = 'RegisteredExternalService.ExtensionPointName' LIMIT 1`,

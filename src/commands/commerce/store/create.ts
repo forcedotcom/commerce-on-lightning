@@ -420,6 +420,17 @@ export class StoreCreate extends SfdxCommand {
             )
         );
         this.ux.log(msgs.getMessage('create.changingPasswordForBuyer'));
+        const buyerUserProperties = await StoreCreate.getUserInfo(
+            this.statusFileManager,
+            this.flags['buyer-username'] as string,
+            this.flags,
+            this.logger
+        );
+
+        if (buyerUserProperties.password) {
+            this.ux.log(msgs.getMessage('create.buyerUserHasPassword'));
+            return;
+        }
         try {
             shellJsonSfdx(
                 appendCommonFlags(
