@@ -288,11 +288,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
             ['B2CDeliverySample', 'COMPUTE_SHIPPING_B2C', 'Shipment'],
             ['B2CTaxSample', 'COMPUTE_TAXES_B2C', 'Tax'],
         ];
-        // let integrations = [
-        //     ['B2CCheckInventorySample', 'CHECK_INVENTORY', 'COMMERCE_DOMAIN_INVENTORY_CARTCALCULATOR'],
-        //     ['B2CDeliverySample', 'COMPUTE_SHIPPING', 'COMMERCE_DOMAIN_SHIPPING_CARTCALCULATOR'],
-        //     ['B2CTaxSample', 'COMPUTE_TAXES', 'COMMERCE_DOMAIN_TAX_CARTCALCULATOR'],
-        // ];
         if (
             StoreQuickstartSetup.getStoreType(this.org.getUsername(), this.flags, this.ux, this.logger) === 'B2B' &&
             this.getTemplateName() === 'B2B Commerce (Aura)'
@@ -333,29 +328,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
         developerName?: string,
         serviceProviderType?: string
     ): Promise<void> {
-        // console.log(`Registering ${apexClassName} to ${epn}`);
-        // try {
-        //     await RegisterExtension.run([
-        //         '--apex-class-name', apexClassName,
-        //         '--extension-point-name', epn,
-        //         '--registered-extension-name', developerName,
-        //         '-u', this.org.getUsername()
-        //     ], this.config);
-        // }
-        // catch (e) {
-        //     this.ux.log(
-        //         chalk.red(
-        //             msgs.getMessage('quickstart.setup.errorRegApexClassForIntegrationsInfo', [
-        //                 apexClassName,
-        //                 'run sfdx commerce:examples:convert',
-        //                 'sfdx force:source:push -f',
-        //             ])
-        //         )
-        //     );
-        //     console.error(e);
-        //     return;
-        // }
-
         try {
             const storeName = this.flags['store-name'] as string;
             const storeId = await this.statusFileManager.getValue('id');
