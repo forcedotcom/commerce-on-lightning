@@ -403,16 +403,15 @@ export class StoreCreate extends SfdxCommand {
         this.ux.log(msgs.getMessage('create.assigningShopperProfileToBuyer'));
         shell(
             appendCommonFlags(
-                'sfdx force:user:permset:assign --permsetname CommerceUser ' +
-                    `--targetusername "${this.org.getUsername()}"  --onbehalfof "${
-                        this.flags['buyer-username'] as string
-                    }"`,
+                `sf org assign permset -n CommerceUser -o "${this.org.getUsername()}"  -b "${
+                    this.flags['buyer-username'] as string
+                }"`,
                 this.flags,
                 this.logger
             )
         );
         this.ux.log(msgs.getMessage('create.changingPasswordForBuyer'));
-        const buyerUserProperties = await StoreCreate.getUserInfo(
+        let buyerUserProperties = await StoreCreate.getUserInfo(
             this.statusFileManager,
             this.flags['buyer-username'] as string,
             this.flags,
@@ -421,33 +420,33 @@ export class StoreCreate extends SfdxCommand {
 
         if (buyerUserProperties.password) {
             this.ux.log(msgs.getMessage('create.buyerUserHasPassword'));
-            return;
-        }
-        try {
-            shellJsonSfdx(
-                appendCommonFlags(
-                    `sfdx force:user:password:generate -u "${this.org.getUsername()}" -o "${
-                        this.flags['buyer-username'] as string
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    }" -v "${this.devhubUsername}"`,
-                    this.flags,
-                    this.logger
-                )
-            );
-        } catch (e) {
-            if (e.message.indexOf('INSUFFICIENT_ACCESS') < 0) {
-                await this.statusFileManager.setValue('userInfo', JSON.parse(JSON.stringify(e, replaceErrors)));
-                throw e;
+        } else {
+            try {
+                shellJsonSfdx(
+                    appendCommonFlags(
+                        `sf org generate password -o "${this.org.getUsername()}" -b "${
+                            this.flags['buyer-username'] as string
+                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+                        }"`,
+                        this.flags,
+                        this.logger
+                    )
+                );
+            } catch (e) {
+                if (e.message.indexOf('INSUFFICIENT_ACCESS') < 0) {
+                    await this.statusFileManager.setValue('userInfo', JSON.parse(JSON.stringify(e, replaceErrors)));
+                    throw e;
+                }
+                this.ux.log(chalk.red.bold(JSON.parse(e.message).message));
             }
-            this.ux.log(chalk.red.bold(JSON.parse(e.message).message));
+            buyerUserProperties = await StoreCreate.getUserInfo(
+                this.statusFileManager,
+                this.flags['buyer-username'],
+                this.flags,
+                this.logger
+            );
         }
-        userInfo = await StoreCreate.getUserInfo(
-            this.statusFileManager,
-            this.flags['buyer-username'],
-            this.flags,
-            this.logger
-        );
-        await this.statusFileManager.setValue('userInfo', userInfo);
+        await this.statusFileManager.setValue('userInfo', buyerUserProperties);
     }
 
     private async createSearchIndex(): Promise<void> {
