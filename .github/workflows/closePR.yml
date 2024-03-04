@@ -9,8 +9,8 @@ jobs:
     cleanup_job:
         runs-on: ubuntu-latest
         env:
-            DEVHUB_USERNAME: ${{ secrets.PATCH_DEVHUB_USERNAME }}
-            DEVHUB_AUTH: ${{ secrets.PATCH_DEVHUB_AUTH }}
+            DEVHUB_USERNAME: ${{ secrets.DEVHUB_USERNAME }}
+            DEVHUB_AUTH: ${{ secrets.DEVHUB_AUTH }}
             PR_NUMBER:  ${{ github.event.pull_request.number }}
         steps:
         - name: Setup Node (v20)
@@ -28,5 +28,5 @@ jobs:
         - name: Cleanup the last created scratch org for the PR CI
           run: |
             LAST_SCRATCH_ID=`sf data query --query "SELECT Id FROM ActiveScratchOrg WHERE SignupUsername LIKE '%pr${{ env.PR_NUMBER }}%'" -o ${{ env.DEVHUB_USERNAME }} --json | jq -r '.result.records[0].Id'`
-            [ "$LAST_SCRATCH_ID" != "null" ] && sf data delete record -s ActiveScratchOrg -o ${{ env.DEVHUB_USERNAME }} -i $LAST_SCRATCH_ID
+            if [ "$LAST_SCRATCH_ID" != "null" ]; then sf data delete record -s ActiveScratchOrg -o ${{ env.DEVHUB_USERNAME }} -i $LAST_SCRATCH_ID; else echo 'No scratch org needs to be deleted.'; fi
             
