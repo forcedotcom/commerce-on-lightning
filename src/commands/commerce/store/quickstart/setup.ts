@@ -37,7 +37,6 @@ import { ProductsImport } from '../../products/import';
 import { StoreCreate } from '../create';
 import { FilesCopy } from '../../files/copy';
 import { appendCommonFlags, setApiVersion } from '../../../../lib/utils/args/flagsUtils';
-import { MapExtension } from '../../extension/map';
 
 Messages.importMessagesDirectory(__dirname);
 
