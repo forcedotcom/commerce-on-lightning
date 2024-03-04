@@ -807,7 +807,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
             this.logger
         ).result.records[0].Id;
         const username = shellJsonSfdx<Org>(
-            appendCommonFlags(`sf org display user -o "${this.org.getUsername()}" -v --json`, this.flags, this.logger)
+            appendCommonFlags(`sf org display user -o "${this.org.getUsername()}" --json`, this.flags, this.logger)
         ).result.username;
         forceDataRecordUpdate(
             'User',
