@@ -203,15 +203,7 @@ export class StoreCreate extends SfdxCommand {
         }
         try {
             const output = shellJsonSfdx(
-                appendCommonFlags(
-                    `sfdx force:user:display -u "${scratchOrgBuyerUsername}" ${
-                        statusFileManager.devhubAdminUsername
-                            ? '-v "' + statusFileManager.devhubAdminUsername + '"'
-                            : ''
-                    } --json`,
-                    cmdFlags,
-                    logger
-                )
+                appendCommonFlags(`sf org display user -o "${scratchOrgBuyerUsername}" --json`, cmdFlags, logger)
             );
             console.log(JSON.stringify(output));
             await statusFileManager.setValue('userInfo', output.result);

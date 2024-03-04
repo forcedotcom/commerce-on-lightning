@@ -866,9 +866,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         try {
             shellJsonSfdx(
                 appendCommonFlags(
-                    `sfdx force:user:create -u "${this.org.getUsername()}" -f "${BUYER_USER_DEF(this.storeDir)}" -v "${(
-                        await this.org.getDevHubOrg()
-                    ).getUsername()}"`,
+                    `sf org create user -o "${this.org.getUsername()}" -f "${BUYER_USER_DEF(this.storeDir)}"`,
                     this.flags,
                     this.logger
                 )
@@ -882,7 +880,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
             )
                 throw err;
             /* eslint-disable @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-member-access */
-            this.ux.log('DUPLICATES_DETECTED in force:user:create');
+            this.ux.log('DUPLICATES_DETECTED in sf org create user');
             // if(err) "portal account owner must have a role"  then this.mapAdminUserToRole()
         }
         const buyerUsername = Object.assign(
