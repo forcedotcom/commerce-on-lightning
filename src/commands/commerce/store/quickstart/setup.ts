@@ -328,31 +328,6 @@ export class StoreQuickstartSetup extends SfdxCommand {
         developerName?: string,
         serviceProviderType?: string
     ): Promise<void> {
-        try {
-            const storeName = this.flags['store-name'] as string;
-            const storeId = await this.statusFileManager.getValue('id');
-            if (!storeId || typeof storeId == 'boolean') {
-                console.log(`storeId returned ${storeId}`);
-                return;
-            }
-            console.log(`Mapping ${apexClassName} to ${storeName} with ID ${storeId}`);
-            await MapExtension.run(
-                [
-                    '--registered-extension-name',
-                    apexClassName,
-                    '--store-name',
-                    storeName,
-                    '--store-id',
-                    storeId,
-                    '-u',
-                    this.org.getUsername(),
-                ],
-                this.config
-            );
-        } catch (e) {
-            console.error(e);
-            return;
-        }
         this.ux.log(
             msgs.getMessage('quickstart.setup.regApexClassForIntegrations', [
                 apexClassName,
@@ -369,6 +344,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 this.logger
             ).result.records[0].Id;
         } catch (e) {
+            console.error(e);
             this.ux.log(
                 chalk.red(
                     msgs.getMessage('quickstart.setup.errorRegApexClassForIntegrationsInfo', [
