@@ -426,7 +426,6 @@ export class StoreCreate extends SfdxCommand {
                     appendCommonFlags(
                         `sf org generate password -o "${this.org.getUsername()}" -b "${
                             this.flags['buyer-username'] as string
-                            // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
                         }"`,
                         this.flags,
                         this.logger
