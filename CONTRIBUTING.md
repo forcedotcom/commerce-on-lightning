@@ -46,6 +46,26 @@ Agreement. You can do so by going to [https://cla.salesforce.com/sign-cla](https
 -   Hot-fix branches are an exception.
     -   Instead we aim for faster cycles and a generally stable `develop` branch.
 
+## Debugging
+
+In VSCode:
+
+-   If you don't have it already, get the [JavaScript Debugger](https://marketplace.visualstudio.com/items?itemName=ms-vscode.js-debug) extension for VSCode.
+
+-   Go to settings and search for `debug.javascript.autoAttachFilter`
+
+-   Recommended setting is `onlyWithFlag`. This will allow the debugger to attach whenever the `--inspect` flag is given in Node.
+
+-   Now in your VSCode terminal, whenever you want do debug, set up some breakpoints and run the plugin like this:
+
+```
+node --inspect ./bin/run <PLUGIN COMMAND YOU WANT TO RUN> <ADDITIONAL ARGS YOU WANT TO PASS>
+```
+
+_\<PLUGIN COMMAND YOU WANT TO RUN\>_: `commerce:scratchorg:create` `commerce:store:create` etc...
+
+**Note**: Make sure to run `yarn build` whenever you change the javascript so the binary `./bin/run` can be updated.
+
 ## Pull Requests
 
 -   Develop features and bug fixes in _topic_ branches.
