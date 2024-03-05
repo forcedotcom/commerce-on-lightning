@@ -299,7 +299,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
             ];
         }
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        integrations.forEach(async (args) => await this.registerAndMapIntegration(...args));
+        integrations.forEach((args) => this.registerAndMapIntegration(...args));
         this.ux.log(msgs.getMessage('quickstart.setup.doneRegAndMapIntegrations'));
 
         // By default, use the internal pricing integration
