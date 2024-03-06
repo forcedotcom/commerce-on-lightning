@@ -67,9 +67,8 @@ export const shell = (
         res = cleanConsoleCharacters(res);
         j = JSON.parse(res);
     } catch (error) {
-        if (error instanceof SyntaxError) {
-            /* Json.parse failed, but it is ok since it's not a json object */
-        } else {
+        /* SyntaxError signifies JSON parsing was not successful. Do nothing if it fails since it's not a json object */
+        if (!(error instanceof SyntaxError)) {
             e = error;
             e.stdout = e.stdout ? cleanConsoleCharacters(e.stdout.toString()) : e.stdout;
             e.stderr = e.stderr ? cleanConsoleCharacters(e.stderr.toString()) : e.stderr;
