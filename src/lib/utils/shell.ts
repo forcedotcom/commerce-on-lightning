@@ -49,23 +49,31 @@ export const shell = (
     envars: Record<string, string> = {}
 ): ShellOutput => {
     let res: string;
+    let resBuffer: Buffer;
     let e;
     let j = '';
     Object.assign(envars, envs);
     try {
-        res = execSync(cmd, { stdio: _stdio, cwd: _cwd, env: envars, shell: process.platform === 'win32' ? 'powershell.exe' : '/bin/sh' }).toString();
-        if (res) res = cleanConsoleCharacters(res);
-        else return;
-        try {
-            j = JSON.parse(res);
-        } catch (ee) {
-            /* DON't Care maybe it's not a json object*/
+        resBuffer = execSync(cmd, {
+            stdio: _stdio,
+            cwd: _cwd,
+            env: envars,
+            shell: process.platform === 'win32' ? 'powershell.exe' : '/bin/sh',
+        });
+        if (!resBuffer) {
+            return;
         }
+        res = resBuffer.toString();
+        res = cleanConsoleCharacters(res);
+        j = JSON.parse(res);
     } catch (error) {
-        e = error;
-        e.stdout = e.stdout ? cleanConsoleCharacters(e.stdout.toString()) : e.stdout;
-        e.stderr = e.stderr ? cleanConsoleCharacters(e.stderr.toString()) : e.stderr;
-        e.output = e.output ? e.output.map((v) => (v ? cleanConsoleCharacters(v.toString()) : v)) : e.output;
+        /* SyntaxError signifies JSON parsing was not successful. Do nothing if it fails since it's not a json object */
+        if (!(error instanceof SyntaxError)) {
+            e = error;
+            e.stdout = e.stdout ? cleanConsoleCharacters(e.stdout.toString()) : e.stdout;
+            e.stderr = e.stderr ? cleanConsoleCharacters(e.stderr.toString()) : e.stderr;
+            e.output = e.output ? e.output.map((v) => (v ? cleanConsoleCharacters(v.toString()) : v)) : e.output;
+        }
     }
     return {
         res,

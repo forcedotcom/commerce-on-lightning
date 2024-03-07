@@ -45,6 +45,7 @@
         "errorStoreQuickstartSetupFailed": "StoreQuickstartSetup failed",
         "assigningShopperProfileToBuyer": "Assigning Shopper profile to the buyer user",
         "changingPasswordForBuyer": "Changing password for the buyer user",
+        "buyerUserHasPassword": "The buyer user already has a password. You can check it via sf org display user.",
         "createSearchIndexInfo": "Creating search index",
         "configFileDescription": "The store config file. By default it will be either of ~/.commerce/config/b2c-store-scratch-def or ~/.commerce/config/b2b-store-scratch-def based on store type. Default store type is b2c.]",
         "storeTypeDescription": "The type of store you want to create"
