@@ -11,7 +11,9 @@
         "PersonAccounts",
         "OrderManagement",
         "EnableSetPasswordInApi",
-        "Multicurrency"
+        "Multicurrency",
+        "DebugApex",
+        "AuthorApex"
     ],
     "settings": {
         "lightningExperienceSettings": {
