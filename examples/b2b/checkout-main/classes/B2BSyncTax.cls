@@ -13,7 +13,7 @@ public class B2BSyncTax {
             // Sync non-user errors skip saveCartValidationOutputError
             throw new CalloutException (errorMessage);
         }
-        
+
         // Extract cart id and start processing
         Id cartId = cartIds[0];
         startCartProcessSync(cartId);
@@ -35,23 +35,23 @@ public class B2BSyncTax {
         Id cartDeliveryGroupId = [SELECT CartDeliveryGroupId FROM CartItem WHERE CartId = :cartId][0].CartDeliveryGroupId;
         CartDeliveryGroup deliveryGroup = [SELECT DeliverToState, DeliverToCountry FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId][0];
         String taxType = [SELECT TaxType FROM WebCart WHERE Id = :cartId][0].TaxType;
-        
+
         Map<ID, CartItem> cartItemsMap = new Map<ID, CartItem>([SELECT Id, Sku, Quantity, TotalLineAmount, AdjustmentAmount, (Select Id, TotalAmount from CartItemPriceAdjustments) FROM CartItem  WHERE CartId = :cartId]);
 
         // Following snippet of code fetches a mocked static json response from getDataFromStaticResponse.
-        // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired 
+        // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired
         // response is implemented in getDataFromExternalService method.
-        
+
         Map<String, Object> dataFromService = null;
         if(useHTTPService) {
             dataFromService = getDataFromExternalService(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
         } else {
             dataFromService = getDataFromStaticResponse(cartItemsMap, deliveryGroup.DeliverToState, deliveryGroup.DeliverToCountry, taxType);
         }
-        
+
         // If there are taxes from a previously cancelled checkout, delete them.
         delete [SELECT Id FROM CartTax WHERE CartItemId IN (Select Id FROM CartItem WHERE CartId = :cartId)];
-        
+
         // For each cart item, insert a new tax line in the CartTax entity.
             // The total tax is automatically rolled up to TotalLineTaxAmount in the corresponding CartItem line.
             CartTax[] cartTaxestoInsert = new CartTax[]{};
@@ -104,37 +104,37 @@ public class B2BSyncTax {
         for (ID key : cartItemsMap.keySet()) {
             CartItem cartItem = cartItemsMap.get(key);
             Id cartItemId = cartItem.Id;
-            
+
             Double amount = cartItem.TotalLineAmount==null ? 0.00 : cartItem.TotalLineAmount;
             Double tierAdjustment = cartItem.AdjustmentAmount==null ? 0.00 : cartItem.AdjustmentAmount;
             Double quantity = cartItem.Quantity==null ? 0.00 : cartItem.Quantity;
-            
-            if(country == null || country == 'US' || country == 'United States') {
+
+            if(country == 'US' || country == 'United States') {
                 taxRate = 0.08;
                 String [] noSalesTaxUSStates = new String [] {'AK', 'DE', 'MT', 'NH', 'OR'};
                 if (noSalesTaxUSStates.contains(state)) {
                     taxRate = 0.00;
                 }
             }
-            
+
             Double itemizedPromotionTax = 0.00;
             Double [] itemizedPromotionTaxArr = new Double [] {};
             Double netUnitPrice = 0.00;
             Double grossUnitPrice = 0.00;
-            
+
             Double multiplier = 0.00;
-        
+
             if(taxType == 'Gross') {
                 multiplier = taxRate / (1 + taxRate);
             } else {
                 multiplier = taxRate;
             }
-            
+
             Double cartItemTax = amount * multiplier;
             Double tierAdjustmentTax = (tierAdjustment!=null ? tierAdjustment : 0.00) * multiplier;
-            
+
             CartItemPriceAdjustment [] itemizedPromotions = cartItem.CartItemPriceAdjustments;
-            
+
             String itemizedPromotionTaxResp = '[';
             for(CartItemPriceAdjustment itemAdj : itemizedPromotions) {
                 Double itemTaxAmount = (itemAdj.TotalAmount!=null ? itemAdj.TotalAmount : 0.00) * multiplier;
@@ -145,7 +145,7 @@ public class B2BSyncTax {
                 itemizedPromotionTax = itemizedPromotionTax + itemTaxAmount;
             }
             itemizedPromotionTaxResp = itemizedPromotionTaxResp.removeEnd(',') + ']';
-            
+
             if(taxType == 'Gross') {
                 grossUnitPrice = amount / quantity;
                 netUnitPrice = (amount - cartItemTax) / quantity;
@@ -153,17 +153,17 @@ public class B2BSyncTax {
                 grossUnitPrice = (amount + cartItemTax) / quantity;
                 netUnitPrice = amount / quantity;
             }
-            
+
             responseJson = responseJson + '"'+cartItemId+'":';
             responseJson = responseJson + '{';
             responseJson = responseJson + '"cartItemId": "' + cartItemId + '",';
             responseJson = responseJson + '"taxAmount": ' + cartItemTax + ',';
             responseJson = responseJson + '"adjustmentTaxAmount": ' + tierAdjustmentTax + ',';
-            
+
             responseJson = responseJson + '"itemizedPromotionTaxAmounts": ';
             responseJson = responseJson + itemizedPromotionTaxResp;
             responseJson = responseJson + ',';
-            
+
             responseJson = responseJson + '"totalItemizedPromotionTaxAmount": ' + itemizedPromotionTax + ',';
             responseJson = responseJson + '"grossUnitPrice": ' + grossUnitPrice + ',';
             responseJson = responseJson + '"netUnitPrice": ' + netUnitPrice + ',';
@@ -171,11 +171,11 @@ public class B2BSyncTax {
             responseJson = responseJson + '"taxName": "GST"';
             responseJson = responseJson + '},';
         }
-        
-        responseJson = responseJson.removeEnd(',') + '}';        
+
+        responseJson = responseJson.removeEnd(',') + '}';
         return (Map<String, Object>) JSON.deserializeUntyped(responseJson);
     }
-    
+
     private static Map<String, Object> getDataFromExternalService (
         Map<ID, CartItem> cartItemsMap, String state, String country, String taxType) {
 
