@@ -233,7 +233,7 @@ describe('appends common flags to the given command', () => {
         const flags = { apiversion: '56.0' };
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
         command = appendCommonFlags(command, flags, logger);
-        assert.equal(command, 'sf test --apiversion=56.0');
+        assert.equal(command, 'sf test --api-version=56.0');
     });
     it('handles undefined apiversion', async () => {
         let command = 'sf test';
