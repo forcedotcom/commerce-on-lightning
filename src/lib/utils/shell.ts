@@ -95,10 +95,10 @@ const cleanConsoleCharacters = (res: string): string =>
     (res || '').replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 
 /**
- * Use this to run sfdx shell commands with json output ie: --json
+ * Use this to run sf shell commands with json output ie: --json
  * This will check for error and throw sfdxerror or return the json object
  *
- * @param cmd sfdx command to run, if you don't pass --json then it'll put it in there for you
+ * @param cmd sf command to run, if you don't pass --json then it'll put it in there for you
  * @param stdio if you don't want the result and for it to run without throwing exception then set studio to "inherit"
  * @param cwd
  * @param envars

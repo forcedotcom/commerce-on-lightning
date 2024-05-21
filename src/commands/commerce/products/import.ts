@@ -36,7 +36,7 @@ export class ProductsImport extends SfdxCommand {
     public static readonly requiresDevhubUsername = true;
     public static description = msgs.getMessage('import.cmdDescription');
 
-    public static examples = [`sfdx ${CMD} --store-name test-store`];
+    public static examples = [`sf ${CMD} --store-name test-store`];
     protected static flagsConfig = {
         ...productsFlags,
         ...filterFlags(['definitionfile', 'type'], exampleFlags),
@@ -84,9 +84,9 @@ export class ProductsImport extends SfdxCommand {
             try {
                 const res = shellJsonSfdx<ImportResult>(
                     appendCommonFlags(
-                        `sfdx shane:data:file:upload -f ${
+                        `sf shane data file upload --file ${
                             this.flags['products-file-csv'] as string
-                        } -u "${this.org.getUsername()}" --json`,
+                        } --target-org "${this.org.getUsername()}" --json`,
                         this.flags,
                         this.logger
                     )
@@ -212,7 +212,7 @@ export class ProductsImport extends SfdxCommand {
             try {
                 shellJsonSfdx(
                     appendCommonFlags(
-                        `sfdx force:data:tree:import -u "${this.org.getUsername()}" -p ${JSON_DIR(
+                        `sf data import tree --target-org "${this.org.getUsername()}" --plan ${JSON_DIR(
                             this.storeDir
                         )}/Productless-Plan-1.json`,
                         this.flags,
@@ -293,7 +293,7 @@ export class ProductsImport extends SfdxCommand {
             try {
                 shellJsonSfdx(
                     appendCommonFlags(
-                        `sfdx force:data:tree:import -u "${this.org.getUsername()}" -p ${JSON_DIR(
+                        `sf data import tree --target-org "${this.org.getUsername()}" --plan ${JSON_DIR(
                             this.storeDir
                         )}/Plan-1.json`,
                         this.flags,

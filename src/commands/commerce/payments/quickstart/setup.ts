@@ -28,7 +28,7 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static description = msgs.getMessage('quickstart.setup.cmdDescription');
 
-    public static examples = [`sfdx ${CMD} -p Stripe -n 1commerce`]; // TODO documentation including examples and descriptions
+    public static examples = [`sf ${CMD} -p Stripe -n 1commerce`]; // TODO documentation including examples and descriptions
     protected static flagsConfig = {
         ...paymentsFlags,
         ...filterFlags(['store-name', 'prompt'], storeFlags),
@@ -71,7 +71,7 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
             JSON.stringify(
                 shellJsonSfdx(
                     appendCommonFlags(
-                        `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${examplesDir} -w 1`,
+                        `sf project deploy start --metadata-dir --target-org "${this.org.getUsername()}" --deploydir ${examplesDir} --wait 1`,
                         this.flags,
                         this.logger
                     ),
@@ -187,7 +187,7 @@ export class PaymentsQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.namedCredentialWasCreatedUpdateItWithValidUsernamePassword'));
         shell(
             appendCommonFlags(
-                `sfdx force:org:open -u ${this.org.getUsername()} -p "lightning/setup/NamedCredential/page?address=%2F${namedCredentialId}"`,
+                `sf org open --target-org ${this.org.getUsername()} --path "lightning/setup/NamedCredential/page?address=%2F${namedCredentialId}"`,
                 this.flags,
                 this.logger
             )

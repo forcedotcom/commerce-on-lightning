@@ -24,7 +24,7 @@ export class StoreOpen extends SfdxCommand {
     public static requiresUsername = true;
     public static readonly supportsDevhubUsername = true;
     public static description = messages.getMessage('view.cmdDescription');
-    public static examples = [`sfdx ${CMD} --store-name test-store`, `sfdx ${CMD} --all`];
+    public static examples = [`sf ${CMD} --store-name test-store`, `sfdx ${CMD} --all`];
     protected static flagsConfig = filterFlags(['store-name', 'all'], allFlags);
 
     public org: Org;
@@ -45,7 +45,7 @@ export class StoreOpen extends SfdxCommand {
         this.ux.log('Store id is: ' + storeId);
         shell(
             appendCommonFlags(
-                `sfdx force:org:open -p "/lightning/r/WebStore/${storeId}/view" -u ${this.org.getUsername()}`,
+                `sf org open --path "/lightning/r/WebStore/${storeId}/view" --target-org ${this.org.getUsername()}`,
                 this.flags,
                 this.logger
             )
@@ -56,7 +56,7 @@ export class StoreOpen extends SfdxCommand {
     public viewAll(): boolean {
         shell(
             appendCommonFlags(
-                `sfdx force:org:open -u ${this.org.getUsername()} -p _ui/networks/setup/SetupNetworksPage`,
+                `sf org open --target-org ${this.org.getUsername()} --path _ui/networks/setup/SetupNetworksPage`,
                 this.flags,
                 this.logger
             )

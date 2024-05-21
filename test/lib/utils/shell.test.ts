@@ -8,16 +8,16 @@
 // import { shell, shellJsonSfdx } from '../../../src/lib/utils/shell';
 
 // describe('Shell', () => {
-//     it('should execute and correctly output sfdx force --json', async function () {
+//     it('should execute and correctly output sf force --json', async function () {
 //         this.timeout(20000);
-//         const res = shell('sfdx force --json', null);
+//         const res = shell('sf force --json', null);
 //         assert.ok(res.res.indexOf('result') >= 0);
 //     });
 // });
 // describe('Shell Json Sfdx', () => {
 //     it('should get api version in an object', async function () {
 //         this.timeout(20000);
-//         const res = shellJsonSfdx<{ apiVersion }>('sfdx force');
+//         const res = shellJsonSfdx<{ apiVersion }>('sf force');
 //         assert.ok(res.result.apiVersion);
 //     });
 // });

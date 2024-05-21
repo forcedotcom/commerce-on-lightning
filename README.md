@@ -61,7 +61,7 @@ $ npm install -g @salesforce/commerce
 $ sfdx COMMAND
 running command...
 $ sfdx (-v|--version|version)
-@salesforce/commerce/250.1.0 darwin-x64 node-v18.16.1
+@salesforce/commerce/250.1.0 darwin-arm64 node-v18.20.1
 $ sfdx --help [COMMAND]
 USAGE
   $ sfdx COMMAND
@@ -177,7 +177,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:examples:convert -f store-scratch-def.json
+  sf commerce:examples:convert -f store-scratch-def.json
 ```
 
 _See code: [src/commands/commerce/examples/convert.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/examples/convert.ts)_
@@ -211,8 +211,8 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLES
-  sfdx commerce:extension:map --registered-extension-name test-extension-name --store-name test-store-name
-  sfdx commerce:extension:map --registered-extension-name test-extension-name --store-id test-store-id
+  sf commerce:extension:map --registered-extension-name test-extension-name --store-name test-store-name
+  sf commerce:extension:map --registered-extension-name test-extension-name --store-id test-store-id
 ```
 
 _See code: [src/commands/commerce/extension/map.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/extension/map.ts)_
@@ -239,7 +239,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:extension:getEPN
+  sf commerce:extension:getEPN
 ```
 
 _See code: [src/commands/commerce/extension/points/list.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/extension/points/list.ts)_
@@ -290,7 +290,7 @@ OPTIONS
       [default: warn] logging level for this command invocation
 
 EXAMPLE
-  sfdx commerce:extension:register --registered-extension-name test-extension-name --extension-point-name test-epn
+  sf commerce:extension:register --registered-extension-name test-extension-name --extension-point-name test-epn
   --apex-class-name test-apex-class
 ```
 
@@ -325,8 +325,8 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLES
-  sfdx commerce:extension:unmap --registered-extension-name test-extension-name --store-name test-store-name
-  sfdx commerce:extension:unmap --registered-extension-name test-extension-name --store-id test-store-id
+  sf commerce:extension:unmap --registered-extension-name test-extension-name --store-name test-store-name
+  sf commerce:extension:unmap --registered-extension-name test-extension-name --store-id test-store-id
 ```
 
 _See code: [src/commands/commerce/extension/unmap.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/extension/unmap.ts)_
@@ -362,12 +362,12 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLES
-  sfdx commerce:files:copy -y --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt"
+  sf commerce:files:copy -y --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt"
   --dirstocopy "dir1,dir2,dir3"
-  sfdx commerce:files:copy --prompt --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt"
+  sf commerce:files:copy --prompt --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt"
   --dirstocopy "dir1,dir2,dir3"
-  sfdx commerce:files:copy --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt" --dirstocopy
-   "dir1,dir2,dir3"
+  sf commerce:files:copy --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt" --dirstocopy
+  "dir1,dir2,dir3"
 ```
 
 _See code: [src/commands/commerce/files/copy.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/files/copy.ts)_
@@ -398,7 +398,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:ordermanagement:quickstart:setup
+  sf commerce:ordermanagement:quickstart:setup
 ```
 
 _See code: [src/commands/commerce/ordermanagement/quickstart/setup.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/ordermanagement/quickstart/setup.ts)_
@@ -430,7 +430,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:payments:quickstart:setup -p Stripe -n 1commerce
+  sf commerce:payments:quickstart:setup -p Stripe -n 1commerce
 ```
 
 _See code: [src/commands/commerce/payments/quickstart/setup.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/payments/quickstart/setup.ts)_
@@ -481,7 +481,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:products:import --store-name test-store
+  sf commerce:products:import --store-name test-store
 ```
 
 _See code: [src/commands/commerce/products/import.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/products/import.ts)_
@@ -526,7 +526,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:scratchorg:create --username demo@1commerce.com --targetdevhubusername ceo@mydevhub.com
+  sf commerce:scratchorg:create --username demo@1commerce.com --targetdevhubusername ceo@mydevhub.com
 ```
 
 _See code: [src/commands/commerce/scratchorg/create.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/scratchorg/create.ts)_
@@ -556,7 +556,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:search:start -n storeName
+  sf commerce:store:search:start -n storeName
           // Finds a store and indexes it
 ```
 
@@ -609,7 +609,7 @@ OPTIONS
       [default: warn] logging level for this command invocation
 
 EXAMPLE
-  sfdx commerce:store:create --store-name test-store
+  sf commerce:store:create --store-name test-store
 ```
 
 _See code: [src/commands/commerce/store/create.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/store/create.ts)_
@@ -650,7 +650,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLE
-  sfdx commerce:store:display --store-name test-store
+  sf commerce:store:display --store-name test-store
 ```
 
 _See code: [src/commands/commerce/store/display.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/store/display.ts)_
@@ -674,8 +674,7 @@ OPTIONS
   -v, --targetdevhubusername=targetdevhubusername                                   username or alias for the dev hub
                                                                                     org; overrides default dev hub org
 
-  --all                                                                             View All stores using sfdx
-                                                                                    force:org:open
+  --all                                                                             View All stores using sf org open
                                                                                     _ui/networks/setup/SetupNetworksPage
                                                                                     page
 
@@ -688,7 +687,7 @@ OPTIONS
                                                                                     this command invocation
 
 EXAMPLES
-  sfdx commerce:store:open --store-name test-store
+  sf commerce:store:open --store-name test-store
   sfdx commerce:store:open --all
 ```
 
@@ -724,7 +723,7 @@ OPTIONS
       [default: warn] logging level for this command invocation
 
 EXAMPLE
-  sfdx commerce:store:quickstart:create --templatename 'b2c-lite-storefront'
+  sf commerce:store:quickstart:create --templatename 'b2c-lite-storefront'
 ```
 
 _See code: [src/commands/commerce/store/quickstart/create.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/store/quickstart/create.ts)_
@@ -769,7 +768,7 @@ OPTIONS
       [default: warn] logging level for this command invocation
 
 EXAMPLE
-  sfdx commerce:store:quickstart:setup --definitionfile store-scratch-def.json
+  sf commerce:store:quickstart:setup --definitionfile store-scratch-def.json
 ```
 
 _See code: [src/commands/commerce/store/quickstart/setup.ts](https://github.com/forcedotcom/commerce-on-lightning/blob/v250.1.0/src/commands/commerce/store/quickstart/setup.ts)_

@@ -74,7 +74,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         ];
     }
 
-    public static examples = [`sfdx ${CMD} --definitionfile store-scratch-def.json`];
+    public static examples = [`sf ${CMD} --definitionfile store-scratch-def.json`];
 
     protected static flagsConfig = {
         ...filterFlags(['store-name', 'definitionfile', 'prompt', 'templatename'], allFlags),
@@ -255,7 +255,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const bundleDirectory = path.join(this.storeDir, 'experience-bundle-package');
         shell(
             appendCommonFlags(
-                `sfdx force:mdapi:retrieve -u "${this.org.getUsername()}" -r "${bundleDirectory}" -k "${PACKAGE_RETRIEVE(
+                `sf project retrieve start --target-metadata-dir --target-org "${this.org.getUsername()}" --retrievetargetdir "${bundleDirectory}" --unpackaged "${PACKAGE_RETRIEVE(
                     this.storeDir
                 )}"`,
                 this.flags,
@@ -348,8 +348,8 @@ export class StoreQuickstartSetup extends SfdxCommand {
                 chalk.red(
                     msgs.getMessage('quickstart.setup.errorRegApexClassForIntegrationsInfo', [
                         apexClassName,
-                        'run sfdx commerce:examples:convert',
-                        'sfdx force:source:push -f',
+                        'run sf commerce:examples:convert',
+                        'sf project deploy start --forceoverwrite',
                     ])
                 )
             );
@@ -939,7 +939,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
             ''
         );
         const tmpDirName = path.join(this.storeDir, 'sourceGuestProfile');
-        // Can only force:source:deploy from sfdx project folder
+        // Can only project deploy start from sf project folder
         // Cannot push source Guest Profile earlier as Store is not created yet
         // TODO hardcoded b2c add this to store config file
         let pathToGuestProfile = path.join(EXAMPLE_DIR, 'b2c', 'users', 'guest-user-profile-setup');
@@ -950,10 +950,10 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const trgtGuestProfile = path.join(pathToGuestProfile, 'profiles', `${communityNetworkName} Profile.profile`);
         fs.renameSync(srcGuestProfile, trgtGuestProfile);
         shell(`cd "${scratchOrgDir}"`);
-        shell(`sfdx force:mdapi:convert -r "${pathToGuestProfile}" -d "${tmpDirName}"`);
+        shell(`sf project convert mdapi --root-dir "${pathToGuestProfile}" --output-dir "${tmpDirName}"`);
         shell(
             appendCommonFlags(
-                `sfdx force:source:deploy -p "${tmpDirName}" -u "${this.org.getUsername()}"`,
+                `sf project deploy start --sourcepath "${tmpDirName}" --target-org "${this.org.getUsername()}"`,
                 this.flags,
                 this.logger
             )
@@ -1232,7 +1232,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
             if (JSON.stringify(e.message).indexOf(msgs.getMessage('quickstart.setup.checkInvalidSession')) >= 0) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 this.ux.log(msgs.getMessage('quickstart.setup.openingPageToRefreshSession', [e.message]));
-                shell('sfdx force:org:open -u ' + this.org.getUsername());
+                shell('sf org open --target-org ' + this.org.getUsername());
                 res = shellJsonSfdx(deployCommand);
             } else if (JSON.stringify(e.message).indexOf('Error parsing file') >= 0 && cnt === 0) {
                 await this.statusFileManager.setValue('retrievedPackages', false);
@@ -1260,7 +1260,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.publishingCommunityStep7'));
         shell(
             appendCommonFlags(
-                `sfdx force:community:publish -u "${this.org.getUsername()}" -n "${
+                `sf community publish --target-org "${this.org.getUsername()}" --name "${
                     this.varargs['communityNetworkName'] as string
                 }"`,
                 this.flags,

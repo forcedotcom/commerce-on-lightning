@@ -52,7 +52,7 @@ describe('commerce:scratchorg:create', () => {
         res.result = { id: 'hi', username: 'bye' };
         const shellStub = stub(shellExports, 'shellJsonSfdx').returns(res);
 
-        const cmd = `sfdx force:org:create \
+        const cmd = `sf org create scratch \
 --targetdevhubusername="${devhubUser}" \
 --definitionfile=${CONFIG_DIR}/${flagObject.type}-project-scratch-def.json \
 --apiversion="${flagObject.apiversion}" \
