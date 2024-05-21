@@ -136,7 +136,7 @@ export function appendCommonFlags(cmd: string, flags: OutputFlags<any>, logger: 
     if (flags?.apiversion && cmd.startsWith('sf ')) {
         cmd = `${cmd} --api-version=${flags.apiversion as string}`;
     } else if (flags?.apiversion) {
-        cmd = `${cmd} --api-version=${flags.apiversion as string}`;
+        cmd = `${cmd} --apiversion=${flags.apiversion as string}`;
     }
     logger.debug(`Wrapped command: ${cmd}`);
     return cmd;
