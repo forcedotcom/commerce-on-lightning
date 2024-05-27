@@ -53,15 +53,15 @@ describe('commerce:scratchorg:create', () => {
         const shellStub = stub(shellExports, 'shellJsonSfdx').returns(res);
 
         const cmd = `sf org create scratch \
---targetdevhubusername="${devhubUser}" \
---definitionfile=${CONFIG_DIR}/${flagObject.type}-project-scratch-def.json \
---apiversion="${flagObject.apiversion}" \
---setalias="${flagObject.alias}" \
---durationdays=${flagObject.duration} \
---wait=${flagObject.wait} \
-username="${flagObject.username}" \
---setdefaultusername \
---json`;
+        --target-dev-hub="${devhubUser}" \
+        --definition-file=${CONFIG_DIR}/${flagObject.type}-project-scratch-def.json \
+        --api-version="${flagObject.apiversion}" \
+        --alias="${flagObject.alias}" \
+        --duration-days=${flagObject.duration} \
+        --wait=${flagObject.wait} \
+        --targetusername="${flagObject.username}" \
+        --set-default \
+        --json`;
         const flagHelperStub = stub(flagHelpers, 'appendCommonFlags').returns(cmd);
 
         await scratchOrgCreate.createScratchOrg();

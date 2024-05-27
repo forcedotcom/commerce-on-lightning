@@ -73,8 +73,8 @@ describe('Test order management setup command', () => {
         });
 
         const locationTypesCmd = `sf data query --target-org "${username}" --query "${QUERY_LOCATION_TYPES}" --api-version=${apiversion}`;
-        const deployCommand = `sf project deploy start --metadata-dir --target-org "${username}" --deploydir ${EXAMPLE_DIR}/som/ --wait 1 --api-version=${apiversion}`;
-        const deployActionsCommand = `sf project deploy start --metadata-dir --target-org "${username}" --deploydir ${EXAMPLE_DIR}/som/actions/ --wait 1 --api-version=${apiversion}`;
+        const deployCommand = `sf project deploy start --target-org "${username}" --metadata-dir ${EXAMPLE_DIR}/som/ --wait 1 --api-version=${apiversion}`;
+        const deployActionsCommand = `sf project deploy start --target-org "${username}" --metadata-dir ${EXAMPLE_DIR}/som/actions/ --wait 1 --api-version=${apiversion}`;
         shellStub.withArgs(deployCommand).returns(deployResult);
         shellStub.withArgs(deployActionsCommand).returns(deployResult);
         const locationTypesResult = new Result<QueryResult>();
@@ -99,7 +99,7 @@ describe('Test order management setup command', () => {
     it('throws error when flows deployment fails', async () => {
         const shellStub = stub(shellExports, 'shellJsonSfdx');
         const usernameStub = stub(org, 'getUsername').returns(username);
-        const deployCommand = `sf project deploy start --metadata-dir --target-org "${username}" --deploydir ${EXAMPLE_DIR}/som/ --wait 1 --api-version=${apiversion}`;
+        const deployCommand = `sf project deploy start --target-org "${username}" --metadata-dir ${EXAMPLE_DIR}/som/ --wait 1 --api-version=${apiversion}`;
         shellStub.withArgs(deployCommand).throws(new SfdxError('Test'));
 
         await assert.rejects(orderManagementQuickstartSetup.run());
@@ -112,9 +112,9 @@ describe('Test order management setup command', () => {
     it('throws error when actions deployment fails', async () => {
         const shellStub = stub(shellExports, 'shellJsonSfdx');
         const usernameStub = stub(org, 'getUsername').returns(username);
-        const deployCommand = `sf project deploy start --metadata-dir --target-org "${username}" --deploydir ${EXAMPLE_DIR}/som/ --wait 1 --api-version=${apiversion}`;
+        const deployCommand = `sf project deploy start --target-org "${username}" --metadata-dir  ${EXAMPLE_DIR}/som/ --wait 1 --api-version=${apiversion}`;
         shellStub.withArgs(deployCommand).returns(deployResult);
-        const deployActionsCommand = `sf project deploy start --metadata-dir --target-org "${username}" --deploydir ${EXAMPLE_DIR}/som/actions/ --wait 1 --api-version=${apiversion}`;
+        const deployActionsCommand = `sf project deploy start --target-org "${username}" --metadata-dir ${EXAMPLE_DIR}/som/actions/ --wait 1 --api-version=${apiversion}`;
         shellStub.withArgs(deployActionsCommand).throws(new SfdxError('Test'));
         await assert.rejects(orderManagementQuickstartSetup.run());
         sinon.assert.calledTwice(shellStub);
@@ -145,8 +145,8 @@ describe('Test order management setup command', () => {
         });
 
         const locationTypesCmd = `sf data query --target-org "${username}" --query "${QUERY_LOCATION_TYPES}" --api-version=${apiversion}`;
-        const deployCommand = `sf project deploy start --metadata-dir --target-org "${username}" --deploydir ${EXAMPLE_DIR}/som/ --wait 1 --api-version=${apiversion}`;
-        const deployActionsCommand = `sf project deploy start --metadata-dir --target-org "${username}" --deploydir ${EXAMPLE_DIR}/som/actions/ --wait 1 --api-version=${apiversion}`;
+        const deployCommand = `sf project deploy start --target-org "${username}" --metadata-dir  ${EXAMPLE_DIR}/som/ --wait 1 --api-version=${apiversion}`;
+        const deployActionsCommand = `sf project deploy start --target-org "${username}" --metadata-dir  ${EXAMPLE_DIR}/som/actions/ --wait 1 --api-version=${apiversion}`;
         const deployResult = {
             status: 0,
             name: '',

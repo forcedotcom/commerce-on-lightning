@@ -82,15 +82,13 @@ export class ProductsImport extends SfdxCommand {
             this.ux.startSpinner(msgs.getMessage('import.importingProducts'));
             this.ux.setSpinnerStatus(msgs.getMessage('import.uploading'));
             try {
-                const res = shellJsonSfdx<ImportResult>(
-                    appendCommonFlags(
-                        `sf shane data file upload --file ${
-                            this.flags['products-file-csv'] as string
-                        } --target-org "${this.org.getUsername()}" --json`,
-                        this.flags,
-                        this.logger
-                    )
-                );
+                const productsFileCsv: string = this.flags['products-file-csv'] as string;
+                const username: string = this.org.getUsername();
+
+                const command = `sfdx shane:data:file:upload -f ${productsFileCsv} -u ${username} --json`;
+
+                const res = shellJsonSfdx<ImportResult>(command);
+
                 this.ux.setSpinnerStatus(
                     msgs.getMessage('import.uploadedStringWithResult', [this.flags['products-file-csv']]) +
                         JSON.stringify(res)

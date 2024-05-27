@@ -101,7 +101,7 @@ describe('commerce:products:import', () => {
 
         sinon.stub(productImportCommand.org, 'getDevHubOrg').resolves(mockOrg);
 
-        const cmd = `sf commerce products import \
+        const cmd = `sf commerce:products:import \
         --targetdevhubusername="${devhubUsername}" \
         --apiversion="${flagObject.apiversion}" \
         --json`;

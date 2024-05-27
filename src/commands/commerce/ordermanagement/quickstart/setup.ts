@@ -66,7 +66,7 @@ export class OrderManagementQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.deployActionsToOrg'));
         deployResult = shellJsonSfdx(
             appendCommonFlags(
-                `sf project deploy start --metadata-dir --target-org "${this.org.getUsername()}" --deploydir ${EXAMPLE_DIR}/som/actions/ --wait 1`,
+                `sf project deploy start --target-org "${this.org.getUsername()}"  --metadata-dir ${EXAMPLE_DIR}/som/actions/ --wait 1`,
                 this.flags,
                 this.logger
             )

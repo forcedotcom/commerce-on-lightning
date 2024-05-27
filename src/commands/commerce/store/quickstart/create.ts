@@ -73,8 +73,8 @@ export class StoreQuickstartCreate extends SfdxCommand {
                 appendCommonFlags(
                     `sf community create --target-org "${this.org.getUsername()}"` +
                         ` --name "${this.flags['store-name'] as string}" ` +
-                        `--templatename "${this.flags.templatename as string}" ` +
-                        `--urlpathprefix "${urlPathPrefix}" ` +
+                        `--template-name "${this.flags.templatename as string}" ` +
+                        `--url-path-prefix "${urlPathPrefix}" ` +
                         '--description "' + // TODO allow this to be optionaly passed in varargs along with above
                         msgs.getMessage('quickstart.create.storeCreatedByQuickStartScript', [
                             this.flags['store-name'],

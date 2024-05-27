@@ -70,7 +70,7 @@ export class ScratchOrgCreate extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         await setApiVersion(this.hubOrg, this.flags);
         /*
-        Base class reads the tagetdevhubusername or --target-dev-hubarg. if not provided it will use whatever is set for defaultdevhubusername config parameter
+        Base class reads the tagetdevhubusername or --target-dev-hub arg. if not provided it will use whatever is set for defaultdevhubusername config parameter
          */
         this.devhubUsername = this.hubOrg.getUsername();
         await this.copyConfigFiles();
@@ -111,14 +111,13 @@ export class ScratchOrgCreate extends SfdxCommand {
             mkdirSync((this.devHubDir ? this.devHubDir : BASE_DIR) + '/force-app');
             const cmd = appendCommonFlags(
                 `sf org create scratch \
---targetdevhubusername="${this.devhubUsername}" \
---definitionfile=${CONFIG_DIR}/${orgType}-project-scratch-def.json \
---setalias="${this.flags.alias as string}" \
---durationdays=${this.flags.duration as number} \
---wait=${this.flags.wait as number} \
-username="${this.flags.username as string}" \
---setdefaultusername \
---json`,
+                --target-dev-hub="${this.devhubUsername}" \
+                --definition-file=${CONFIG_DIR}/${orgType}-project-scratch-def.json \
+                --alias="${this.flags.alias as string}" \
+                --duration-days=${this.flags.duration as number} \
+                --wait=${this.flags.wait as number} \
+                --username="${this.flags.username as string}" \
+                --json`,
                 this.flags,
                 this.logger
             );

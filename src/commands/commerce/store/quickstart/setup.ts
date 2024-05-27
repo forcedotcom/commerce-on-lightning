@@ -255,7 +255,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         const bundleDirectory = path.join(this.storeDir, 'experience-bundle-package');
         shell(
             appendCommonFlags(
-                `sf project retrieve start --target-metadata-dir --target-org "${this.org.getUsername()}" --retrievetargetdir "${bundleDirectory}" --unpackaged "${PACKAGE_RETRIEVE(
+                `sf project retrieve start  --target-org "${this.org.getUsername()}" --target-metadata-dir "${bundleDirectory}" --manifest "${PACKAGE_RETRIEVE(
                     this.storeDir
                 )}"`,
                 this.flags,
@@ -349,7 +349,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
                     msgs.getMessage('quickstart.setup.errorRegApexClassForIntegrationsInfo', [
                         apexClassName,
                         'run sf commerce:examples:convert',
-                        'sf project deploy start --forceoverwrite',
+                        'sf project deploy start --ignore-conflicts',
                     ])
                 )
             );
@@ -759,7 +759,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
 
         shellJsonSfdx(
             appendCommonFlags(
-                `sf project deploy start -o "${this.org.getUsername()}" -g --metadata-dir='${constructedToDeployPath}' -w 60 --verbose --single-package`,
+                `sf project deploy start -o ${this.org.getUsername()} -g --metadata-dir='${constructedToDeployPath}' -w 60 --verbose --single-package`,
                 this.flags,
                 this.logger
             )
@@ -953,7 +953,7 @@ export class StoreQuickstartSetup extends SfdxCommand {
         shell(`sf project convert mdapi --root-dir "${pathToGuestProfile}" --output-dir "${tmpDirName}"`);
         shell(
             appendCommonFlags(
-                `sf project deploy start --sourcepath "${tmpDirName}" --target-org "${this.org.getUsername()}"`,
+                `sf project deploy start --source-dir "${tmpDirName}" --target-org "${this.org.getUsername()}"`,
                 this.flags,
                 this.logger
             )

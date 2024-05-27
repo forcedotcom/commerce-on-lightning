@@ -48,7 +48,7 @@ export function forceDataRecordCreate(
     logger: Logger,
     stdio: StdioOptions = null
 ) {
-    const u = user ? `-u "${user}"` : '';
+    const u = user ? `--target-org "${user}"` : '';
     try {
         return shellJsonSfdx(
             appendCommonFlags(
