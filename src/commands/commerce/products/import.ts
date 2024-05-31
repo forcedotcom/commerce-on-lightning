@@ -85,7 +85,7 @@ export class ProductsImport extends SfdxCommand {
                 const productsFileCsv: string = this.flags['products-file-csv'] as string;
                 const username: string = this.org.getUsername();
                 // haven't updated the user flag u here to keep a track of replacing this with sf command
-                const command = `sfdx shane:data:file:upload -f ${productsFileCsv} -u ${username} --json`;
+                const command = `sf data create file -f ${productsFileCsv} --target-org ${username} --json`;
 
                 const res = shellJsonSfdx<ImportResult>(command);
 

@@ -8,7 +8,7 @@ It will create one [Fulfillment Order](https://help.salesforce.com/s/articleView
 
 ## Deploy
 
-This flow will be automatically deployed when using sfdx to set up a B2B or B2B2C store. You may also manually deploy the flow via Workbench or sfdx.
+This flow will be automatically deployed when using sf to set up a B2B or B2B2C store. You may also manually deploy the flow via Workbench or sf.
 After the flow is deployed, you may update the flow if needed and manually activate it.
 
 ### Deploy Using Workbench
@@ -27,10 +27,8 @@ Run `sfdx force:mdapi:deploy -d <path-to-this-directory> -w -1`
 
 ## Activate Split Order Flows
 
-Once flows are deployed please open Setup page and select Process Automation -> Flows. Please open each flow and activate it. 
+Once flows are deployed please open Setup page and select Process Automation -> Flows. Please open each flow and activate it.
+
 1. [Create OrderSummaryRoutingSchedule on OrderSummary event](flows/Create_OrderSummaryRoutingSchedule_on_OrderSummary_event.flow)
-2. [Create Fulfillment Orders on OrderSummaryRoutingSchedule](flows/Create_Fulfillment_Orders_on_OrderSummaryRoutingSchedule.flow) 
+2. [Create Fulfillment Orders on OrderSummaryRoutingSchedule](flows/Create_Fulfillment_Orders_on_OrderSummaryRoutingSchedule.flow)
 3. [Create Fulfillment Orders from Order Summary Subflow](flows/Create_Fulfillment_Orders_from_Order_Summary_Subflow.flow)
-
-
-

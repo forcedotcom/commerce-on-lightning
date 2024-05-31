@@ -18,11 +18,7 @@
     ```bash
     sfdx plugins:install @salesforce/commerce
     ```
-3. Install the shane-sfdx-plugins.
-    ```bash
-     sfdx plugins:install shane-sfdx-plugins
-    ```
-4. Verify that you installed Salesforce CLI correctly and see what version was installed.
+3. Verify that you installed Salesforce CLI correctly and see what version was installed.
 
     ```bash
     sfdx -v
@@ -31,19 +27,16 @@
     sfdx-cli/7.182.1 darwin-arm64 node-v16.17.1
     ```
 
-5. Verify that you successfully installed the required plugins and see what versions were installed.
+4. Verify that you successfully installed the required plugins and see what versions were installed.
 
     ```bash
     sfdx plugins
 
     # sample output
     @salesforce/commerce 242.0.26
-    shane-sfdx-plugins 4.43.0
-    ├─ @mshanemc/sfdx-sosl 1.1.0
-    └─ @mshanemc/plugin-streaming 1.1.7
     ```
 
-6. Authorize your org for use with Salesforce CLI.
+5. Authorize your org for use with Salesforce CLI.
 
     ```bash
     sfdx force:auth:web:login -r <<INSTANCE_URL>> -a <<ORG_ALIAS>>
@@ -56,7 +49,7 @@
     # sfdx force:auth:web:login -r https://login.test1.pc-rnd.salesforce.com -i XXXXX -a mydevhub
     ```
 
-7. Create a scratch org.
+6. Create a scratch org.
 
     **Note:** By default, new scratch orgs contain 1 administrator user with no password. To generate a password, see [Generate or Change a Password for a Scratch Org User](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_scratch_orgs_passwd.htm).
 
@@ -68,7 +61,7 @@
     # sfdx commerce:scratchorg:create -u demo_org_1@1commerce.com -a demo_org_1 -v devhubtest1sdb3@mydevhub.com -w 15 --json
     ```
 
-8. Create a B2B Aura store.
+7. Create a B2B Aura store.
 
     ```bash
     sfdx commerce:store:create -t '<<TEMPLATE_NAME>>' -n <<STORE_NAME>> -o b2b -b <<BUYER_USER_EMAIL>> -u <<ORG_USERNAME>> -v <<DEVHUB_USERNAME>> --apiversion=<<API_VERSION>>
@@ -78,7 +71,7 @@
     # sfdx commerce:store:create -t 'B2B Commerce (Aura)' -n b2bstore01 -o b2b -b b2b_aura_buyer@1commerce.com -u demo_org_1@1commerce.com -v devhubtest1sdb3@mydevhub.com --apiversion=57.0
     ```
 
-9. Create a B2B LWR store.
+8. Create a B2B LWR store.
 
     ```bash
     sfdx commerce:store:create -n <<STORE_NAME>> -o b2b -b <<BUYER_USER_EMAIL>> -u <<ORG_USERNAME>> -v <<DEVHUB_USERNAME>> --apiversion=<<API_VERSION>>
@@ -87,7 +80,7 @@
     # sfdx commerce:store:create -n b2bstore02 -o b2b -b b2b_buyer@1commerce.com -u demo_org_1@1commerce.com -v devhubtest1sdb3@mydevhub.com --apiversion=57.0
     ```
 
-10. Create a B2C LWR store.
+9. Create a B2C LWR store.
 
     ```bash
     sfdx commerce:store:create -n <<STORE_NAME>> -o b2c -b <<BUYER_USER_EMAIL>> -u <<ORG_USERNAME>> -v <<DEVHUB_USERNAME>> --apiversion=<<API_VERSION>>
