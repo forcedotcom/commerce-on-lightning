@@ -128,7 +128,10 @@ export async function setApiVersion(org: Org, flags: OutputFlags<any>): Promise<
     } else {
         apiVersion = await org.retrieveMaxApiVersion();
     }
-    apiVersion = '60.0'; // remove this after e2e testing
+    if (apiVersion === '62.0') {
+        apiVersion = '60.0'; // remove this after e2e testing
+    }
+
     flags.apiversion = apiVersion;
 }
 
