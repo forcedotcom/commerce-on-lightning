@@ -20,10 +20,9 @@ jobs:
                   node-version: '20'
             - name: Setup SF and yarn
               run: |
-                  echo 'y' | npm install @salesforce/cli --global 
+                  echo 'y' | npm install @salesforce/cli@2.43.7 --global 
                   npm install --global yarn
                   sf --version
-                  echo 'y' | sf plugins install shane-sfdx-plugins
             - name: Build the plugin
               run: |
                   yarn install && yarn build

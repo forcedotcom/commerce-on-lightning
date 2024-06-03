@@ -29,7 +29,7 @@ export const forceDataSoql = (
     flags: OutputFlags<any>,
     logger: Logger
 ): Result<QueryResult> => {
-    const u = user ? `-u "${user}"` : ''; // TODO should i do something here if there are no results to save on further checking in the code?
+    const u = user ? `--target-org "${user}"` : ''; // TODO should i do something here if there are no results to save on further checking in the code?
     return shellJsonSfdx<QueryResult>(appendCommonFlags(`sf data query ${u} --query "${query}" --json`, flags, logger));
 }; // TODO make this into a class that returns null for .result.records[0].Id; if there are no results this will prevent all null pointers
 /* eslint-disable */
@@ -89,7 +89,7 @@ export function forceDataRecordUpdate(
     logger: Logger,
     stdio: StdioOptions = 'inherit'
 ) {
-    const u = user ? `-u "${user}"` : '';
+    const u = user ? `--target-org "${user}"` : '';
     return shellJsonSfdx(
         appendCommonFlags(
             `sf data update record ${u} --sobject "${service}" --values "${value}" --where "${w}" --json`,
@@ -114,7 +114,7 @@ export function forceDataRecordDelete(
     logger: Logger,
     stdio: StdioOptions = 'inherit'
 ) {
-    const u = user ? `-u "${user}"` : '';
+    const u = user ? `--target-org "${user}"` : '';
     return shellJsonSfdx(
         appendCommonFlags(
             `sf data delete record ${u} --sobject "${service}" --record-id "${value}" --json`,
