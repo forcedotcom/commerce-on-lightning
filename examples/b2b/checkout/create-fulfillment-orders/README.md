@@ -21,9 +21,9 @@ After the flow is deployed, you may update the flow if needed and manually activ
 5.  Click **Next**.
 6.  Click **Deploy**.
 
-### Deploy Using sfdx
+### Deploy Using sf
 
-Run `sfdx force:mdapi:deploy -d <path-to-this-directory> -w -1`
+Run `sf project deploy start --metadata-dir <path-to-this-directory> -w -1`
 
 ## Activate Split Order Flows
 

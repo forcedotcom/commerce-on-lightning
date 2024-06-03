@@ -18,18 +18,8 @@ This plugin is used to create and setup either a B2B or a B2C store with data wi
 
 We always recommend using the latest version of these commands, however, you can install a specific version or tag if needed.
 
--   [commerce-on-lightning](https://github.com/forcedotcom/commerce-on-lightning) - @salesforce/commerce <---- THIS PLUGIN
-    -   create stores
-    -   install command: `sf plugins:install @salesforce/commerce`
-    -   install specific version:`sf plugins:install @salesforce/commerce@242.0.26`
-
-#### Plugin Dependencies
-
-1. [shane-sfdx-plugins](https://github.com/mshanemc/shane-sfdx-plugins) - shane-sfdx-plugins
-    - public plugin for imports
-    - install command: `sfdx plugins:install shane-sfdx-plugins`
-
-==============
+-   [commerce-on-lightning](https://github.com/forcedotcom/commerce-on-lightning) - @salesforce/commerce <---- THIS PLUGIN - create stores - install command: `sf plugins:install @salesforce/commerce` - install specific version:`sf plugins:install @salesforce/commerce@242.0.26`
+    ==============
 
 -   [Introduction](#introduction)
 -   [Usage](#usage)
@@ -76,9 +66,6 @@ USAGE
 
 ```bash
 sf plugins:install @salesforce/commerce
-
-# install dependencies
-sfdx plugins:install shane-sfdx-plugins
 ```
 
 <!-- installstop -->
@@ -117,7 +104,7 @@ purposes as you can add this command to an IDE.
 There should be no differences when running via the Salesforce CLI or using the local run file. However, it can be useful to link the plugin to do some additional testing or run your commands from anywhere on your machine.
 
 ```bash
-# Link your plugin to the sfdx cli
+# Link your plugin to the sf cli
 sf plugins:link .
 # To verify
 sf plugins
@@ -146,7 +133,7 @@ sf plugins
 
 ## `sf commerce:examples:convert -f <filepath> -n <string> [-d <string>] [-p <string>] [-o <string>] [-y] [--json] [--loglevel trace|debug|info|warn|error|fatal|TRACE|DEBUG|INFO|WARN|ERROR|FATAL]`
 
-Convert repo examples to sf scratch org
+Convert repo examples to SFDX scratch org
 
 ```
 USAGE

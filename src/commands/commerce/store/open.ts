@@ -24,7 +24,7 @@ export class StoreOpen extends SfdxCommand {
     public static requiresUsername = true;
     public static readonly supportsDevhubUsername = true;
     public static description = messages.getMessage('view.cmdDescription');
-    public static examples = [`sf ${CMD} --store-name test-store`, `sfdx ${CMD} --all`];
+    public static examples = [`sf ${CMD} --store-name test-store`, `sf ${CMD} --all`];
     protected static flagsConfig = filterFlags(['store-name', 'all'], allFlags);
 
     public org: Org;

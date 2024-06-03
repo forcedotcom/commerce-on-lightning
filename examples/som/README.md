@@ -18,7 +18,7 @@ _Note:_ The Cancel, Discount and Return an Item flows are cloned from the defaul
 
 1. Set up order management flows and actions.
     ```bash
-    sfdx commerce:ordermanagement:quickstart:setup -u <<ORG_USERNAME>> --json
+    sf commerce:ordermanagement:quickstart:setup -u <<ORG_USERNAME>> --json
     ```
 2. Add an Actions & Recommendation Deployment to the Order Summary page. You need an Order Summary record for the following steps. Use commerce store to submit an order.
     1. Navigate to the Order Management application.
