@@ -26,7 +26,7 @@ export class ExamplesConvert extends SfdxCommand {
     // TODO fix this to use store-def.json file
     public static description = messages.getMessage('convert.cmdDescription');
 
-    public static examples = [`sfdx ${CMD} -f store-scratch-def.json`]; // TODO documentation including examples and descriptions
+    public static examples = [`sf ${CMD} -f store-scratch-def.json`]; // TODO documentation including examples and descriptions
     protected static flagsConfig = {
         definitionfile: flags.filepath({
             char: 'f',
@@ -75,7 +75,7 @@ export class ExamplesConvert extends SfdxCommand {
         if (!this.flags.sourcepath && this.flags['examples-convert'])
             this.flags.sourcepath = this.flags['examples-convert'] as string;
         if (this.flags.sourcepath)
-            // if you pass -v meta path to convert then don't read in the config file, basically override config file
+            // if you pass --target-dev-hub meta path to convert then don't read in the config file, basically override config file
             this.convert(this.flags.sourcepath);
         else if (paths) this.convert(paths);
         else
@@ -85,7 +85,7 @@ export class ExamplesConvert extends SfdxCommand {
                     .split('\n')
                     .filter((l) => l && !l.startsWith('#'))
             );
-        // this command is required to run from within an sfdx project if running from ide
+        // this command is required to run from within an sf project if running from ide
         await renameRecursive(
             [{ name: 'InsertStoreNameHere', value: this.flags['store-name'] as string }],
             // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
@@ -110,7 +110,12 @@ export class ExamplesConvert extends SfdxCommand {
     private convert(r: string[]): void {
         r.map((l) => l.replace('$EXAMPLE_DIR', EXAMPLE_DIR).replace('~', os.homedir())).forEach((dir) => {
             shell(`cd ${this.flags.outputdir as string}`);
-            shell(`sfdx force:mdapi:convert -r ${dir} -d ${path.join(this.flags.outputdir as string, 'force-app')}`);
+            shell(
+                `sf project convert mdapi --root-dir ${dir} --output-dir ${path.join(
+                    this.flags.outputdir as string,
+                    'force-app'
+                )}`
+            );
         });
     }
 }

@@ -29,7 +29,7 @@ const msgs = Messages.loadMessages('@salesforce/commerce', TOPIC);
 export class ScratchOrgCreate extends SfdxCommand {
     public static readonly requiresDevhubUsername = true;
     public static description = msgs.getMessage('create.cmdDescription');
-    public static examples = [`sfdx ${CMD} --username demo@1commerce.com --targetdevhubusername ceo@mydevhub.com`];
+    public static examples = [`sf ${CMD} --username demo@1commerce.com --targetdevhubusername ceo@mydevhub.com`];
 
     protected static flagsConfig = {
         username: flags.string({
@@ -70,7 +70,7 @@ export class ScratchOrgCreate extends SfdxCommand {
     public async run(): Promise<AnyJson> {
         await setApiVersion(this.hubOrg, this.flags);
         /*
-        Base class reads the tagetdevhubusername or -v arg. if not provided it will use whatever is set for defaultdevhubusername config parameter
+        Base class reads the tagetdevhubusername or --target-dev-hub arg. if not provided it will use whatever is set for defaultdevhubusername config parameter
          */
         this.devhubUsername = this.hubOrg.getUsername();
         await this.copyConfigFiles();
@@ -107,18 +107,17 @@ export class ScratchOrgCreate extends SfdxCommand {
         this.ux.log(`${CONFIG_DIR}/${orgType}-project-scratch-def.json`);
         this.ux.startSpinner(msgs.getMessage('create.creatingNewScratchOrg'));
         try {
-            this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:org:create']));
+            this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sf org create scratch']));
             mkdirSync((this.devHubDir ? this.devHubDir : BASE_DIR) + '/force-app');
             const cmd = appendCommonFlags(
-                `sfdx force:org:create \
---targetdevhubusername="${this.devhubUsername}" \
---definitionfile=${CONFIG_DIR}/${orgType}-project-scratch-def.json \
---setalias="${this.flags.alias as string}" \
---durationdays=${this.flags.duration as number} \
---wait=${this.flags.wait as number} \
-username="${this.flags.username as string}" \
---setdefaultusername \
---json`,
+                `sf org create scratch \
+                --target-dev-hub="${this.devhubUsername}" \
+                --definition-file=${CONFIG_DIR}/${orgType}-project-scratch-def.json \
+                --alias="${this.flags.alias as string}" \
+                --duration-days=${this.flags.duration as number} \
+                --wait=${this.flags.wait as number} \
+                --username="${this.flags.username as string}" \
+                --json`,
                 this.flags,
                 this.logger
             );

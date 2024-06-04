@@ -14,11 +14,11 @@ This repository is an SFDX project that you can deploy directly to an org and mo
 
 1. If you haven't already, clone this repository.
 1. If you haven't already, create a B2B Commerce org.
-   Optional: Use the included [project-scratch-def.json](config/project-scratch-def.json), e.g. `sfdx force:org:create -f ./config/project-scratch-def.json`
-1. Push the source code in this repository to the new org, e.g. `sfdx force:source:push -u <org username>`.
+   Optional: Use the included [project-scratch-def.json](config/project-scratch-def.json), e.g. `sf org create scratch -f ./config/project-scratch-def.json`
+1. Push the source code in this repository to the new org, e.g. `sf project deploy start -u <org username>`.
 1. Grant permissions to the APEX class (do this only once):
 
-    1. Login to the org, e.g., `sfdx force:org:open -u <org username>`.
+    1. Login to the org, e.g., `sf org open -o <org username>`.
     1. Go to Setup -> Custom Code -> APEX Classes.
     1. On the B2BGetInfo class, click "Security".
     1. Assign the buyer user profile(s) or other user profiles that will use your components.

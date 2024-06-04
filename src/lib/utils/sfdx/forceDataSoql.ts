@@ -29,10 +29,8 @@ export const forceDataSoql = (
     flags: OutputFlags<any>,
     logger: Logger
 ): Result<QueryResult> => {
-    const u = user ? `-u "${user}"` : ''; // TODO should i do something here if there are no results to save on further checking in the code?
-    return shellJsonSfdx<QueryResult>(
-        appendCommonFlags(`sfdx force:data:soql:query ${u} -q "${query}" --json`, flags, logger)
-    );
+    const u = user ? `--target-org "${user}"` : ''; // TODO should i do something here if there are no results to save on further checking in the code?
+    return shellJsonSfdx<QueryResult>(appendCommonFlags(`sf data query ${u} --query "${query}" --json`, flags, logger));
 }; // TODO make this into a class that returns null for .result.records[0].Id; if there are no results this will prevent all null pointers
 /* eslint-disable */
 /**
@@ -50,10 +48,14 @@ export function forceDataRecordCreate(
     logger: Logger,
     stdio: StdioOptions = null
 ) {
-    const u = user ? `-u "${user}"` : '';
+    const u = user ? `--target-org "${user}"` : '';
     try {
         return shellJsonSfdx(
-            appendCommonFlags(`sfdx force:data:record:create ${u} -s "${service}" -v "${value}" --json`, flags, logger),
+            appendCommonFlags(
+                `sf data create record ${u} --sobject "${service}" --values "${value}" --json`,
+                flags,
+                logger
+            ),
             stdio
         );
     } catch (e) {
@@ -87,10 +89,10 @@ export function forceDataRecordUpdate(
     logger: Logger,
     stdio: StdioOptions = 'inherit'
 ) {
-    const u = user ? `-u "${user}"` : '';
+    const u = user ? `--target-org "${user}"` : '';
     return shellJsonSfdx(
         appendCommonFlags(
-            `sfdx force:data:record:update ${u} -s "${service}" -v "${value}" -w "${w}" --json`,
+            `sf data update record ${u} --sobject "${service}" --values "${value}" --where "${w}" --json`,
             flags,
             logger
         ),
@@ -112,9 +114,13 @@ export function forceDataRecordDelete(
     logger: Logger,
     stdio: StdioOptions = 'inherit'
 ) {
-    const u = user ? `-u "${user}"` : '';
+    const u = user ? `--target-org "${user}"` : '';
     return shellJsonSfdx(
-        appendCommonFlags(`sfdx force:data:record:delete ${u} -s "${service}" -i "${value}" --json`, flags, logger),
+        appendCommonFlags(
+            `sf data delete record ${u} --sobject "${service}" --record-id "${value}" --json`,
+            flags,
+            logger
+        ),
         stdio
     );
 }

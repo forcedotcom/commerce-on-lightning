@@ -13,7 +13,7 @@ export default class SearchIndex extends SfdxCommand {
     public static description = 'Start search indexing for a given webstore';
 
     public static examples = [
-        `sfdx commerce:store:search:start -n storeName
+        `sf commerce:store:search:start -n storeName
         // Finds a store and indexes it
         `,
     ];
