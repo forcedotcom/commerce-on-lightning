@@ -3,7 +3,14 @@
     "country": "us",
     "language": "en_US",
     "edition": "Developer",
-    "features": ["Communities", "B2BCommerce", "B2BAuraTemplateEnabled", "OrderManagement", "EnableSetPasswordInApi"],
+    "features": [
+        "Communities",
+        "B2BCommerce",
+        "B2BAuraTemplateEnabled",
+        "OrderManagement",
+        "EnableSetPasswordInApi",
+        "CommerceConsoleAppEnabled"
+    ],
     "settings": {
         "lightningExperienceSettings": {
             "enableS1DesktopEnabled": true
