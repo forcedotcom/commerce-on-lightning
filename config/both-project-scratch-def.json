@@ -11,7 +11,8 @@
         "PersonAccounts",
         "OrderManagement",
         "EnableSetPasswordInApi",
-        "Multicurrency"
+        "Multicurrency",
+        "CommerceConsoleAppEnabled"
     ],
     "settings": {
         "lightningExperienceSettings": {
