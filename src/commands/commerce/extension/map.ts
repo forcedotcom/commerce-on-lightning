@@ -22,8 +22,8 @@ export class MapExtension extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static description = msgs.getMessage('extension.map.cmdDescription');
     public static example = [
-        `sfdx ${CMD} --registered-extension-name test-extension-name --store-name test-store-name `,
-        `sfdx ${CMD} --registered-extension-name test-extension-name --store-id test-store-id `,
+        `sf ${CMD} --registered-extension-name test-extension-name --store-name test-store-name `,
+        `sf ${CMD} --registered-extension-name test-extension-name --store-id test-store-id `,
     ];
     public static flagsConfig = {
         'registered-extension-name': flags.string({

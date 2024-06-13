@@ -49,23 +49,31 @@ export const shell = (
     envars: Record<string, string> = {}
 ): ShellOutput => {
     let res: string;
+    let resBuffer: Buffer;
     let e;
     let j = '';
     Object.assign(envars, envs);
     try {
-        res = execSync(cmd, { stdio: _stdio, cwd: _cwd, env: envars, shell: process.platform === 'win32' ? 'powershell.exe' : '/bin/sh' }).toString();
-        if (res) res = cleanConsoleCharacters(res);
-        else return;
-        try {
-            j = JSON.parse(res);
-        } catch (ee) {
-            /* DON't Care maybe it's not a json object*/
+        resBuffer = execSync(cmd, {
+            stdio: _stdio,
+            cwd: _cwd,
+            env: envars,
+            shell: process.platform === 'win32' ? 'powershell.exe' : '/bin/sh',
+        });
+        if (!resBuffer) {
+            return;
         }
+        res = resBuffer.toString();
+        res = cleanConsoleCharacters(res);
+        j = JSON.parse(res);
     } catch (error) {
-        e = error;
-        e.stdout = e.stdout ? cleanConsoleCharacters(e.stdout.toString()) : e.stdout;
-        e.stderr = e.stderr ? cleanConsoleCharacters(e.stderr.toString()) : e.stderr;
-        e.output = e.output ? e.output.map((v) => (v ? cleanConsoleCharacters(v.toString()) : v)) : e.output;
+        /* SyntaxError signifies JSON parsing was not successful. Do nothing if it fails since it's not a json object */
+        if (!(error instanceof SyntaxError)) {
+            e = error;
+            e.stdout = e.stdout ? cleanConsoleCharacters(e.stdout.toString()) : e.stdout;
+            e.stderr = e.stderr ? cleanConsoleCharacters(e.stderr.toString()) : e.stderr;
+            e.output = e.output ? e.output.map((v) => (v ? cleanConsoleCharacters(v.toString()) : v)) : e.output;
+        }
     }
     return {
         res,
@@ -87,10 +95,10 @@ const cleanConsoleCharacters = (res: string): string =>
     (res || '').replace(/[\u001b\u009b][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]/g, '');
 
 /**
- * Use this to run sfdx shell commands with json output ie: --json
+ * Use this to run sf shell commands with json output ie: --json
  * This will check for error and throw sfdxerror or return the json object
  *
- * @param cmd sfdx command to run, if you don't pass --json then it'll put it in there for you
+ * @param cmd sf command to run, if you don't pass --json then it'll put it in there for you
  * @param stdio if you don't want the result and for it to run without throwing exception then set studio to "inherit"
  * @param cwd
  * @param envars

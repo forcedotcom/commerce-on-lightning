@@ -17,9 +17,9 @@ const msgs = Messages.loadMessages('@salesforce/commerce', 'commerce');
 export class FilesCopy extends SfdxCommand {
     public static description = msgs.getMessage('files.cmdDescription', [BASE_DIR]);
     public static examples = [
-        `sfdx ${CMD} -y --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt" --dirstocopy "dir1,dir2,dir3"`,
-        `sfdx ${CMD} --prompt --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt" --dirstocopy "dir1,dir2,dir3"`,
-        `sfdx ${CMD} --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt" --dirstocopy "dir1,dir2,dir3"`,
+        `sf ${CMD} -y --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt" --dirstocopy "dir1,dir2,dir3"`,
+        `sf ${CMD} --prompt --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt" --dirstocopy "dir1,dir2,dir3"`,
+        `sf ${CMD} --copySourcePath "~/myexamplefilesdirectory" --filestocopy "file1.txt,file2.txt" --dirstocopy "dir1,dir2,dir3"`,
     ];
     public static varargs = {
         required: false,

@@ -7,7 +7,7 @@
 import { shellJsonSfdx } from '../shell';
 import { Org, OrgListResult, Result } from '../jsonUtils';
 
-export const forceOrgList = (): Result<OrgListResult> => shellJsonSfdx('sfdx force:org:list --json');
+export const forceOrgList = (): Result<OrgListResult> => shellJsonSfdx('sf org list --json');
 const getOrg = (resultType: string, by: string, value: string): Org => {
     let orgInfo: Result<OrgListResult>;
     try {

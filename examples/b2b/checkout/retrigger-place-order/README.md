@@ -8,7 +8,7 @@ The implementation provided in this directory contains flow metadata files that 
 
 ## Deploy
 
-This flow will be automatically deployed when using sfdx to set up a B2B or B2B2C store. You may also manually deploy the flow via Workbench or sfdx.
+This flow will be automatically deployed when using sf to set up a B2B or B2B2C store. You may also manually deploy the flow via Workbench or sf.
 After the flow is deployed, you may update the flow if needed and manually activate it.
 
 ### Deploy Using Workbench
@@ -21,6 +21,6 @@ After the flow is deployed, you may update the flow if needed and manually activ
 5.  Click **Next**.
 6.  Click **Deploy**.
 
-### Deploy Using sfdx
+### Deploy Using sf
 
-Run `sfdx force:mdapi:deploy -d <path-to-this-directory> -w -1`
+Run `sf project deploy start --metadata-dir <path-to-this-directory> -w -1`

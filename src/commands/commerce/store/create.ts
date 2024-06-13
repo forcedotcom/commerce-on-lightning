@@ -66,7 +66,7 @@ export class StoreCreate extends SfdxCommand {
     }
 
     public static description = msgs.getMessage('create.cmdDescription');
-    public static examples = [`sfdx ${CMD} --store-name test-store`];
+    public static examples = [`sf ${CMD} --store-name test-store`];
     protected static flagsConfig = {
         'store-name': flags.string({
             char: 'n',
@@ -134,7 +134,7 @@ export class StoreCreate extends SfdxCommand {
                 if (cnt > 0) {
                     ux.log(chalk.green(msgs.getMessage('create.automaticallySettingPermFailedPleaseDoItManually')));
                     shell(
-                        `sfdx force:org:open -u "${statusFileManager.scratchOrgAdminUsername}" -p /qa/hoseMyOrgPleaseSir.jsp`
+                        `sf org open --target-org "${statusFileManager.scratchOrgAdminUsername}" --path /qa/hoseMyOrgPleaseSir.jsp`
                     );
                     ux.log(chalk.green(msgs.getMessage('create.pressEnterWhenPermIsSet')));
                     await ux.prompt(msgs.getMessage('create.enter'), { required: false });
@@ -203,15 +203,7 @@ export class StoreCreate extends SfdxCommand {
         }
         try {
             const output = shellJsonSfdx(
-                appendCommonFlags(
-                    `sfdx force:user:display -u "${scratchOrgBuyerUsername}" ${
-                        statusFileManager.devhubAdminUsername
-                            ? '-v "' + statusFileManager.devhubAdminUsername + '"'
-                            : ''
-                    } --json`,
-                    cmdFlags,
-                    logger
-                )
+                appendCommonFlags(`sf org display user -o "${scratchOrgBuyerUsername}" --json`, cmdFlags, logger)
             );
             console.log(JSON.stringify(output));
             await statusFileManager.setValue('userInfo', output.result);
@@ -345,17 +337,18 @@ export class StoreCreate extends SfdxCommand {
             .build();
         this.ux.startSpinner(msgs.getMessage('create.pushingStoreSources'));
         try {
-            this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sfdx force:source:push']));
+            this.ux.setSpinnerStatus(msgs.getMessage('create.using', ['sf project deploy start']));
+
             shellJsonSfdx(
                 appendCommonFlags(
-                    `cd ${scratchOrgDir}; sfdx force:source:tracking:clear -u "${this.org.getUsername()}" -p`,
+                    `cd ${scratchOrgDir}; sf project delete tracking --target-org "${this.org.getUsername()}" --no-prompt`,
                     this.flags,
                     this.logger
                 )
             );
             shellJsonSfdx(
                 appendCommonFlags(
-                    `cd ${scratchOrgDir}; sfdx force:source:push -f -u "${this.org.getUsername()}"`,
+                    `cd ${scratchOrgDir}; sf project deploy start --ignore-conflicts --target-org "${this.org.getUsername()}"`,
                     this.flags,
                     this.logger
                 )
@@ -364,10 +357,10 @@ export class StoreCreate extends SfdxCommand {
             console.error(e);
             if (e.message && JSON.stringify(e.message).indexOf(msgs.getMessage('create.checkInvalidSession')) >= 0) {
                 this.ux.log(msgs.getMessage('create.preMessageOpeningPageSessinonRefresh', [e.message]));
-                shell('sfdx force:org:open -u ' + this.org.getUsername()); // todo might puppet this
+                shell('sf org open --target-org ' + this.org.getUsername()); // todo might puppet this
                 shellJsonSfdx(
                     appendCommonFlags(
-                        `cd ${scratchOrgDir}; sfdx force:source:push -f -u "${this.org.getUsername()}"`,
+                        `cd ${scratchOrgDir}; sf project deploy start --ignore-conflicts --target-org "${this.org.getUsername()}"`,
                         this.flags,
                         this.logger
                     )
@@ -411,40 +404,49 @@ export class StoreCreate extends SfdxCommand {
         this.ux.log(msgs.getMessage('create.assigningShopperProfileToBuyer'));
         shell(
             appendCommonFlags(
-                'sfdx force:user:permset:assign --permsetname CommerceUser ' +
-                    `--targetusername "${this.org.getUsername()}"  --onbehalfof "${
-                        this.flags['buyer-username'] as string
-                    }"`,
+                `sf org assign permset -n CommerceUser -o "${this.org.getUsername()}"  -b "${
+                    this.flags['buyer-username'] as string
+                }"`,
                 this.flags,
                 this.logger
             )
         );
         this.ux.log(msgs.getMessage('create.changingPasswordForBuyer'));
-        try {
-            shellJsonSfdx(
-                appendCommonFlags(
-                    `sfdx force:user:password:generate -u "${this.org.getUsername()}" -o "${
-                        this.flags['buyer-username'] as string
-                        // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-                    }" -v "${this.devhubUsername}"`,
-                    this.flags,
-                    this.logger
-                )
-            );
-        } catch (e) {
-            if (e.message.indexOf('INSUFFICIENT_ACCESS') < 0) {
-                await this.statusFileManager.setValue('userInfo', JSON.parse(JSON.stringify(e, replaceErrors)));
-                throw e;
-            }
-            this.ux.log(chalk.red.bold(JSON.parse(e.message).message));
-        }
-        userInfo = await StoreCreate.getUserInfo(
+        let buyerUserProperties = await StoreCreate.getUserInfo(
             this.statusFileManager,
-            this.flags['buyer-username'],
+            this.flags['buyer-username'] as string,
             this.flags,
             this.logger
         );
-        await this.statusFileManager.setValue('userInfo', userInfo);
+
+        if (buyerUserProperties.password) {
+            this.ux.log(msgs.getMessage('create.buyerUserHasPassword'));
+        } else {
+            try {
+                shellJsonSfdx(
+                    appendCommonFlags(
+                        `sf org generate password -o "${this.org.getUsername()}" -b "${
+                            this.flags['buyer-username'] as string
+                        }"`,
+                        this.flags,
+                        this.logger
+                    )
+                );
+            } catch (e) {
+                if (e.message.indexOf('INSUFFICIENT_ACCESS') < 0) {
+                    await this.statusFileManager.setValue('userInfo', JSON.parse(JSON.stringify(e, replaceErrors)));
+                    throw e;
+                }
+                this.ux.log(chalk.red.bold(JSON.parse(e.message).message));
+            }
+            buyerUserProperties = await StoreCreate.getUserInfo(
+                this.statusFileManager,
+                this.flags['buyer-username'],
+                this.flags,
+                this.logger
+            );
+        }
+        await this.statusFileManager.setValue('userInfo', buyerUserProperties);
     }
 
     private async createSearchIndex(): Promise<void> {

@@ -14,7 +14,7 @@
     "create": {
         "cmdDescription": "Comprehensive create and set up a store.  This will create your community/store push store sources, create buyer user, import products, create search index.",
         "webStoreNotSupported": "'WebStore' is not supported",
-        "automaticallySettingPermFailedPleaseDoItManually": "Automatically setting perm failed, please do it manually. \nIn the opened page, search for B2CLiteAccess and CommerceEnabled, and make sure they are checked. If not, check them and click Save\nIf the page asks for a username/password, the org is still being created. If so, wait five minutes then re-run the command below until sfdx logs you in automatically.",
+        "automaticallySettingPermFailedPleaseDoItManually": "Automatically setting perm failed, please do it manually. \nIn the opened page, search for B2CLiteAccess and CommerceEnabled, and make sure they are checked. If not, check them and click Save\nIf the page asks for a username/password, the org is still being created. If so, wait five minutes then re-run the command below until sf logs you in automatically.",
         "pressEnterWhenPermIsSet": "Press [ENTER] when you've set the perm",
         "enter": "[ENTER]",
         "assumingYouSavedThePerm": "Assuming you saved the perm",
@@ -26,7 +26,7 @@
         "statusIndicatesCompletedSkipping": "Status file indicates this command is completed successfully, skipping",
         "messageIntentToCreateInfo": "Creates a new store in the org in which the admin is '%s'\nCreates a buyer account with the specified buyer account username '%s'\nThe template name is %s and the store name is %s\nAll usernames must to be lower case.",
         "errorNoScratchOrgExistsWithUsername": "No scratch org exists with username: ",
-        "removingSfdxAuthFile": "Removing %s sfdx authentication file...",
+        "removingSfdxAuthFile": "Removing %s sf authentication file...",
         "completedStep6": "Completed Step 6",
         "completedStep7": "Completed Step 7",
         "completedStep8": "Completed Step 8",
@@ -45,6 +45,7 @@
         "errorStoreQuickstartSetupFailed": "StoreQuickstartSetup failed",
         "assigningShopperProfileToBuyer": "Assigning Shopper profile to the buyer user",
         "changingPasswordForBuyer": "Changing password for the buyer user",
+        "buyerUserHasPassword": "The buyer user already has a password. You can check it via sf org display user.",
         "createSearchIndexInfo": "Creating search index",
         "configFileDescription": "The store config file. By default it will be either of ~/.commerce/config/b2c-store-scratch-def or ~/.commerce/config/b2b-store-scratch-def based on store type. Default store type is b2c.]",
         "storeTypeDescription": "The type of store you want to create"
@@ -109,7 +110,7 @@
             "publishingCommunityStep7": "7. Publishing the community."
         },
         "create": {
-            "cmdDescription": "Use this command to just create a community.  It will use sfdx force:community:create until a community is created or failed.",
+            "cmdDescription": "Use this command to just create a community.  It will use sf community create until a community is created or failed.",
             "creatingNewStoreInQueUpTo10Minutes": "Creating a new store, this may take up to 10 minutes until it's available.\n",
             "storeName": "Store name: %s\n",
             "communityTemplate": "Community Template: %s\n",

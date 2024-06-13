@@ -17,7 +17,7 @@ const msgs = Messages.loadMessages('@salesforce/commerce', 'store');
 
 export class getEPN extends SfdxCommand {
     public static readonly requiresUsername = true;
-    public static example = [`sfdx ${CMD}`];
+    public static example = [`sf ${CMD}`];
 
     public static description = msgs.getMessage('extension.getEPN.cmdDescription');
     public org: Org;

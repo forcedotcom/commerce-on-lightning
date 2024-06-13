@@ -29,7 +29,7 @@ export class RegisterExtension extends SfdxCommand {
     // Setting specific flags
     public static description = msgs.getMessage('extension.register.cmdDescription');
     public static example = [
-        `sfdx ${CMD} --registered-extension-name test-extension-name --extension-point-name test-epn --apex-class-name test-apex-class`,
+        `sf ${CMD} --registered-extension-name test-extension-name --extension-point-name test-epn --apex-class-name test-apex-class`,
     ];
     public static flagsConfig = {
         'registered-extension-name': flags.string({

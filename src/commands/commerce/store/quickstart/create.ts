@@ -23,7 +23,7 @@ export class StoreQuickstartCreate extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static description = msgs.getMessage('quickstart.create.cmdDescription');
 
-    public static examples = [`sfdx ${CMD} --templatename 'b2c-lite-storefront'`];
+    public static examples = [`sf ${CMD} --templatename 'b2c-lite-storefront'`];
     public static varargs = {
         required: false,
         validator: (name: string): void => {
@@ -66,17 +66,15 @@ export class StoreQuickstartCreate extends SfdxCommand {
         let output;
         const urlPathPrefix = ((this.flags['store-name'] as string) + unique).replace(/[\\W_]+/g, '');
         try {
-            this.ux.setSpinnerStatus(
-                msgs.getMessage('quickstart.create.creatingWith', ['sfdx force:community:create'])
-            );
+            this.ux.setSpinnerStatus(msgs.getMessage('quickstart.create.creatingWith', ['sf community create']));
             // TODO make urlpathprefix and description a vararg
             // TODO make a community create object to avoid any
             output = shellJsonSfdx(
                 appendCommonFlags(
-                    `sfdx force:community:create -u "${this.org.getUsername()}"` +
+                    `sf community create --target-org "${this.org.getUsername()}"` +
                         ` --name "${this.flags['store-name'] as string}" ` +
-                        `--templatename "${this.flags.templatename as string}" ` +
-                        `--urlpathprefix "${urlPathPrefix}" ` +
+                        `--template-name "${this.flags.templatename as string}" ` +
+                        `--url-path-prefix "${urlPathPrefix}" ` +
                         '--description "' + // TODO allow this to be optionaly passed in varargs along with above
                         msgs.getMessage('quickstart.create.storeCreatedByQuickStartScript', [
                             this.flags['store-name'],

@@ -25,7 +25,7 @@ export class OrderManagementQuickstartSetup extends SfdxCommand {
     public static readonly requiresUsername = true;
     public static description = msgs.getMessage('quickstart.setup.cmdDescription');
 
-    public static examples = [`sfdx ${CMD} `]; // TODO documentation including examples and descriptions
+    public static examples = [`sf ${CMD} `]; // TODO documentation including examples and descriptions
     protected static flagsConfig = {
         prompt: flags.boolean({
             char: 'y',
@@ -52,7 +52,7 @@ export class OrderManagementQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.deployFlowsToOrg'));
         let deployResult = shellJsonSfdx(
             appendCommonFlags(
-                `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${EXAMPLE_DIR}/som/ -w 1`,
+                `sf project deploy start --target-org "${this.org.getUsername()}" --metadata-dir ${EXAMPLE_DIR}/som/ --wait 1`,
                 this.flags,
                 this.logger
             )
@@ -66,7 +66,7 @@ export class OrderManagementQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.deployActionsToOrg'));
         deployResult = shellJsonSfdx(
             appendCommonFlags(
-                `sfdx force:mdapi:deploy -u "${this.org.getUsername()}" -d ${EXAMPLE_DIR}/som/actions/ -w 1`,
+                `sf project deploy start --target-org "${this.org.getUsername()}" --metadata-dir ${EXAMPLE_DIR}/som/actions/ --wait 1`,
                 this.flags,
                 this.logger
             )
@@ -78,7 +78,7 @@ export class OrderManagementQuickstartSetup extends SfdxCommand {
         this.ux.log(msgs.getMessage('quickstart.setup.addingLocations'));
         // get location types
         const cmd = appendCommonFlags(
-            `sfdx force:data:soql:query -u "${this.org.getUsername()}" -q "${QUERY_LOCATION_TYPES}"`,
+            `sf data query --target-org "${this.org.getUsername()}" --query "${QUERY_LOCATION_TYPES}"`,
             this.flags,
             this.logger
         );

@@ -5,5 +5,5 @@ Apex tests that use existing data in the org and verify that the Quick Start cre
 To be run after the full Quick Start execution with the command
 
 ```
-sfdx force:apex:test:run -y -r human
+sf apex run test -y -r human
 ```

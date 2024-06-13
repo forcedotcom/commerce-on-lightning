@@ -1,146 +1,148 @@
 {
-  "name": "@salesforce/commerce",
-  "version": "250.1.0",
-  "author": "CC Mostly Harmless",
-  "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
-  "dependencies": {
-    "@mshanemc/plugin-helpers": "^2.1.0",
-    "@oclif/command": "^1.8.22",
-    "@oclif/config": "^1.18.2",
-    "@oclif/errors": "^1",
-    "@salesforce/command": "^3.1.0",
-    "@salesforce/core": "^2.36.0",
-    "fast-xml-parser": "^4.2.5",
-    "string-argv": "^0.3.1",
-    "tslib": "^2.5.0",
-    "yaml": "^2.2.2"
-  },
-  "devDependencies": {
-    "@oclif/dev-cli": "^1",
-    "@oclif/plugin-command-snapshot": "^2.0.0",
-    "@salesforce/cli-plugins-testkit": "^0.0.25",
-    "@salesforce/dev-config": "^2.1.0",
-    "@salesforce/dev-scripts": "^3.1.0",
-    "@salesforce/plugin-command-reference": "^1.3.0",
-    "@salesforce/prettier-config": "^0.0.2",
-    "@salesforce/ts-sinon": "1.3.5",
-    "@types/jest": "^26.0.23",
-    "@typescript-eslint/eslint-plugin": "^4.2.0",
-    "@typescript-eslint/parser": "^4.2.0",
-    "chai": "^4.2.0",
-    "cz-conventional-changelog": "^3.3.0",
-    "eslint": "^6.8.0",
-    "eslint-config-prettier": "^6.11.0",
-    "eslint-config-salesforce": "^0.1.0",
-    "eslint-config-salesforce-license": "^0.1.0",
-    "eslint-config-salesforce-typescript": "^0.2.0",
-    "eslint-plugin-header": "^3.0.0",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-jsdoc": "^27.0.3",
-    "eslint-plugin-prettier": "^3.1.3",
-    "husky": "^7.0.4",
-    "lint-staged": "^11.0.0",
-    "mocha": "^8.3.0",
-    "nyc": "^15.1.0",
-    "prettier": "^2.0.5",
-    "pretty-quick": "^2.0.1",
-    "shx": "0.2.2",
-    "sinon": "^9.0.2",
-    "ts-jest": "^26.5.6",
-    "ts-node": "^8.10.2",
-    "typescript": "^4.1.3"
-  },
-  "config": {
-    "commitizen": {
-      "path": "cz-conventional-changelog"
-    }
-  },
-  "engines": {
-    "node": ">=12.0.0"
-  },
-  "engineStrict": true,
-  "files": [
-    "/lib",
-    "/messages",
-    "/examples",
-    "/json",
-    "/quickstart-config",
-    "/config",
-    "/npm-shrinkwrap.json",
-    "/oclif.manifest.json",
-    "/.oclif.manifest.json",
-    "/sfdx-project.json"
-  ],
-  "homepage": "https://github.com/forcedotcom/commerce-on-lightning",
-  "keywords": [
-    "force",
-    "salesforce",
-    "sfdx",
-    "salesforcedx",
-    "sfdx-plugin"
-  ],
-  "license": "BSD-3-Clause",
-  "oclif": {
-    "commands": "./lib/commands",
-    "bin": "sfdx",
-    "topics": {
-      "commerce": {
-        "description": "Commands for 1commerce developers.",
-        "subtopics": {
-          "devhub": {},
-          "examples": {},
-          "extension": {},
-          "files": {},
-          "open": {},
-          "payments": {},
-          "products": {},
-          "scratchorg": {},
-          "search": {},
-          "store": {
-            "subtopics": {
-              "view": {},
-              "quickstart": {}
-            }
-          },
-          "ordermanagement": {}
-        }
-      }
+    "name": "@salesforce/commerce",
+    "version": "252.0.0",
+    "author": "CC Mostly Harmless",
+    "bugs": "https://github.com/forcedotcom/commerce-on-lightning/issues",
+    "dependencies": {
+        "@mshanemc/plugin-helpers": "^2.1.0",
+        "@oclif/command": "^1.8.22",
+        "@oclif/config": "^1.18.2",
+        "@oclif/errors": "^1",
+        "@salesforce/command": "^3.1.0",
+        "@salesforce/core": "^2.36.0",
+        "@salesforce/sf-plugins-core": "^9.0.11",
+        "fast-xml-parser": "^4.2.5",
+        "string-argv": "^0.3.1",
+        "tslib": "^2.5.0",
+        "yaml": "^2.2.2"
     },
-    "devPlugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-command-snapshot",
-      "@salesforce/plugin-command-reference"
-    ]
-  },
-  "repository": "https://github.com/forcedotcom/commerce-on-lightning",
-  "scripts": {
-    "build": "sf-build",
-    "clean": "sf-clean",
-    "clean-all": "sf-clean all",
-    "clean:lib": "shx rm -rf lib && shx rm -rf coverage && shx rm -rf .nyc_output && shx rm -f oclif.manifest.json",
-    "compile": "sf-compile",
-    "docs": "sf-docs",
-    "format": "sf-format",
-    "lint": "sf-lint",
-    "manifest": "oclif-dev manifest",
-    "postpack": "shx rm -f oclif.manifest.json",
-    "postpublish": "yarn run clean; git push; git push --tags",
-    "posttest": "yarn lint && yarn test:deprecation-policy && yarn test:command-reference",
-    "precommit": "npm run clean && npm run build && npm run lint && npm run version",
-    "prepack": "sf-prepack",
-    "prepare": "node scripts/prepare.mjs",
-    "prepublishOnly": "yarn run build && oclif-dev manifest",
-    "pretest": "sf-compile-test",
-    "prettier": "prettier --write src/**/**/*.ts && prettier --write src/**/*.ts && prettier --write src/*.ts && prettier --write test/**/*.ts && prettier --write test/**/**/*.ts",
-    "preversion": "yarn run clean",
-    "snapshot:update": "./bin/run snapshot:generate",
-    "test": "sf-test",
-    "test:command-reference": "./bin/run commandreference:generate --erroronwarnings",
-    "test:deprecation-policy": "./bin/run snapshot:compare",
-    "test:nuts": "nyc mocha \"**/*.nut.ts\" --slow 4500 --timeout 600000 --parallel",
-    "version": "(oclif-dev readme && sed -i.bak -e \"s|$(echo $HOME)|~|g\" -e \"s|$(whoami)|\"\\$\\(whoami\\)\"|g\" README.md && git add README.md) || exit 0"
-  },
-  "publishConfig": {
-    "access": "public"
-  }
+    "devDependencies": {
+        "@oclif/dev-cli": "^1",
+        "@oclif/plugin-command-snapshot": "^2.0.0",
+        "@salesforce/cli-plugins-testkit": "^0.0.25",
+        "@salesforce/dev-config": "^2.1.0",
+        "@salesforce/dev-scripts": "^3.1.0",
+        "@salesforce/plugin-command-reference": "^1.3.0",
+        "@salesforce/prettier-config": "^0.0.2",
+        "@salesforce/ts-sinon": "1.3.5",
+        "@types/jest": "^26.0.23",
+        "@typescript-eslint/eslint-plugin": "^4.2.0",
+        "@typescript-eslint/parser": "^4.2.0",
+        "chai": "^4.2.0",
+        "cz-conventional-changelog": "^3.3.0",
+        "eslint": "^6.8.0",
+        "eslint-config-prettier": "^6.11.0",
+        "eslint-config-salesforce": "^0.1.0",
+        "eslint-config-salesforce-license": "^0.1.0",
+        "eslint-config-salesforce-typescript": "^0.2.0",
+        "eslint-plugin-header": "^3.0.0",
+        "eslint-plugin-import": "^2.20.2",
+        "eslint-plugin-jsdoc": "^27.0.3",
+        "eslint-plugin-prettier": "^3.1.3",
+        "eslint-plugin-sf-plugin": "^1.18.0",
+        "husky": "^7.0.4",
+        "lint-staged": "^11.0.0",
+        "mocha": "^8.3.0",
+        "nyc": "^15.1.0",
+        "prettier": "^2.0.5",
+        "pretty-quick": "^2.0.1",
+        "shx": "0.2.2",
+        "sinon": "^9.0.2",
+        "ts-jest": "^26.5.6",
+        "ts-node": "^8.10.2",
+        "typescript": "^4.1.3"
+    },
+    "config": {
+        "commitizen": {
+            "path": "cz-conventional-changelog"
+        }
+    },
+    "engines": {
+        "node": ">=12.0.0"
+    },
+    "engineStrict": true,
+    "files": [
+        "/lib",
+        "/messages",
+        "/examples",
+        "/json",
+        "/quickstart-config",
+        "/config",
+        "/npm-shrinkwrap.json",
+        "/oclif.manifest.json",
+        "/.oclif.manifest.json",
+        "/sfdx-project.json"
+    ],
+    "homepage": "https://github.com/forcedotcom/commerce-on-lightning",
+    "keywords": [
+        "force",
+        "salesforce",
+        "sfdx",
+        "salesforcedx",
+        "sfdx-plugin"
+    ],
+    "license": "BSD-3-Clause",
+    "oclif": {
+        "commands": "./lib/commands",
+        "bin": "sfdx",
+        "topics": {
+            "commerce": {
+                "description": "Commands for 1commerce developers.",
+                "subtopics": {
+                    "devhub": {},
+                    "examples": {},
+                    "extension": {},
+                    "files": {},
+                    "open": {},
+                    "payments": {},
+                    "products": {},
+                    "scratchorg": {},
+                    "search": {},
+                    "store": {
+                        "subtopics": {
+                            "view": {},
+                            "quickstart": {}
+                        }
+                    },
+                    "ordermanagement": {}
+                }
+            }
+        },
+        "devPlugins": [
+            "@oclif/plugin-help",
+            "@oclif/plugin-command-snapshot",
+            "@salesforce/plugin-command-reference"
+        ]
+    },
+    "repository": "https://github.com/forcedotcom/commerce-on-lightning",
+    "scripts": {
+        "build": "sf-build",
+        "clean": "sf-clean",
+        "clean-all": "sf-clean all",
+        "clean:lib": "shx rm -rf lib && shx rm -rf coverage && shx rm -rf .nyc_output && shx rm -f oclif.manifest.json",
+        "compile": "sf-compile",
+        "docs": "sf-docs",
+        "format": "sf-format",
+        "lint": "sf-lint",
+        "manifest": "oclif-dev manifest",
+        "postpack": "shx rm -f oclif.manifest.json",
+        "postpublish": "yarn run clean; git push; git push --tags",
+        "posttest": "yarn lint && yarn test:deprecation-policy && yarn test:command-reference",
+        "precommit": "npm run clean && npm run build && npm run lint && npm run version",
+        "prepack": "sf-prepack",
+        "prepare": "node scripts/prepare.mjs",
+        "prepublishOnly": "yarn run build && oclif-dev manifest",
+        "pretest": "sf-compile-test",
+        "prettier": "prettier --write src/**/**/*.ts && prettier --write src/**/*.ts && prettier --write src/*.ts && prettier --write test/**/*.ts && prettier --write test/**/**/*.ts",
+        "preversion": "yarn run clean",
+        "snapshot:update": "./bin/run snapshot:generate",
+        "test": "sf-test",
+        "test:command-reference": "./bin/run commandreference:generate --erroronwarnings",
+        "test:deprecation-policy": "./bin/run snapshot:compare",
+        "test:nuts": "nyc mocha \"**/*.nut.ts\" --slow 4500 --timeout 600000 --parallel",
+        "version": "(oclif-dev readme && sed -i.bak -e \"s|$(echo $HOME)|~|g\" -e \"s|$(whoami)|\"\\$\\(whoami\\)\"|g\" README.md && git add README.md) || exit 0"
+    },
+    "publishConfig": {
+        "access": "public"
+    }
 }

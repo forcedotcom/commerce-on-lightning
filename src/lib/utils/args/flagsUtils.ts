@@ -133,10 +133,8 @@ export async function setApiVersion(org: Org, flags: OutputFlags<any>): Promise<
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function appendCommonFlags(cmd: string, flags: OutputFlags<any>, logger: Logger): string {
-    if (flags?.apiversion && cmd.startsWith('sf ')) {
+    if (flags?.apiversion) {
         cmd = `${cmd} --api-version=${flags.apiversion as string}`;
-    } else if (flags?.apiversion) {
-        cmd = `${cmd} --apiversion=${flags.apiversion as string}`;
     }
     logger.debug(`Wrapped command: ${cmd}`);
     return cmd;

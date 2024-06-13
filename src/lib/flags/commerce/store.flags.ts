@@ -46,6 +46,6 @@ export const storeFlags = {
     }),
     all: flags.boolean({
         default: false,
-        description: 'View All stores using sfdx force:org:open _ui/networks/setup/SetupNetworksPage page',
+        description: 'View All stores using sf org open _ui/networks/setup/SetupNetworksPage page',
     }),
 };

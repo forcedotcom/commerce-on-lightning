@@ -14,7 +14,7 @@
             "nonexistent": "Can't find extension with registered extension name:",
             "previousEPN": "Unmapped the extension",
             "undefinedName": "Undefined webstore ID and webstore name. Enter either '-i <webstoreId>' or '-n <webstoreName>'.",
-            "errMultipleStoreWithSameName": "More than one webstore found with the given name. To see all the webstores with the given name, run [sfdx force:data:soql:query -q SELECT ID, NAME FROM WEBSTORE WHERE NAME = '<webstoreName>' --json] and use '-i <storeId>' to specify a specific webstore."
+            "errMultipleStoreWithSameName": "More than one webstore found with the given name. To see all the webstores with the given name, run [sf data query -q SELECT ID, NAME FROM WEBSTORE WHERE NAME = '<webstoreName>' --json] and use '-i <storeId>' to specify a specific webstore."
         },
         "unmap": {
             "cmdDescription": "Unmaps an extension from a store",

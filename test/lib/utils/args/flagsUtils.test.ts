@@ -229,22 +229,22 @@ describe('appends common flags to the given command', () => {
         loggerStub.restore();
     });
     it('should set the version specified in flags', async () => {
-        let command = 'sfdx test';
+        let command = 'sf test';
         const flags = { apiversion: '56.0' };
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
         command = appendCommonFlags(command, flags, logger);
-        assert.equal(command, 'sfdx test --apiversion=56.0');
+        assert.equal(command, 'sf test --api-version=56.0');
     });
     it('handles undefined apiversion', async () => {
-        let command = 'sfdx test';
+        let command = 'sf test';
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
         command = appendCommonFlags(command, {}, logger);
-        assert.equal(command, 'sfdx test');
+        assert.equal(command, 'sf test');
     });
     it('handles undefined flags object', async () => {
-        let command = 'sfdx test';
+        let command = 'sf test';
         // eslint-disable-next-line @typescript-eslint/no-unsafe-call,@typescript-eslint/no-unsafe-assignment
         command = appendCommonFlags(command, undefined, logger);
-        assert.equal(command, 'sfdx test');
+        assert.equal(command, 'sf test');
     });
 });
