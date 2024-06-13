@@ -18,7 +18,11 @@ This plugin is used to create and setup either a B2B or a B2C store with data wi
 
 We always recommend using the latest version of these commands, however, you can install a specific version or tag if needed.
 
--   [commerce-on-lightning](https://github.com/forcedotcom/commerce-on-lightning) - @salesforce/commerce <---- THIS PLUGIN - create stores - install command: `sf plugins:install @salesforce/commerce` - install specific version:`sf plugins:install @salesforce/commerce@242.0.26`
+-   [commerce-on-lightning](https://github.com/forcedotcom/commerce-on-lightning) - @salesforce/commerce <---- THIS PLUGIN
+    -   create stores
+    -   install command: `sfdx plugins:install @salesforce/commerce`
+    -   install specific version:`sfdx plugins:install @salesforce/commerce@242.0.26`
+
     ==============
 
 -   [Introduction](#introduction)
