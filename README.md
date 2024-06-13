@@ -19,6 +19,7 @@ This plugin is used to create and setup either a B2B or a B2C store with data wi
 We always recommend using the latest version of these commands, however, you can install a specific version or tag if needed.
 
 -   [commerce-on-lightning](https://github.com/forcedotcom/commerce-on-lightning) - @salesforce/commerce <---- THIS PLUGIN
+
     -   create stores
     -   install command: `sfdx plugins:install @salesforce/commerce`
     -   install specific version:`sfdx plugins:install @salesforce/commerce@242.0.26`
@@ -55,7 +56,7 @@ $ npm install -g @salesforce/commerce
 $ sf COMMAND
 running command...
 $ sf (-v|--version|version)
-@salesforce/commerce/250.1.0 darwin-arm64 node-v18.20.1
+@salesforce/commerce/252.0.0 darwin-arm64 node-v18.20.1
 $ sf --help [COMMAND]
 USAGE
   $ sf COMMAND
