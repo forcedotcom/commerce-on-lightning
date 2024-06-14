@@ -29,6 +29,7 @@ We always recommend using the latest version of these commands, however, you can
 -   [Introduction](#introduction)
 -   [Usage](#usage)
 -   [Install](#install)
+-   [Create my first store](#create-my-first-store)
 -   [Commands](#commands)
 -   [Debugging your plugin](#debugging-your-plugin)
 -   [Commerce Org and Store Setup Guide](docs/setup-guide.md)
@@ -74,6 +75,21 @@ sf plugins:install @salesforce/commerce
 ```
 
 <!-- installstop -->
+
+
+<!-- create-my-first-store -->
+
+## Create my first store
+
+```bash
+# create scratch org for store
+sf commerce:scratchorg:create -u test_store@testStore.com -a testStore -w 15 --json
+
+# create store on scratch org
+sf commerce:store:create -n MyFirstTestStore -b b2c_buyer11@1commerce.com -u testStore --json
+```
+
+<!-- create-my-first-storestop -->
 
 ## Issues
 
