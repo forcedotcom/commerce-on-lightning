@@ -11,7 +11,7 @@
         "@salesforce/command": "^3.1.0",
         "@salesforce/core": "^2.36.0",
         "@salesforce/sf-plugins-core": "^9.0.11",
-        "fast-xml-parser": "^4.2.5",
+        "fast-xml-parser": "^4.4.1",
         "string-argv": "^0.3.1",
         "tslib": "^2.5.0",
         "yaml": "^2.2.2"
