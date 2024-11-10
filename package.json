@@ -8,7 +8,7 @@
         "@oclif/command": "^1.8.22",
         "@oclif/config": "^1.18.2",
         "@oclif/errors": "^1",
-        "@salesforce/command": "^3.1.0",
+        "@salesforce/command": "^5.3.9",
         "@salesforce/core": "^2.36.0",
         "@salesforce/sf-plugins-core": "^9.0.11",
         "fast-xml-parser": "^4.2.5",
