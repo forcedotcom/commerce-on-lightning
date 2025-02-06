@@ -34,4 +34,5 @@
             <property name="purchaseOrderNumber" label="Purchase Order Number" type="String" description="The entered purchase order number" role="outputOnly" />
         </targetConfig>
     </targetConfigs>
+    <apiVersion>52.0</apiVersion>
 </LightningComponentBundle>
