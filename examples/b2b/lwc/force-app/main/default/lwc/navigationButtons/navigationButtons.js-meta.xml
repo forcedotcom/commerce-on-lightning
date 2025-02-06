@@ -14,5 +14,5 @@
             <property name="selectedAction" label="The selected action" type="String" description="The action selected by the user (NEXT, BACK)" role="outputOnly"/>
         </targetConfig>
     </targetConfigs>
-    <apiVersion>52.0</apiVersion>
+    <apiVersion>52.0</apiVersion> 
 </LightningComponentBundle>
