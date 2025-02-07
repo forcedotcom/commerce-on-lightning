@@ -56,7 +56,7 @@ $ npm install -g @salesforce/commerce
 $ sf COMMAND
 running command...
 $ sf (-v|--version|version)
-@salesforce/commerce/252.0.0 darwin-arm64 node-v18.20.1
+@salesforce/commerce/252.0.1 darwin-arm64 node-v18.20.1
 $ sf --help [COMMAND]
 USAGE
   $ sf COMMAND
