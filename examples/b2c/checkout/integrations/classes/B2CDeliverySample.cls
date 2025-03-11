@@ -31,20 +31,17 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                 shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromMockedService(siteLanguage);
             }
 
-            // On re-entry of the checkout flow delete all previous CartDeliveryGroupMehods for the given cartDeliveryGroupId
-            //delete [SELECT Id FROM CartDeliveryGroupMethod WHERE WebCartId = :cartId];
-
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
             Integer cdgmToBeCreated = 0;
             CartDeliveryGroupMethod[] cdgmsToInsert = new CartDeliveryGroupMethod[]{};
             for(CartDeliveryGroup curCartDeliveryGroup : cartDeliveryGroups){
-                for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromExternalService) {
-                    // get selected Delivery method id for cart delivery groupId
-                    ID previousSelectDeliveryMethodId = [SELECT SelectedDeliveryMethodId FROM CartDeliveryGroup WHERE Id = :curCartDeliveryGroup.Id][0].SelectedDeliveryMethodId;
+               // get selected Delivery method id for cart delivery groupId
+               ID previousSelectDeliveryMethodId = [SELECT SelectedDeliveryMethodId FROM CartDeliveryGroup WHERE Id = :curCartDeliveryGroup.Id][0].SelectedDeliveryMethodId;
 
-                    // delete all the cart delivery group method id except selected one
-                    delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id and Id!= :previousSelectDeliveryMethodId];
+               // delete all the cart delivery group method id except selected one
+               delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id and Id!= :previousSelectDeliveryMethodId];
 
+               for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromExternalService) {
                     //if selected CDGM is matching with shipping option then we don't need to create shipping option and existing can be reused
                     if(!isShippingOptionMatchingWithSelectedDM(shippingOption,previousSelectDeliveryMethodId)){
                         CartDeliveryGroupMethod cdgm = populateCartDeliveryGroupMethodWithShippingOptions(shippingOption, curCartDeliveryGroup.Id, cartId);
@@ -57,16 +54,15 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             insert(cdgmsToInsert);
 
             List<CartDeliveryGroupMethod> cdgms = new List<CartDeliveryGroupMethod>([SELECT Id FROM CartDeliveryGroupMethod WHERE WebCartId = :cartId]);
-
             System.assertEquals(cdgmToBeCreated, cdgms.size(),'The number of created CDGMs is not matching'); // It's important to fail the example integration early
 
             // If everything works well, the charge is added to the cart and our integration has been successfully completed.
             integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
 
-            // For testing purposes, this example treats exceptions as user errors, which means they are displayed to the buyer user.
-            // In production you probably want this to be an admin-type error. In that case, throw the exception here
-            // and make sure that a notification system is in place to let the admin know that the error occurred.
-            // See the readme section about error handling for details about how to create that notification.
+        // For testing purposes, this example treats exceptions as user errors, which means they are displayed to the buyer user.
+        // In production you probably want this to be an admin-type error. In that case, throw the exception here
+        // and make sure that a notification system is in place to let the admin know that the error occurred.
+        // See the readme section about error handling for details about how to create that notification.
         } catch (DmlException de) {
             // Catch any exceptions thrown when trying to insert the shipping charge to the CartItems
             Integer numErrors = de.getNumDml();
@@ -76,24 +72,26 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                 errorMessage += 'Message = ' + de.getDmlMessage(errorIdx);
                 errorMessage += ' , ';
             }
-
             return integrationStatusFailedWithCartValidationOutputError(
-            integStatus,
-            errorMessage,
-            jobInfo,
-            cartId
+                integStatus,
+                errorMessage,
+                jobInfo,
+                cartId
             );
         } catch(Exception e) {
             return integrationStatusFailedWithCartValidationOutputError(
-            integStatus,
-            'An exception occurred during Shipping Calculation.',
-            jobInfo,
-            cartId
+                integStatus,
+                'An exception occurred during Shipping Calculation.',
+                jobInfo,
+                cartId
             );
         }
         return integStatus;
     }
 
+     /**
+        This method compares previous Selected Delivery method with current shipping options and if both matches returns ture
+     */
     private boolean isShippingOptionMatchingWithSelectedDM(ShippingOptionsAndRatesFromExternalService shippingOption, String previousSelectDeliveryMethodId) {
         if(previousSelectDeliveryMethodId != null && !previousSelectDeliveryMethodId.equals('')) {
             // get delivery group method for seletctedDMId
@@ -108,7 +106,7 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             isNullOrEquals(previousSelectDeliveryMethod.ProcessTime, shippingOption.getProcessTime()) &&
             isNullOrEquals(previousSelectDeliveryMethod.ProcessTimeUnit, shippingOption.getProcessTimeUnit()) &&
 
-            // ideally reference number should match but in this sample we are generatng random string so not matching
+            // ideally reference number should match but in this sample we are generating random string so won't match
             //previousSelectDeliveryMethod.ReferenceNumber.equals(shippingOption.getReferenceNumber()) &&
             previousSelectDeliveryMethod.Carrier.equals(shippingOption.getCarrier()) &&
             previousSelectDeliveryMethod.ClassOfService.equals(shippingOption.getClassOfService()) &&
@@ -122,14 +120,18 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         return false;
     }
 
+    /**
+        This method compares two objects, if both are null or equals returns true
+    */
     private boolean isNullOrEquals(Object o1, Object o2) {
         return (o1 == null && o2 == null) || (o1 != null && o1.equals(o2));
     }
+
     /**
-    This method provides a sample of how to call an external service to retrieve Shipping Options.
-    The heroku servie called in this method is just a reference implementation that responds back with
-    a sample response and MUST not be used in production systems.
-    */
+        This method provides a sample of how to call an external service to retrieve Shipping Options.
+        The heroku servie called in this method is just a reference implementation that responds back with
+        a sample response and MUST not be used in production systems.
+     */
     private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (String siteLanguage) {
         ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
         Http http = new Http();
@@ -144,11 +146,47 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         // [{"status":"calculated","rate":{"name":"'+name1+'","serviceName":"'+serviceName1+'","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99,"transitTimeMin":1,"transitTimeMax":2,"transitTimeUnit":"Days","processTime":1,"processTimeUnit":"Days"}},
         // {"status":"calculated","rate":{"name":"'+name2+'","serviceName":"'+serviceName2+'","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99,"transitTimeMin":2,"transitTimeMax":3,"transitTimeUnit":"Days","processTime":1,"processTimeUnit":"Days"}}]
         if (response.getStatusCode() == successfulHttpRequest) {
-            List<Object> results = (List<Object>) JSON.deserializeUntyped(response.getBody());
-            for (Object result: results) {
+           List<Object> results = (List<Object>) JSON.deserializeUntyped(response.getBody());
+           for (Object result: results) {
                 Map<String, Object> subresult = (Map<String, Object>) result;
                 Map<String, Object> providerAndRate = (Map<String, Object>) subresult.get('rate');
                 shippingOptions.add( new ShippingOptionsAndRatesFromExternalService(
+                    (String) providerAndRate.get('name'),
+                    (String) providerAndRate.get('serviceCode'),
+                    (Decimal) providerAndRate.get('shipmentCost'),
+                    (Decimal) providerAndRate.get('otherCost'),
+                    (String) providerAndRate.get('serviceName'),
+                    (String) providerAndRate.get('serviceName'),
+                    (String) providerAndRate.get('serviceCode'),
+                    generateRandomString(10),
+                    true,
+                    (Integer) providerAndRate.get('transitTimeMin'),
+                    (Integer) providerAndRate.get('transitTimeMax'),
+                    (String) providerAndRate.get('transitTimeUnit'),
+                    (Integer) providerAndRate.get('processTime'),
+                    (String) providerAndRate.get('processTimeUnit')
+                ));
+            }
+            return shippingOptions;
+        } else if(response.getStatusCode() == 404) {
+            throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
+        } else {
+            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
+        }
+    }
+
+    /**
+        This method provides an alternative to retrieve Shipping Options if http call needs to be bypassed.
+        This method uses a hardcoded sample response and MUST not be used in production systems.
+     */
+    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (String siteLanguage) {
+        ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
+        String responseBody = getShippingOptionsResponse(siteLanguage);
+        List<Object> results = (List<Object>) JSON.deserializeUntyped(responseBody);
+        for (Object result: results) {
+            Map<String, Object> subresult = (Map<String, Object>) result;
+            Map<String, Object> providerAndRate = (Map<String, Object>) subresult.get('rate');
+            shippingOptions.add( new ShippingOptionsAndRatesFromExternalService(
                 (String) providerAndRate.get('name'),
                 (String) providerAndRate.get('serviceCode'),
                 (Decimal) providerAndRate.get('shipmentCost'),
@@ -163,42 +201,6 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                 (String) providerAndRate.get('transitTimeUnit'),
                 (Integer) providerAndRate.get('processTime'),
                 (String) providerAndRate.get('processTimeUnit')
-                ));
-            }
-            return shippingOptions;
-        } else if(response.getStatusCode() == 404) {
-            throw new CalloutException ('404. You must create a sample application or add your own service which returns a valid response');
-        } else {
-            throw new CalloutException ('There was a problem with the request. Error: ' + response.getStatusCode());
-        }
-    }
-
-    /**
-    This method provides an alternative to retrieve Shipping Options if http call needs to be bypassed.
-    This method uses a hardcoded sample response and MUST not be used in production systems.
-    */
-    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (String siteLanguage) {
-        ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
-        String responseBody = getShippingOptionsResponse(siteLanguage);
-        List<Object> results = (List<Object>) JSON.deserializeUntyped(responseBody);
-        for (Object result: results) {
-            Map<String, Object> subresult = (Map<String, Object>) result;
-            Map<String, Object> providerAndRate = (Map<String, Object>) subresult.get('rate');
-            shippingOptions.add( new ShippingOptionsAndRatesFromExternalService(
-            (String) providerAndRate.get('name'),
-            (String) providerAndRate.get('serviceCode'),
-            (Decimal) providerAndRate.get('shipmentCost'),
-            (Decimal) providerAndRate.get('otherCost'),
-            (String) providerAndRate.get('serviceName'),
-            (String) providerAndRate.get('serviceName'),
-            (String) providerAndRate.get('serviceCode'),
-            generateRandomString(10),
-            true,
-            (Integer) providerAndRate.get('transitTimeMin'),
-            (Integer) providerAndRate.get('transitTimeMax'),
-            (String) providerAndRate.get('transitTimeUnit'),
-            (Integer) providerAndRate.get('processTime'),
-            (String) providerAndRate.get('processTimeUnit')
             ));
         }
         return shippingOptions;
@@ -208,8 +210,8 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         final String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz';
         String randStr = '';
         while (randStr.length() < len) {
-            Integer idx = Math.mod(Math.abs(Crypto.getRandomInteger()), chars.length());
-            randStr += chars.substring(idx, idx+1);
+        Integer idx = Math.mod(Math.abs(Crypto.getRandomInteger()), chars.length());
+        randStr += chars.substring(idx, idx+1);
         }
         return randStr;
     }
@@ -273,8 +275,8 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         }
 
         public ShippingOptionsAndRatesFromExternalService(String someName, String someProvider, Decimal someRate, Decimal someOtherCost, String someServiceName,
-        String someCarrier, String someClassOfService, String someReferenceNumber, Boolean someIsActive, Integer someTransitTimeMin, Integer someTransitTimeMax,
-        String someTransitTimeUnit, Integer someProcessTime, String someProcessTimeUnit) {
+                String someCarrier, String someClassOfService, String someReferenceNumber, Boolean someIsActive, Integer someTransitTimeMin, Integer someTransitTimeMax,
+                String someTransitTimeUnit, Integer someProcessTime, String someProcessTimeUnit) {
             name = someName;
             provider = someProvider;
             rate = someRate;
@@ -309,8 +311,8 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
 
     // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
     private CartDeliveryGroupMethod populateCartDeliveryGroupMethodWithShippingOptions(ShippingOptionsAndRatesFromExternalService shippingOption,
-    Id cartDeliveryGroupId,
-    Id webCartId){
+                                                                  Id cartDeliveryGroupId,
+                                                                  Id webCartId){
         // When inserting a new CartDeliveryGroupMethod, the following fields have to be populated:
         // CartDeliveryGroupId: Id of the delivery group of this shipping option
         // ExternalProvider: Unique identifier of shipping provider
@@ -364,28 +366,28 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
     }
 
     private sfdc_checkout.IntegrationStatus integrationStatusFailedWithCartValidationOutputError(
-    sfdc_checkout.IntegrationStatus integrationStatus, String errorMessage, sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
-        integrationStatus.status = sfdc_checkout.IntegrationStatus.Status.FAILED;
-        // In order for the error to be propagated to the user, we need to add a new CartValidationOutput record.
-        // The following fields must be populated:
-        // BackgroundOperationId: Foreign Key to the BackgroundOperation
-        // CartId: Foreign key to the WebCart that this validation line is for
-        // Level (required): One of the following - Info, Error, or Warning
-        // Message (optional): Message displayed to the user
-        // Name (required): The name of this CartValidationOutput record. For example CartId:BackgroundOperationId
-        // RelatedEntityId (required): Foreign key to WebCart, CartItem, CartDeliveryGroup
-        // Type (required): One of the following - SystemError, Inventory, Taxes, Pricing, Shipping, Entitlement, Other
-        CartValidationOutput cartValidationError = new CartValidationOutput(
-        BackgroundOperationId = jobInfo.jobId,
-        CartId = cartId,
-        Level = 'Error',
-        Message = errorMessage.left(255),
-        Name = (String)cartId + ':' + jobInfo.jobId,
-        RelatedEntityId = cartId,
-        Type = 'Shipping'
-        );
-        insert(cartValidationError);
-        return integrationStatus;
+        sfdc_checkout.IntegrationStatus integrationStatus, String errorMessage, sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
+            integrationStatus.status = sfdc_checkout.IntegrationStatus.Status.FAILED;
+            // In order for the error to be propagated to the user, we need to add a new CartValidationOutput record.
+            // The following fields must be populated:
+            // BackgroundOperationId: Foreign Key to the BackgroundOperation
+            // CartId: Foreign key to the WebCart that this validation line is for
+            // Level (required): One of the following - Info, Error, or Warning
+            // Message (optional): Message displayed to the user
+            // Name (required): The name of this CartValidationOutput record. For example CartId:BackgroundOperationId
+            // RelatedEntityId (required): Foreign key to WebCart, CartItem, CartDeliveryGroup
+            // Type (required): One of the following - SystemError, Inventory, Taxes, Pricing, Shipping, Entitlement, Other
+            CartValidationOutput cartValidationError = new CartValidationOutput(
+                BackgroundOperationId = jobInfo.jobId,
+                CartId = cartId,
+                Level = 'Error',
+                Message = errorMessage.left(255),
+                Name = (String)cartId + ':' + jobInfo.jobId,
+                RelatedEntityId = cartId,
+                Type = 'Shipping'
+            );
+            insert(cartValidationError);
+            return integrationStatus;
     }
 
     private Id getDefaultShippingChargeProduct2Id() {
@@ -396,8 +398,8 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
         List<Product2> shippingChargeProducts = [SELECT Id FROM Product2 WHERE Name = :shippingChargeProduct2Name];
         if (shippingChargeProducts.isEmpty()) {
             Product2 shippingChargeProduct = new Product2(
-            isActive = true,
-            Name = shippingChargeProduct2Name
+                isActive = true,
+                Name = shippingChargeProduct2Name
             );
             insert(shippingChargeProduct);
             return shippingChargeProduct.Id;
