@@ -38,8 +38,12 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                // get selected Delivery method id for cart delivery groupId
                ID previousSelectDeliveryMethodId = [SELECT SelectedDeliveryMethodId FROM CartDeliveryGroup WHERE Id = :curCartDeliveryGroup.Id][0].SelectedDeliveryMethodId;
 
-               // delete all the cart delivery group method id except selected one
-               delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id and Id!= :previousSelectDeliveryMethodId];
+               if(previousSelectDeliveryMethodId != null) {
+                    // delete all the cart delivery group method id except selected one
+                    delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id and Id!= :previousSelectDeliveryMethodId];
+               } else {
+                    delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id];
+               }
 
                for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromExternalService) {
                     //if selected CDGM is matching with shipping option then we don't need to create shipping option and existing can be reused
