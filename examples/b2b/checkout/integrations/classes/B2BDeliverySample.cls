@@ -29,16 +29,12 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
                 shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromMockedService(siteLanguage, numberOfUniqueItems);
             }
 
-            // On re-entry of the checkout flow delete all previous CartDeliveryGroupMethods for the given cartDeliveryGroupId
-            //delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId];
-
             // Create orderDeliveryMethods given your shipping options or fetch existing ones. 2 should be returned.
             List<Id> orderDeliveryMethodIds = getOrderDeliveryMethods(shippingOptionsAndRatesFromExternalService);
 
             // We need to get the ID of the cart delivery group in order to create the cart delivery group methods.
             List<CartDeliveryGroup> cartDeliveryGroups = new List<CartDeliveryGroup>([SELECT Id FROM CartDeliveryGroup WHERE CartId = :cartId]);
 
-            System.debug('all options '+ shippingOptionsAndRatesFromExternalService);
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
             Integer i = 0;
             for(CartDeliveryGroup curCartDeliveryGroup : cartDeliveryGroups){
@@ -46,18 +42,15 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
                 ID previousSelectDeliveryMethodId = [SELECT SelectedDeliveryMethodId FROM CartDeliveryGroup WHERE Id = :curCartDeliveryGroup.Id][0].SelectedDeliveryMethodId;
 
                  if(previousSelectDeliveryMethodId != null) {
-                        System.debug('previousselecteddeliverymerhodId '+previousSelectDeliveryMethodId);
                      // delete all the cart delivery group method id except selected one
                      delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id and Id!= :previousSelectDeliveryMethodId];
                  } else {
-                     System.debug('previousselecteddeliverymerhodId  is null');
+                     // if there is no selected Delivery method then we can delete all the existing delivery methods associated with cart delivery group id
                      delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id];
                  }
-                System.debug('orderDeliveryMethodIds '+orderDeliveryMethodIds);
                 for (Id orderDeliveryMethodId: orderDeliveryMethodIds) {
-
+                    // we will populate cart delivery method only when shipping option does not match with previous selected delivery method
                     if(!isShippingOptionMatchingWithSelectedDM(shippingOptionsAndRatesFromExternalService[i],previousSelectDeliveryMethodId)){
-                        System.debug('populating ');
                         populateCartDeliveryGroupMethodWithShippingOptions(shippingOptionsAndRatesFromExternalService[i],
                                                                   cartDeliveryGroupId,
                                                                   orderDeliveryMethodId,
@@ -100,35 +93,33 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         }
         return integStatus;
     }
-/**
+    /**
         This method compares previous Selected Delivery method with current shipping options and if both matches returns ture
-     */
+    */
     private boolean isShippingOptionMatchingWithSelectedDM(ShippingOptionsAndRatesFromExternalService shippingOption, String previousSelectDeliveryMethodId) {
         if(previousSelectDeliveryMethodId != null && !previousSelectDeliveryMethodId.equals('')) {
             // get delivery group method for seletctedDMId
             CartDeliveryGroupMethod previousSelectDeliveryMethod = [SELECT Name, ShippingFee, WebCartId, Carrier, ClassOfService, ExternalProvider, ProductId, ReferenceNumber, IsActive, TransitTimeMin, TransitTimeMax, TransitTimeUnit, ProcessTime, ProcessTimeUnit FROM CartDeliveryGroupMethod WHERE Id= :previousSelectDeliveryMethodId];
-            System.debug('previousSelectDeliveryMethod ' + previousSelectDeliveryMethod);
-            System.debug('shippingOption ' + shippingOption);
             // return if all fields of shipping option matches with selectedDM else return false
-            return (previousSelectDeliveryMethod.Name.equals(shippingOption.getName()) &&
-            previousSelectDeliveryMethod.IsActive.equals(shippingOption.isActive()) &&
+            return (previousSelectDeliveryMethod.Name.equals(shippingOption.getName()) && // compare name
+            previousSelectDeliveryMethod.IsActive.equals(shippingOption.isActive()) && // both should be active status
 
-            previousSelectDeliveryMethod.ShippingFee.equals(shippingOption.getRate()) &&
+            previousSelectDeliveryMethod.ShippingFee.equals(shippingOption.getRate()) &&  // compare shipping fee
 
-            isNullOrEquals(previousSelectDeliveryMethod.ProcessTime, shippingOption.getProcessTime()) &&
-            isNullOrEquals(previousSelectDeliveryMethod.ProcessTimeUnit, shippingOption.getProcessTimeUnit()) &&
+            isNullOrEquals(previousSelectDeliveryMethod.ProcessTime, shippingOption.getProcessTime()) &&  // compare processing time
+            isNullOrEquals(previousSelectDeliveryMethod.ProcessTimeUnit, shippingOption.getProcessTimeUnit()) && // compare time processing unit
 
             // ideally reference number should match but in this sample we are generating random string so won't match
             //previousSelectDeliveryMethod.ReferenceNumber.equals(shippingOption.getReferenceNumber()) &&
-            previousSelectDeliveryMethod.Carrier.equals(shippingOption.getCarrier()) &&
-            previousSelectDeliveryMethod.ClassOfService.equals(shippingOption.getClassOfService()) &&
-            previousSelectDeliveryMethod.ExternalProvider.equals(shippingOption.getProvider()) &&
-            previousSelectDeliveryMethod.Carrier.equals(shippingOption.getCarrier()) &&
+            previousSelectDeliveryMethod.Carrier.equals(shippingOption.getCarrier()) && //compare carrier method
+            previousSelectDeliveryMethod.ClassOfService.equals(shippingOption.getClassOfService()) &&  // comapre class of service
+            previousSelectDeliveryMethod.ExternalProvider.equals(shippingOption.getProvider()) && // compare external provider
 
-            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeMax, shippingOption.getTransitTimeMax()) &&
-            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeMin, shippingOption.getTransitTimeMin()) &&
-            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeUnit, shippingOption.getTransitTimeUnit()));
+            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeMax, shippingOption.getTransitTimeMax()) &&  // compare transit time max
+            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeMin, shippingOption.getTransitTimeMin()) && // compare transit time min
+            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeUnit, shippingOption.getTransitTimeUnit())); // compare transit time unit
         }
+        // if previousSelectDeliveryMethod is null then we can return null so DM can be created
         return false;
     }
 
