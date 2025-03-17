@@ -34,6 +34,7 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
             Integer cdgmToBeCreated = 0;
             CartDeliveryGroupMethod[] cdgmsToInsert = new CartDeliveryGroupMethod[]{};
+            // there can be multiple delivery groups so we will iterate thru DGs
             for(CartDeliveryGroup curCartDeliveryGroup : cartDeliveryGroups){
                // get selected Delivery method id for cart delivery groupId
                ID previousSelectDeliveryMethodId = [SELECT SelectedDeliveryMethodId FROM CartDeliveryGroup WHERE Id = :curCartDeliveryGroup.Id][0].SelectedDeliveryMethodId;
@@ -42,9 +43,10 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
                     // delete all the cart delivery group method id except selected one
                     delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id and Id!= :previousSelectDeliveryMethodId];
                } else {
+               //Delete all the delivery methods if previousSelectDeliveryMethod is null
                     delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id];
                }
-
+                // iterate thru all shipping rates
                for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptionsAndRatesFromExternalService) {
                     //if selected CDGM is matching with shipping option then we don't need to create shipping option and existing can be reused
                     if(!isShippingOptionMatchingWithSelectedDM(shippingOption,previousSelectDeliveryMethodId)){
@@ -102,25 +104,25 @@ global class B2CDeliverySample implements sfdc_checkout.CartShippingCharges {
             CartDeliveryGroupMethod previousSelectDeliveryMethod = [SELECT Name, ShippingFee, WebCartId, Carrier, ClassOfService, ExternalProvider, ProductId, ReferenceNumber, IsActive, TransitTimeMin, TransitTimeMax, TransitTimeUnit, ProcessTime, ProcessTimeUnit FROM CartDeliveryGroupMethod WHERE Id= :previousSelectDeliveryMethodId];
 
             // return if all fields of shipping option matches with selectedDM else return false
-            return (previousSelectDeliveryMethod.Name.equals(shippingOption.getName()) &&
-            previousSelectDeliveryMethod.IsActive.equals(shippingOption.isActive()) &&
+            return (previousSelectDeliveryMethod.Name.equals(shippingOption.getName()) && // compare name
+            previousSelectDeliveryMethod.IsActive.equals(shippingOption.isActive()) && // compare isActive flag
 
-            previousSelectDeliveryMethod.ShippingFee.equals(shippingOption.getRate()) &&
+            previousSelectDeliveryMethod.ShippingFee.equals(shippingOption.getRate()) && // compare shipping fee
 
-            isNullOrEquals(previousSelectDeliveryMethod.ProcessTime, shippingOption.getProcessTime()) &&
-            isNullOrEquals(previousSelectDeliveryMethod.ProcessTimeUnit, shippingOption.getProcessTimeUnit()) &&
+            isNullOrEquals(previousSelectDeliveryMethod.ProcessTime, shippingOption.getProcessTime()) && // compare process time
+            isNullOrEquals(previousSelectDeliveryMethod.ProcessTimeUnit, shippingOption.getProcessTimeUnit()) && // compare time unit
 
             // ideally reference number should match but in this sample we are generating random string so won't match
             //previousSelectDeliveryMethod.ReferenceNumber.equals(shippingOption.getReferenceNumber()) &&
-            previousSelectDeliveryMethod.Carrier.equals(shippingOption.getCarrier()) &&
+            previousSelectDeliveryMethod.Carrier.equals(shippingOption.getCarrier()) && // compare carrier
             previousSelectDeliveryMethod.ClassOfService.equals(shippingOption.getClassOfService()) &&
-            previousSelectDeliveryMethod.ExternalProvider.equals(shippingOption.getProvider()) &&
-            previousSelectDeliveryMethod.Carrier.equals(shippingOption.getCarrier()) &&
+            previousSelectDeliveryMethod.ExternalProvider.equals(shippingOption.getProvider()) && // compare external provider
 
-            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeMax, shippingOption.getTransitTimeMax()) &&
+            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeMax, shippingOption.getTransitTimeMax()) && // compare transit time
             isNullOrEquals(previousSelectDeliveryMethod.TransitTimeMin, shippingOption.getTransitTimeMin()) &&
-            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeUnit, shippingOption.getTransitTimeUnit()));
+            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeUnit, shippingOption.getTransitTimeUnit())); // compare transit time unit
         }
+        // we will return false so DM can be created if no previous selected DM is null
         return false;
     }
 
