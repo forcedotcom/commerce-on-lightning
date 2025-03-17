@@ -26,7 +26,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
             if(useHTTPService) {
                 shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService(numberOfUniqueItems);
             } else {
-                shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromMockedService(siteLanguage);
+                shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromMockedService(siteLanguage, numberOfUniqueItems);
             }
 
             // On re-entry of the checkout flow delete all previous CartDeliveryGroupMethods for the given cartDeliveryGroupId
@@ -142,7 +142,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         This method provides an alternative to retrieve Shipping Options if http call needs to be bypassed.
         This method uses a hardcoded sample response and MUST not be used in production systems.
      */
-    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (String siteLanguage) {
+    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (String siteLanguage, Integer numberOfUniqueItems) {
             ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
             String responseBody = getShippingOptionsResponse(siteLanguage);
             List<Object> results = (List<Object>) JSON.deserializeUntyped(responseBody);
@@ -152,7 +152,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
                 shippingOptions.add(new ShippingOptionsAndRatesFromExternalService(
                     (String) providerAndRate.get('name'),
                     (String) providerAndRate.get('serviceCode'),
-                    (Decimal) providerAndRate.get('shipmentCost'),
+                    (Decimal) providerAndRate.get('shipmentCost') * numberOfUniqueItems, // Multiply so shipping costs can change; remove when using a real shipping provider
                     (Decimal) providerAndRate.get('otherCost'),
                     (String) providerAndRate.get('serviceName'),
                     (String) providerAndRate.get('serviceName'),
