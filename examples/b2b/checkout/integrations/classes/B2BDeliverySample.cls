@@ -12,10 +12,10 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         try {
             String siteLanguage = jobInfo.siteLanguage;
             // We need to get the ID of the cart delivery group in order to create the order delivery groups.
-            Id cartDeliveryGroupId = [SELECT Id FROM CartDeliveryGroup WHERE CartId = :cartId][0].Id;
+            Id cartDeliveryGroupId = [SELECT Id FROM CartDeliveryGroup WHERE CartId = :cartId WITH SECURITY_ENFORCED][0].Id;
 
             // Used to increase the cost by a multiple of the number of items in the cart (useful for testing but should not be done in the final code)
-            Integer numberOfUniqueItems = [SELECT count() from cartItem WHERE CartId = :cartId];
+            Integer numberOfUniqueItems = [SELECT count() from cartItem WHERE CartId = :cartId WITH SECURITY_ENFORCED];
 
             // Following snippet of code fetches a static json response with 2 mocked sample shipping methods.
             // Another example that demonstrates how to call a live 3rd party HTTP Service to fetch the desired response is implemented
@@ -33,20 +33,20 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
             List<Id> orderDeliveryMethodIds = getOrderDeliveryMethods(shippingOptionsAndRatesFromExternalService);
 
             // We need to get the ID of the cart delivery group in order to create the cart delivery group methods.
-            List<CartDeliveryGroup> cartDeliveryGroups = new List<CartDeliveryGroup>([SELECT Id FROM CartDeliveryGroup WHERE CartId = :cartId]);
+            List<CartDeliveryGroup> cartDeliveryGroups = new List<CartDeliveryGroup>([SELECT Id FROM CartDeliveryGroup WHERE CartId = :cartId WITH SECURITY_ENFORCED]);
 
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
             Integer i = 0;
             for(CartDeliveryGroup curCartDeliveryGroup : cartDeliveryGroups){
                 // get selected Delivery method id for cart delivery groupId
-                ID previousSelectDeliveryMethodId = [SELECT SelectedDeliveryMethodId FROM CartDeliveryGroup WHERE Id = :curCartDeliveryGroup.Id][0].SelectedDeliveryMethodId;
+                ID previousSelectDeliveryMethodId = [SELECT SelectedDeliveryMethodId FROM CartDeliveryGroup WHERE Id = :curCartDeliveryGroup.Id WITH SECURITY_ENFORCED][0].SelectedDeliveryMethodId;
 
                  if(previousSelectDeliveryMethodId != null) {
                      // delete all the cart delivery group method id except selected one
-                     delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id and Id!= :previousSelectDeliveryMethodId];
+                     delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id and Id!= :previousSelectDeliveryMethodId WITH SECURITY_ENFORCED];
                  } else {
                      // if there is no selected Delivery method then we can delete all the existing delivery methods associated with cart delivery group id
-                     delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id];
+                     delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id WITH SECURITY_ENFORCED];
                  }
                 for (Id orderDeliveryMethodId: orderDeliveryMethodIds) {
                     // we will populate cart delivery method only when shipping option does not match with previous selected delivery method
@@ -391,7 +391,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
 
     private Id getShippingChargeProduct2Id(Id orderDeliveryMethodId) {
         // The Order Delivery Method should have a Product2 associated with it, because we added that in getDefaultOrderDeliveryMethod if it didn't exist.
-        List<OrderDeliveryMethod> orderDeliveryMethods = [SELECT ProductId FROM OrderDeliveryMethod WHERE Id = :orderDeliveryMethodId];
+        List<OrderDeliveryMethod> orderDeliveryMethods = [SELECT ProductId FROM OrderDeliveryMethod WHERE Id = :orderDeliveryMethodId WITH SECURITY_ENFORCED];
         return orderDeliveryMethods[0].ProductId;
     }
 
@@ -407,7 +407,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         for (ShippingOptionsAndRatesFromExternalService shippingOption: shippingOptions) {
             String shippingOptionNumber = String.valueOf(i);
             String name = defaultDeliveryMethodName + shippingOptionNumber;
-            List<OrderDeliveryMethod> odms = [SELECT Id, ProductId, Carrier, ClassOfService FROM OrderDeliveryMethod WHERE Name = :name];
+            List<OrderDeliveryMethod> odms = [SELECT Id, ProductId, Carrier, ClassOfService FROM OrderDeliveryMethod WHERE Name = :name WITH SECURITY_ENFORCED];
             // This is the case in which an Order Delivery method does not exist.
             if (odms.isEmpty()) {
                 OrderDeliveryMethod defaultOrderDeliveryMethod = new OrderDeliveryMethod(
@@ -446,7 +446,7 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         // Check to see if a Product2 with that name already exists.
         // If it doesn't exist, create one.
         String shippingChargeProduct2Name = 'Shipping Charge for this delivery method';
-        List<Product2> shippingChargeProducts = [SELECT Id FROM Product2 WHERE Name = :shippingChargeProduct2Name];
+        List<Product2> shippingChargeProducts = [SELECT Id FROM Product2 WHERE Name = :shippingChargeProduct2Name WITH SECURITY_ENFORCED];
         if (shippingChargeProducts.isEmpty()) {
             Product2 shippingChargeProduct = new Product2(
                 isActive = true,
