@@ -91,7 +91,20 @@ private class B2CDeliverySampleTest {
             cdgToUpdate.SelectedDeliveryMethodId = nonSelectedId;
             update cdgToUpdate;
 
-            // run integratio again
+            // run integration again
+            integInfo.jobId = null;
+            integrationResult = apexSample.startCartProcessAsync(integInfo, webCart.Id);
+            // Verify: the integration executed successfully
+            System.assertEquals(sfdc_checkout.IntegrationStatus.Status.SUCCESS, integrationResult.status);
+
+            //fetch all cart delivery groups
+            cartDeliveryGroups = new List<CartDeliveryGroup>([SELECT Id FROM CartDeliveryGroup WHERE CartId = :webCart.Id]);
+            //update cart delivery group with updated DM
+            cdgToUpdate = cartDeliveryGroups[0];
+            cdgToUpdate.DeliverToPostalCode = '100001';
+            update cdgToUpdate;
+
+            // run integration again
             integInfo.jobId = null;
             integrationResult = apexSample.startCartProcessAsync(integInfo, webCart.Id);
             // Verify: the integration executed successfully
