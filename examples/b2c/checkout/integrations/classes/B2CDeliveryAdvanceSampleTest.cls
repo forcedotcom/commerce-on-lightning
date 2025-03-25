@@ -1,5 +1,5 @@
 @isTest
-private class B2CDeliverySampleAdvanceTest {
+private class B2CDeliveryAdvanceSampleTest {
 
     static Integer cartDeliveryGroupsNo;
     static Integer expectedCDGMInTheIntegrationMock;
@@ -37,7 +37,7 @@ private class B2CDeliverySampleAdvanceTest {
         Test.startTest();
         init();
         // Test: execute the integration for the test cart ID.
-        B2CDeliverySampleAdvance apexSample = new B2CDeliverySampleAdvance();
+        B2CDeliveryAdvanceSample apexSample = new B2CDeliveryAdvanceSample();
         sfdc_checkout.IntegrationInfo integInfo = new sfdc_checkout.IntegrationInfo();
         WebCart webCart = [SELECT Id FROM WebCart WHERE Name='Cart' LIMIT 1];
         integInfo.jobId = null;

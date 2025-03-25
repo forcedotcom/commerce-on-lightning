@@ -1,7 +1,11 @@
 // This must implement the sfdc_checkout.CartShippingCharges interface
 // in order to be processed by the checkout flow for the "Shipping" integration
-
-global class B2CDeliverySampleAdvance implements sfdc_checkout.CartShippingCharges {
+// This class contains functionality of basic sample and this calculator has additional functionality to retain shopper/buyer preferred delivery method based on below conditions.
+// During the first run, the selection of the shipping method will be defaulted to the cheapest available option.
+// If the buyer/shopper selects a different delivery method and later makes additional changes on the checkout page that trigger a recalculation of shipping methods:
+//If the previously selected method is still valid, it will be retained.
+//If the previously selected method is no longer valid, the cheapest available option will be selected.
+global class B2CDeliveryAdvanceSample implements sfdc_checkout.CartShippingCharges {
     // You MUST change this to be your service or you must launch your own Heroku Service
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
