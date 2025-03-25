@@ -1,5 +1,5 @@
 @isTest
-private class B2BDeliverySampleTest {
+private class B2BDeliveryAdvanceSampleTest {
     @testSetup static void setup() {
         Account testAccount = new Account(Name='TestAccount');
         insert testAccount;
@@ -22,7 +22,7 @@ private class B2BDeliverySampleTest {
     @isTest static void testIntegrationRunsSuccessfully() {
         Test.startTest();
         // Test: execute the integration for the test cart ID.
-        B2BDeliverySampleAdvance apexSample = new B2BDeliverySampleAdvance();
+        B2BDeliveryAdvanceSample apexSample = new B2BDeliveryAdvanceSample();
         sfdc_checkout.IntegrationInfo integInfo = new sfdc_checkout.IntegrationInfo();
         WebCart webCart = [SELECT Id FROM WebCart WHERE Name='Cart' LIMIT 1];
         integInfo.jobId = null;
@@ -35,7 +35,7 @@ private class B2BDeliverySampleTest {
     @isTest static void testIntegrationRunsSuccessfully_toRetainPrevSelectedDeliveryMethod() {
         Test.startTest();
         // Test: execute the integration for the test cart ID.
-        B2BDeliverySampleAdvance apexSample = new B2BDeliverySampleAdvance();
+        B2BDeliveryAdvanceSample apexSample = new B2BDeliveryAdvanceSample();
         sfdc_checkout.IntegrationInfo integInfo = new sfdc_checkout.IntegrationInfo();
         WebCart webCart = [SELECT Id FROM WebCart WHERE Name='Cart' LIMIT 1];
         integInfo.jobId = null;
