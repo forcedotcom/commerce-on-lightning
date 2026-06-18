@@ -5,12 +5,15 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
     // and add the host in Setup | Security | Remote site settings.
     private static String httpHost = 'https://example.com';
     private static Boolean useHTTPService = false;
+    private String className = String.valueOf(this).split(':')[0];
+    ApexClass apexClass = [SELECT ApiVersion FROM ApexClass WHERE Name = :className];
     global sfdc_checkout.IntegrationStatus startCartProcessAsync(sfdc_checkout.IntegrationInfo jobInfo, Id cartId) {
         sfdc_checkout.IntegrationStatus integStatus = new sfdc_checkout.IntegrationStatus();
         try {
+            String siteLanguage = jobInfo.siteLanguage;
             // We need to get the ID of the cart delivery group in order to create the order delivery groups.
             Id cartDeliveryGroupId = [SELECT Id FROM CartDeliveryGroup WHERE CartId = :cartId WITH SECURITY_ENFORCED][0].Id;
-            
+
             // Used to increase the cost by a multiple of the number of items in the cart (useful for testing but should not be done in the final code)
             Integer numberOfUniqueItems = [SELECT count() from cartItem WHERE CartId = :cartId WITH SECURITY_ENFORCED];
 
@@ -23,25 +26,40 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
             if(useHTTPService) {
                 shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromExternalService(numberOfUniqueItems);
             } else {
-                shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromMockedService(numberOfUniqueItems);
+                shippingOptionsAndRatesFromExternalService = getShippingOptionsAndRatesFromMockedService(siteLanguage, numberOfUniqueItems);
             }
-
-            // On re-entry of the checkout flow delete all previous CartDeliveryGroupMethods for the given cartDeliveryGroupId
-            delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :cartDeliveryGroupId WITH SECURITY_ENFORCED];
 
             // Create orderDeliveryMethods given your shipping options or fetch existing ones. 2 should be returned.
             List<Id> orderDeliveryMethodIds = getOrderDeliveryMethods(shippingOptionsAndRatesFromExternalService);
 
+            // We need to get the ID of the cart delivery group in order to create the cart delivery group methods.
+            List<CartDeliveryGroup> cartDeliveryGroups = new List<CartDeliveryGroup>([SELECT Id FROM CartDeliveryGroup WHERE CartId = :cartId WITH SECURITY_ENFORCED]);
+
             // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
             Integer i = 0;
-            for (Id orderDeliveryMethodId: orderDeliveryMethodIds) {
-               populateCartDeliveryGroupMethodWithShippingOptions(shippingOptionsAndRatesFromExternalService[i],
+            for(CartDeliveryGroup curCartDeliveryGroup : cartDeliveryGroups){
+                // get selected Delivery method id for cart delivery groupId
+                ID previousSelectDeliveryMethodId = [SELECT SelectedDeliveryMethodId FROM CartDeliveryGroup WHERE Id = :curCartDeliveryGroup.Id WITH SECURITY_ENFORCED][0].SelectedDeliveryMethodId;
+
+                 if(previousSelectDeliveryMethodId != null) {
+                     // delete all the cart delivery group method id except selected one
+                     delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id and Id!= :previousSelectDeliveryMethodId WITH SECURITY_ENFORCED];
+                 } else {
+                     // if there is no selected Delivery method then we can delete all the existing delivery methods associated with cart delivery group id
+                     delete [SELECT Id FROM CartDeliveryGroupMethod WHERE CartDeliveryGroupId = :curCartDeliveryGroup.Id WITH SECURITY_ENFORCED];
+                 }
+                for (Id orderDeliveryMethodId: orderDeliveryMethodIds) {
+                    // we will populate cart delivery method only when shipping option does not match with previous selected delivery method
+                    if(!isShippingOptionMatchingWithSelectedDM(shippingOptionsAndRatesFromExternalService[i],previousSelectDeliveryMethodId)){
+                        populateCartDeliveryGroupMethodWithShippingOptions(shippingOptionsAndRatesFromExternalService[i],
                                                                   cartDeliveryGroupId,
                                                                   orderDeliveryMethodId,
                                                                   cartId);
-                i+=1;
+                    }
+                    i+=1;
+                }
             }
-            
+
             // If everything works well, the charge is added to the cart and our integration has been successfully completed.
             integStatus.status = sfdc_checkout.IntegrationStatus.Status.SUCCESS;
 
@@ -75,36 +93,104 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
         }
         return integStatus;
     }
+    /**
+        This method compares previous Selected Delivery method with current shipping options and if both matches returns ture
+    */
+    private boolean isShippingOptionMatchingWithSelectedDM(ShippingOptionsAndRatesFromExternalService shippingOption, String previousSelectDeliveryMethodId) {
+        if(previousSelectDeliveryMethodId != null && !previousSelectDeliveryMethodId.equals('')) {
+            // get delivery group method for seletctedDMId
+            CartDeliveryGroupMethod previousSelectDeliveryMethod = [SELECT Name, ShippingFee, WebCartId, Carrier, ClassOfService, ExternalProvider, ProductId, ReferenceNumber, IsActive, TransitTimeMin, TransitTimeMax, TransitTimeUnit, ProcessTime, ProcessTimeUnit FROM CartDeliveryGroupMethod WHERE Id= :previousSelectDeliveryMethodId];
+            // return if all fields of shipping option matches with selectedDM else return false
+            return (previousSelectDeliveryMethod.Name.equals(shippingOption.getName()) && // compare name
+            previousSelectDeliveryMethod.IsActive.equals(shippingOption.isActive()) && // both should be active status
 
+            previousSelectDeliveryMethod.ShippingFee.equals(shippingOption.getRate()) &&  // compare shipping fee
+
+            isNullOrEquals(previousSelectDeliveryMethod.ProcessTime, shippingOption.getProcessTime()) &&  // compare processing time
+            isNullOrEquals(previousSelectDeliveryMethod.ProcessTimeUnit, shippingOption.getProcessTimeUnit()) && // compare time processing unit
+
+            // ideally reference number should match but in this sample we are generating random string so won't match
+            //previousSelectDeliveryMethod.ReferenceNumber.equals(shippingOption.getReferenceNumber()) &&
+            previousSelectDeliveryMethod.Carrier.equals(shippingOption.getCarrier()) && //compare carrier method
+            previousSelectDeliveryMethod.ClassOfService.equals(shippingOption.getClassOfService()) &&  // comapre class of service
+            previousSelectDeliveryMethod.ExternalProvider.equals(shippingOption.getProvider()) && // compare external provider
+
+            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeMax, shippingOption.getTransitTimeMax()) &&  // compare transit time max
+            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeMin, shippingOption.getTransitTimeMin()) && // compare transit time min
+            isNullOrEquals(previousSelectDeliveryMethod.TransitTimeUnit, shippingOption.getTransitTimeUnit())); // compare transit time unit
+        }
+        // if previousSelectDeliveryMethod is null then we can return null so DM can be created
+        return false;
+    }
+
+    /**
+        This method compares two objects, if both are null or equals returns true
+    */
+    private boolean isNullOrEquals(Object o1, Object o2) {
+        return (o1 == null && o2 == null) || (o1 != null && o1.equals(o2));
+    }
     /**
         This method provides an alternative to retrieve Shipping Options if http call needs to be bypassed.
         This method uses a hardcoded sample response and MUST not be used in production systems.
      */
-    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (Integer numberOfUniqueItems) {
-        ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
-        String responseBody = getShippingOptionsResponse();
-        List<Object> results = (List<Object>) JSON.deserializeUntyped(responseBody);
-        for (Object result: results) {
-            Map<String, Object> subresult = (Map<String, Object>) result;
-            Map<String, Object> providerAndRate = (Map<String, Object>) subresult.get('rate');
-            shippingOptions.add( new ShippingOptionsAndRatesFromExternalService(
-                (String) providerAndRate.get('name'),
-                (String) providerAndRate.get('serviceCode'),
-                (Decimal) providerAndRate.get('shipmentCost') * numberOfUniqueItems,
-                (Decimal) providerAndRate.get('otherCost'),
-                (String) providerAndRate.get('serviceName')
-            ));
+    private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromMockedService (String siteLanguage, Integer numberOfUniqueItems) {
+            ShippingOptionsAndRatesFromExternalService[] shippingOptions = new List<ShippingOptionsAndRatesFromExternalService>();
+            String responseBody = getShippingOptionsResponse(siteLanguage);
+            List<Object> results = (List<Object>) JSON.deserializeUntyped(responseBody);
+            for (Object result: results) {
+                Map<String, Object> subresult = (Map<String, Object>) result;
+                Map<String, Object> providerAndRate = (Map<String, Object>) subresult.get('rate');
+                shippingOptions.add(new ShippingOptionsAndRatesFromExternalService(
+                    (String) providerAndRate.get('name'),
+                    (String) providerAndRate.get('serviceCode'),
+                    (Decimal) providerAndRate.get('shipmentCost') * numberOfUniqueItems, // Multiply so shipping costs can change; remove when using a real shipping provider
+                    (Decimal) providerAndRate.get('otherCost'),
+                    (String) providerAndRate.get('serviceName'),
+                    (String) providerAndRate.get('serviceName'),
+                    (String) providerAndRate.get('serviceCode'),
+                    generateRandomString(10),
+                    true,
+                    (Integer) providerAndRate.get('transitTimeMin'),
+                    (Integer) providerAndRate.get('transitTimeMax'),
+                    (String) providerAndRate.get('transitTimeUnit'),
+                    (Integer) providerAndRate.get('processTime'),
+                    (String) providerAndRate.get('processTimeUnit')
+                ));
+            }
+            return shippingOptions;
         }
-        return shippingOptions;
-    }
+     private static String generateRandomString(Integer len) {
+            final String chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz';
+            String randStr = '';
+            while (randStr.length() < len) {
+            Integer idx = Math.mod(Math.abs(Crypto.getRandomInteger()), chars.length());
+            randStr += chars.substring(idx, idx+1);
+            }
+            return randStr;
+        }
+    private String getShippingOptionsResponse(String siteLanguage) {
+            String name1, name2, serviceName1, serviceName2;
+            Integer transitTimeMin, transitTimeMax, processTime;
+            String transitTimeUnit, processTimeUnit;
+            if(siteLanguage == 'de') {
+                name1 = 'Liefermethode 1';
+                name2 = 'Liefermethode 2';
+                serviceName1 = 'Testträger 1';
+                serviceName2 = 'Testträger 2';
+            } else if(siteLanguage == 'ja') {
+                name1 = '配送方法1';
+                name2 = '配送方法2';
+                serviceName1 = 'テストキャリア1';
+                serviceName2 = 'テストキャリア2';
+            } else {
+                name1 = 'Delivery Method 1';
+                name2 = 'Delivery Method 2';
+                serviceName1 = 'Test Carrier 1';
+                serviceName2 = 'Test Carrier 2';
+            }
 
-    private String getShippingOptionsResponse() {
-        String name1 = 'Delivery Method 1';
-        String name2 = 'Delivery Method 2';
-        String serviceName1 = 'Test Carrier 1';
-        String serviceName2 = 'Test Carrier 2';
-        return '[{"status":"calculated","rate":{"name":"'+name1+'","serviceName":"'+serviceName1+'","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99}},{"status":"calculated","rate":{"name":"'+name2+'","serviceName":"'+serviceName2+'","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99}}]';
-    }
+            return '[{"status":"calculated","rate":{"name":"'+name1+'","serviceName":"'+serviceName1+'","serviceCode":"SNC9600","shipmentCost":11.99,"otherCost":5.99,"transitTimeMin":1,"transitTimeMax":2,"transitTimeUnit":"Days","processTime":1,"processTimeUnit":"Days"}},{"status":"calculated","rate":{"name":"'+name2+'","serviceName":"'+serviceName2+'","serviceCode":"SNC9600","shipmentCost":15.99,"otherCost":6.99,"transitTimeMin":2,"transitTimeMax":3,"transitTimeUnit":"Days","processTime":1,"processTimeUnit":"Days"}}]';
+        }
 
     private ShippingOptionsAndRatesFromExternalService[] getShippingOptionsAndRatesFromExternalService (Integer numberOfUniqueItems) {
         final Integer successfulHttpRequest = 200;
@@ -129,9 +215,18 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
                 shippingOptions.add( new ShippingOptionsAndRatesFromExternalService(
                     (String) providerAndRate.get('name'),
                     (String) providerAndRate.get('serviceCode'),
-                    (Decimal) providerAndRate.get('shipmentCost') * numberOfUniqueItems, // Multiply so shipping costs can change; remove when using a real shipping provider
+                    (Decimal) providerAndRate.get('shipmentCost'),
                     (Decimal) providerAndRate.get('otherCost'),
-                    (String) providerAndRate.get('serviceName')
+                    (String) providerAndRate.get('serviceName'),
+                    (String) providerAndRate.get('serviceName'),
+                    (String) providerAndRate.get('serviceCode'),
+                    generateRandomString(10),
+                    true,
+                    (Integer) providerAndRate.get('transitTimeMin'),
+                    (Integer) providerAndRate.get('transitTimeMax'),
+                    (String) providerAndRate.get('transitTimeUnit'),
+                    (Integer) providerAndRate.get('processTime'),
+                    (String) providerAndRate.get('processTimeUnit')
                 ));
             }
             return shippingOptions;
@@ -144,61 +239,128 @@ global with sharing class B2BDeliverySample implements sfdc_checkout.CartShippin
 
     // Structure to store the shipping options retrieved from external service.
     Class ShippingOptionsAndRatesFromExternalService {
-        private String name;
-        private String provider;
-        private Decimal rate;
-        private Decimal otherCost;
-        private String serviceName;
+            private String name;
+            private String provider;
+            private Decimal rate;
+            private Decimal otherCost;
+            private String serviceName;
+            private String carrier;
+            private String classOfService;
+            private String referenceNumber;
+            private Boolean isActive;
+            private Integer transitTimeMin;
+            private Integer transitTimeMax;
+            private String transitTimeUnit;
+            private Integer processTime;
+            private String processTimeUnit;
 
-        public ShippingOptionsAndRatesFromExternalService(String someName, String someProvider, Decimal someRate, Decimal someOtherCost, String someServiceName) {
-            name = someName;
-            provider = someProvider;
-            rate = someRate;
-            otherCost = someOtherCost;
-            serviceName = someServiceName;
-        }
+            public ShippingOptionsAndRatesFromExternalService() {
+                name = '';
+                provider = '';
+                rate = 0.0;
+                serviceName = '';
+                otherCost = 0.0;
+                carrier = '';
+                classOfService = '';
+                referenceNumber = '';
+                isActive = true;
+                transitTimeMin = 0;
+                transitTimeMax = 0;
+                transitTimeUnit = '';
+                processTime = 0;
+                processTimeUnit = '';
+            }
 
-        public String getProvider() {
-            return provider;
-        }
+            public ShippingOptionsAndRatesFromExternalService(String someName, String someProvider, Decimal someRate, Decimal someOtherCost, String someServiceName,
+                    String someCarrier, String someClassOfService, String someReferenceNumber, Boolean someIsActive, Integer someTransitTimeMin, Integer someTransitTimeMax,
+                    String someTransitTimeUnit, Integer someProcessTime, String someProcessTimeUnit) {
+                name = someName;
+                provider = someProvider;
+                rate = someRate;
+                otherCost = someOtherCost;
+                serviceName = someServiceName;
+                carrier = someCarrier;
+                classOfService = someClassOfService;
+                referenceNumber = someReferenceNumber;
+                isActive = someIsActive;
+                transitTimeMin = someTransitTimeMin;
+                transitTimeMax = someTransitTimeMax;
+                transitTimeUnit = someTransitTimeUnit;
+                processTime = someProcessTime;
+                processTimeUnit = someProcessTimeUnit;
+            }
 
-        public Decimal getRate() {
-            return rate;
+            public String getProvider() { return provider; }
+            public Decimal getRate() { return rate; }
+            public Decimal getOtherCost() { return otherCost; }
+            public String getServiceName() { return serviceName; }
+            public String getName() { return name; }
+            public String getCarrier() { return carrier; }
+            public String getClassOfService() { return classOfService; }
+            public String getReferenceNumber() { return referenceNumber; }
+            public Boolean isActive() { return isActive; }
+            public Integer getTransitTimeMin() { return transitTimeMin; }
+            public Integer getTransitTimeMax() { return transitTimeMax; }
+            public String getTransitTimeUnit() { return transitTimeUnit; }
+            public Integer getProcessTime() { return processTime; }
+            public String getProcessTimeUnit() { return processTimeUnit; }
         }
-
-        public Decimal getOtherCost() {
-            return otherCost;
-        }
-
-        public String getServiceName() {
-            return serviceName;
-        }
-
-        public String getName() {
-            return name;
-        }
-    }
 
     // Create a CartDeliveryGroupMethod record for every shipping option returned from the external service
     private void populateCartDeliveryGroupMethodWithShippingOptions(ShippingOptionsAndRatesFromExternalService shippingOption,
                                                                   Id cartDeliveryGroupId,
                                                                   Id deliveryMethodId,
                                                                   Id webCartId){
-        // When inserting a new CartDeliveryGroupMethod, the following fields have to be populated:
-        // CartDeliveryGroupId: Id of the delivery group of this shipping option
-        // DeliveryMethodId: Id of the delivery method for this shipping option
-        // ExternalProvider: Unique identifier of shipping provider
-        // Name: Name of the CartDeliveryGroupMethod record
-        // ShippingFee: The cost of shipping for the delivery group
-        // WebCartId: Id if the cart that the delivery group belongs to
-        CartDeliveryGroupMethod cartDeliveryGroupMethod = new CartDeliveryGroupMethod(
-            CartDeliveryGroupId = cartDeliveryGroupId,
-            DeliveryMethodId = deliveryMethodId,
-            ExternalProvider = shippingOption.getProvider(),
-            Name = shippingOption.getName(),
-            ShippingFee = shippingOption.getRate(),
-            WebCartId = webCartId
-        );
+            // When inserting a new CartDeliveryGroupMethod, the following fields have to be populated:
+            // CartDeliveryGroupId: Id of the delivery group of this shipping option
+            // ExternalProvider: Unique identifier of shipping provider
+            // Name: Name of the CartDeliveryGroupMethod record
+            // ShippingFee: The cost of shipping for the delivery group
+            // WebCartId: Id if the cart that the delivery group belongs to
+            // Carrier: Shipping Carrier e.g. UPS, FedEx etc.
+            // ClassOfService: Service e.g. 2 Day Ground, Overnight etc.
+            // Product: Product Id for this Shipping Charge
+            // ReferenceNumber: Reference Number from External Service
+            // IsActive: If this Option is Active
+
+            // Below fields are available only for api version >= 61
+
+            // TransitTimeMin: Minimum Transit Time
+            // TransitTimeMax: Maximum Transit Time
+            // TransitTimeUnit: Time Unit for Transit Time (Valid Values are "Hours", "Days", "Weeks")
+            // ProcessTime: Process Time
+            // ProcessTimeUnit: Time Unit for Process Time (Valid Values are "Hours", "Days", "Weeks")
+
+            Id productId = getDefaultShippingChargeProduct2Id();
+
+            CartDeliveryGroupMethod cartDeliveryGroupMethod = new CartDeliveryGroupMethod();
+            cartDeliveryGroupMethod.put('CartDeliveryGroupId', cartDeliveryGroupId);
+            cartDeliveryGroupMethod.put('DeliveryMethodId', deliveryMethodId);
+            cartDeliveryGroupMethod.put('ExternalProvider', shippingOption.getProvider());
+            cartDeliveryGroupMethod.put('Name', shippingOption.getName());
+            cartDeliveryGroupMethod.put('ShippingFee', shippingOption.getRate());
+            cartDeliveryGroupMethod.put('WebCartId', webCartId);
+            cartDeliveryGroupMethod.put('Carrier', shippingOption.getCarrier());
+            cartDeliveryGroupMethod.put('ClassOfService', shippingOption.getClassOfService());
+            //cartDeliveryGroupMethod.put('ProductId', productId);
+            cartDeliveryGroupMethod.put('ReferenceNumber', shippingOption.getReferenceNumber());
+            cartDeliveryGroupMethod.put('IsActive', shippingOption.isActive());
+
+            if(apexClass.ApiVersion >= 61) {
+                cartDeliveryGroupMethod.put('TransitTimeMin', shippingOption.getTransitTimeMin());
+                cartDeliveryGroupMethod.put('TransitTimeMax', shippingOption.getTransitTimeMax());
+                cartDeliveryGroupMethod.put('TransitTimeUnit', shippingOption.getTransitTimeUnit());
+                cartDeliveryGroupMethod.put('ProcessTime', shippingOption.getProcessTime());
+                cartDeliveryGroupMethod.put('ProcessTimeUnit', shippingOption.getProcessTimeUnit());
+            }
+
+            Boolean multiCurrencyEnabled = UserInfo.isMultiCurrencyOrganization();
+            if(multiCurrencyEnabled) {
+                String cartDeliveryGroupQuery = 'SELECT CurrencyIsoCode FROM CartDeliveryGroup WHERE Id = :cartDeliveryGroupId LIMIT 1';
+                CartDeliveryGroup cartDeliveryGroup = (CartDeliveryGroup) Database.query(cartDeliveryGroupQuery);
+                String cartDeliveryGroupMethodCurrency = (String) cartDeliveryGroup.get('CurrencyIsoCode');
+                cartDeliveryGroupMethod.put('CurrencyIsoCode', cartDeliveryGroupMethodCurrency);
+            }
         insert(cartDeliveryGroupMethod);
     }
 
